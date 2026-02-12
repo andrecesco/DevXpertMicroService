@@ -2,7 +2,6 @@
 using EduOnline.Conteudos.Domain;
 using EduOnline.IntegrationTest;
 using EduOnline.WebApps.ApiRest.Models;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Shouldly;
 using System.Net.Http.Json;
 
@@ -21,7 +20,7 @@ public class ConteudoIntegrationTest(AlunoIntegrationTestFixture fixture) : ICla
         var cursoRequest = AlunoIntegrationTestFixture.ObterCursoRequest();
 
         var response = await fixture.Client.PostAsJsonAsync($"{AlunoIntegrationTestFixture.Uri}", cursoRequest);
-        
+
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();

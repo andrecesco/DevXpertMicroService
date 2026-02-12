@@ -27,7 +27,7 @@ public class PagamentoService(IPagamentoCartaoCreditoFacade pagamentoCartaoCredi
 
         var transacao = pagamentoCartaoCreditoFacade.RealizarPagamento(curso, pagamento);
 
-        if(transacao.StatusTransacaoId == StatusTransacao.Aprovado.Id)
+        if (transacao.StatusTransacaoId == StatusTransacao.Aprovado.Id)
         {
             pagamentoRepository.Adicionar(pagamento);
             pagamentoRepository.AdicionarTransacao(transacao);

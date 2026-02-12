@@ -1,5 +1,4 @@
 ﻿using EduOnline.Alunos.Application.Events;
-using EduOnline.Alunos.Data.Context;
 using EduOnline.Alunos.Domain.Enumeradores;
 using EduOnline.Alunos.Domain.Interfaces;
 using EduOnline.Alunos.Domain.Models;
@@ -91,7 +90,7 @@ public class AlunoCommandHandler(IAlunoRepository repository, IMediatorHandler m
             return false;
         }
 
-        if(matricula.PagamentoStatusId != PagamentoStatus.Pago.Id)
+        if (matricula.PagamentoStatusId != PagamentoStatus.Pago.Id)
         {
             await mediatorHandler.PublicarNotificacao(new DomainNotification("CursoNaoPago", "O pagamento do curso ainda não foi confirmado"));
             return false;
@@ -144,7 +143,7 @@ public class AlunoCommandHandler(IAlunoRepository repository, IMediatorHandler m
     {
         var matricula = await repository.ObterMatriculaPorId(request.AggregateId);
 
-        if(matricula is null)
+        if (matricula is null)
         {
             await mediatorHandler.PublicarNotificacao(new DomainNotification("MatriculaNaoEncontrada", "Não foi encontrada a Matrícula para atualizar o pagamento"));
             return false;

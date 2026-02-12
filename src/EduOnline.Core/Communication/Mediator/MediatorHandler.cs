@@ -1,5 +1,4 @@
 ﻿using EduOnline.Core.Data.EventSourcing;
-using EduOnline.Core.DomainObjects;
 using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.DomainEvents;
 using EduOnline.Core.Mensagens.Notifications;

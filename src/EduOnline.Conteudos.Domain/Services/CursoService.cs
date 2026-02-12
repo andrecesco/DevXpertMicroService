@@ -41,7 +41,7 @@ public class CursoService(INotificador notificador, ICursoRepository repository)
     {
         var curso = await repository.ObterPorIdAsync(id);
 
-        if(curso is null)
+        if (curso is null)
         {
             Notificar("Curso não encontrado.");
             return;

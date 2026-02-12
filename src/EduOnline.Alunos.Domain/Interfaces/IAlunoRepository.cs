@@ -1,5 +1,4 @@
 ﻿using EduOnline.Alunos.Domain.Models;
-using EduOnline.Alunos.Domain.ValueObjects;
 using EduOnline.Core.Data;
 using System.Linq.Expressions;
 

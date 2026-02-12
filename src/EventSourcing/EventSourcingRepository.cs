@@ -31,7 +31,7 @@ public class EventSourcingRepository(IEventStoreService eventStoreService) : IEv
             var dataEncoded = Encoding.UTF8.GetString(resolvedEvent.OriginalEvent.Data.ToArray());
             var jsonData = JsonSerializer.Deserialize<BaseEvent>(dataEncoded);
 
-            if(jsonData == null)
+            if (jsonData == null)
                 continue;
 
             var evento = new StoredEvent(

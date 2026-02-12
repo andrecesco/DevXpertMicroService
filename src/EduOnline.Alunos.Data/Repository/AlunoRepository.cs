@@ -1,7 +1,6 @@
 ﻿using EduOnline.Alunos.Data.Context;
 using EduOnline.Alunos.Domain.Interfaces;
 using EduOnline.Alunos.Domain.Models;
-using EduOnline.Alunos.Domain.ValueObjects;
 using EduOnline.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

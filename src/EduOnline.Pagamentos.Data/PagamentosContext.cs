@@ -39,7 +39,7 @@ public class PagamentosContext(DbContextOptions<PagamentosContext> options, IMed
 
         var sucesso = await base.SaveChangesAsync() > 0;
 
-        if(sucesso)
+        if (sucesso)
             await mediatorHandler.PublicarEventos(this);
 
         return sucesso;

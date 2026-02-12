@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using EduOnline.Alunos.Application.Queries.Dtos;
 using EduOnline.Alunos.Domain.Enumeradores;
-using EduOnline.Alunos.Domain.Models;
 using EduOnline.IntegrationTest;
 using EduOnline.WebApps.ApiRest.Models;
 using Shouldly;
@@ -136,7 +135,7 @@ public class AlunoIntegrationTest(AlunoIntegrationTestFixture fixture) : IClassF
         foreach (var aula in fixture.Aulas)
         {
             var response = await fixture.Client.PatchAsync($"{AlunoIntegrationTestFixture.Uri}/{fixture.UsuarioId}/matriculas/{fixture.MatriculaId}/progresso/{aula.Id}", null);
-            
+
             var json = await response.Content.ReadAsStringAsync();
 
             response.EnsureSuccessStatusCode();

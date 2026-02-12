@@ -1,7 +1,5 @@
 ﻿using EduOnline.Alunos.Application.Commands;
 using EduOnline.Alunos.Application.Queries;
-using EduOnline.Alunos.Application.Queries.Dtos;
-using EduOnline.Alunos.Domain.Models;
 using EduOnline.Conteudos.Domain;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
@@ -88,7 +86,7 @@ public class AlunoController : MainController
 
         var certificado = await _alunoQuery.ObterCertificadoPorMatriculaId(matriculaId);
 
-        if(certificado is null)
+        if (certificado is null)
         {
             NotificarErro("Certificado não encontrado");
             return CustomResponse();
@@ -119,7 +117,7 @@ public class AlunoController : MainController
     }
 
     [HttpPost("{id}/matriculas")]
-    public async Task<IActionResult> MatricularAluno(Guid id, [FromBody]AdicionarMatriculaRequest request)
+    public async Task<IActionResult> MatricularAluno(Guid id, [FromBody] AdicionarMatriculaRequest request)
     {
         if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
             return Forbid();
@@ -152,7 +150,7 @@ public class AlunoController : MainController
 
         var aula = await _cursoRepository.ObterAulaPorIdAsync(aulaId);
 
-        if(aula is null)
+        if (aula is null)
         {
             NotificarErro("Aula não encontrada");
             return CustomResponse();

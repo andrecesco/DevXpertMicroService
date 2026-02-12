@@ -1,7 +1,5 @@
 ﻿using Bogus;
 using EduOnline.Alunos.Application.Queries.Dtos;
-using EduOnline.Alunos.Domain.Enumeradores;
-using EduOnline.Alunos.Domain.Models;
 using EduOnline.Conteudos.Domain;
 using EduOnline.IntegrationTest;
 using EduOnline.WebApps.ApiRest.Models;
@@ -24,7 +22,7 @@ public class AlunoIntegrationTestFixture : WebApiIntegrationTestFixture<Program>
     public AtualizarAlunoRequest? AlterarAlunoRequest { get; private set; }
     public UsuarioRegistroModel? RegistroUsuarioRequest { get; private set; }
 
-    public AlunoIntegrationTestFixture() 
+    public AlunoIntegrationTestFixture()
     {
     }
 

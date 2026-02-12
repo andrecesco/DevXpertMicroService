@@ -1,8 +1,6 @@
-using System;
-using Moq;
 using EduOnline.Pagamentos.AntiCorruption;
 using EduOnline.Pagamentos.Domain;
-using Xunit;
+using Moq;
 
 namespace EduOnline.Pagamentos.UnitTest
 {

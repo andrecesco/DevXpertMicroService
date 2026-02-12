@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>Fact Method</Title>
+      <Shortcut>factaaa</Shortcut>
+      <Description>Cria um método de teste do Xunit com padrão AAA</Description>
+      <Author>Eduardo Pires</Author>
+    </Header>
+    <Snippet>
+      <Imports>
+        <Import>
+          <Namespace>Xunit</Namespace>
+        </Import>
+      </Imports>
+      <Code Language="csharp"><![CDATA[[Fact(DisplayName = "Mudar")]
+      [Trait("Categoria","Mudar")]
+      public void Trocar_Nome_Metodo()
+      {
+          // Arrange
+
+          // Act
+
+          // Assert
+          $end$
+      }]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -2,7 +2,7 @@
 
 namespace EduOnline.Core.ControleDeAcesso;
 
-public interface IUser
+public interface IAspNetUser
 {
     string Name { get; }
     Guid GetUserId();

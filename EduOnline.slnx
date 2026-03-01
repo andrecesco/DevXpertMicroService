@@ -39,6 +39,6 @@
     <Project Path="test/EduOnline.Pagamentos.UnitTest/EduOnline.Pagamentos.UnitTest.csproj" Id="7161a36f-1c2b-4c45-a753-04e780b7b0fe" />
   </Folder>
   <Folder Name="/WebApps/">
-    <Project Path="src/EduOnline.WebApps.ApiRest/EduOnline.WebApps.ApiRest.csproj" Id="efa6d407-a541-418c-a8b2-b9cc4b4e76f4" />
+    <Project Path="src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" Id="efa6d407-a541-418c-a8b2-b9cc4b4e76f4" />
   </Folder>
 </Solution>

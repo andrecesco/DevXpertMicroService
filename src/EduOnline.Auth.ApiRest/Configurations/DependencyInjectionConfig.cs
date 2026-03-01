@@ -21,7 +21,7 @@ public static class DependencyInjectionConfig
     {
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ApplicationDbContext>();
-        builder.Services.AddScoped<IUser, AspNetUser>();
+        builder.Services.AddScoped<IAspNetUser, AspNetUser>();
     }
 
     private static void AddNotificators(WebApplicationBuilder builder)

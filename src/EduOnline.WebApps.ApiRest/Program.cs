@@ -1,19 +1,11 @@
-using EduOnline.Alunos.Application.Automapper;
 using EduOnline.WebApps.ApiRest.Configurations;
-using EduOnline.WebApps.ApiRest.Extensions;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.AddDatabaseSelector()
-    .AddApiConfig()
-    .RegisterServices()
-    .AddIdentityConfig()
-    .AddJwtConfig()
+builder.RegisterServices()
     .AddSwaggerConfig();
-
-builder.Services.AddAutoMapperApplication();
 
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
@@ -35,8 +27,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseDbMigrationHelper();
 
 app.Run();
 

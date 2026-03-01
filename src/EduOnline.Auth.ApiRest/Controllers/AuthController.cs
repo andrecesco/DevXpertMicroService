@@ -18,7 +18,7 @@ public class AuthController(INotificador notificador,
                       SignInManager<IdentityUser> signInManager,
                       UserManager<IdentityUser> userManager,
                       IOptions<JwtSettings> jwtSettings,
-                      IUser user, ILogger<AuthController> logger) : MainController(notificador, user)
+                      IAspNetUser user, ILogger<AuthController> logger) : MainController(notificador, user)
 {
     private readonly SignInManager<IdentityUser> _signInManager = signInManager;
     private readonly UserManager<IdentityUser> _userManager = userManager;

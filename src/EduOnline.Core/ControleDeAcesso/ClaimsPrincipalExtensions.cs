@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace EduOnline.WebApps.ApiRest.Extensions;
+namespace EduOnline.Core.ControleDeAcesso;
 
 public static class ClaimsPrincipalExtensions
 {
@@ -12,7 +12,7 @@ public static class ClaimsPrincipalExtensions
         }
 
         var claim = principal.FindFirst(ClaimTypes.NameIdentifier);
-        return claim?.Value;
+        return claim?.Value ?? string.Empty;
     }
 
     public static string GetUserEmail(this ClaimsPrincipal principal)
@@ -23,6 +23,6 @@ public static class ClaimsPrincipalExtensions
         }
 
         var claim = principal.FindFirst(ClaimTypes.Email);
-        return claim?.Value;
+        return claim?.Value ?? string.Empty;
     }
 }

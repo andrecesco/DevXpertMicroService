@@ -1,10 +1,10 @@
 ﻿using EduOnline.Core.ControleDeAcesso;
-using EduOnline.WebApps.ApiRest.Extensions;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
-namespace EduOnline.Auth.ApiRest.Extensions;
+namespace EduOnline.Core.ControleDeAcesso;
 
-public class AspNetUser(IHttpContextAccessor accessor) : IUser
+public class AspNetUser(IHttpContextAccessor accessor) : IAspNetUser
 {
     private readonly IHttpContextAccessor _accessor = accessor;
 

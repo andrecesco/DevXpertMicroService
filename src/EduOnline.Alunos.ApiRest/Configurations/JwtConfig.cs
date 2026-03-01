@@ -1,22 +1,20 @@
-﻿using EduOnline.WebApps.ApiRest.Extensions;
+using EduOnline.Alunos.ApiRest.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace EduOnline.WebApps.ApiRest.Configurations;
+namespace EduOnline.Alunos.ApiRest.Configurations;
 
 public static class JwtConfig
 {
     public static WebApplicationBuilder AddJwtConfig(this WebApplicationBuilder builder)
     {
-        //Pegar token e gerar chave
-
         var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
         builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 
-        var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+        var jwtSettings = jwtSettingsSection.Get<JwtSettings>() ?? throw new Exception("JwtSettings não configurado");
 
-        var key = Encoding.ASCII.GetBytes(jwtSettings.Segredo);
+        var key = Encoding.ASCII.GetBytes(jwtSettings.Segredo!);
 
         builder.Services.AddAuthentication(options =>
         {

@@ -14,13 +14,13 @@ public abstract class MainController : ControllerBase
 {
     private readonly DomainNotificationHandler _domainNotifications;
     private readonly INotificador _notificador;
-    public readonly IUser AppUser;
+    public readonly IAspNetUser AppUser;
 
     protected Guid UsuarioId { get; set; }
     protected bool UsuarioAutenticado { get; set; }
 
     protected MainController(INotificador notificador,
-                             IUser appUser)
+                             IAspNetUser appUser)
     {
         _notificador = notificador;
         AppUser = appUser;
@@ -33,7 +33,7 @@ public abstract class MainController : ControllerBase
     }
 
     protected MainController(INotificationHandler<DomainNotification> notifications,
-                                 IUser appUser)
+                                 IAspNetUser appUser)
     {
         _domainNotifications = (DomainNotificationHandler)notifications;
         AppUser = appUser;
@@ -50,24 +50,16 @@ public abstract class MainController : ControllerBase
         return !_notificador?.TemNotificacao() ?? false || !_domainNotifications.TemNotificacao();
     }
 
-    protected ActionResult CustomResponse(object result = null)
+    protected ActionResult CustomResponse(object? result = null)
     {
         if (OperacaoValida())
         {
-            var okResult = new ResponseResult
-            {
-                Success = true,
-                Data = result
-            };
+            var okResult = new ResponseResult(result, []);
 
             return Ok(okResult);
         }
 
-        var errorResponse = new ResponseResult
-        {
-            Success = false,
-            Errors = _notificador?.ObterNotificacoes().Select(n => new DomainNotification(string.Empty, n.Mensagem)) ?? _domainNotifications.ObterNotificacoes()
-        };
+        var errorResponse = new ResponseResult(null, _notificador?.ObterNotificacoes().Select(n => new DomainNotification(string.Empty, n.Mensagem)) ?? _domainNotifications.ObterNotificacoes());
 
         return BadRequest(errorResponse);
     }
@@ -84,6 +76,7 @@ public abstract class MainController : ControllerBase
 
         return CustomResponse();
     }
+
     protected ActionResult CustomResponse(ModelStateDictionary modelState)
     {
         if (!modelState.IsValid) NotificarErroModelInvalida(modelState);
@@ -109,9 +102,9 @@ public abstract class MainController : ControllerBase
 }
 
 
-public class ResponseResult
+public class ResponseResult(object? data, IEnumerable<DomainNotification> errors)
 {
-    public bool Success { get; set; }
-    public object Data { get; set; }
-    public IEnumerable<DomainNotification> Errors { get; set; }
+    public bool Success { get; set; } = errors?.Count() == 0;
+    public object? Data { get; set; } = data;
+    public IEnumerable<DomainNotification>? Errors { get; set; } = errors;
 }

@@ -19,13 +19,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\EduOnline.Alunos.Application\EduOnline.Alunos.Application.csproj" />
-		<ProjectReference Include="..\EduOnline.Conteudos.Data\EduOnline.Conteudos.Data.csproj" />
 		<ProjectReference Include="..\EduOnline.Core.Api\EduOnline.Core.Api.csproj" />
-		<ProjectReference Include="..\EduOnline.Core\EduOnline.Core.csproj" />
-		<ProjectReference Include="..\EduOnline.Pagamentos.AntiCorruption\EduOnline.Pagamentos.AntiCorruption.csproj" />
-		<ProjectReference Include="..\EduOnline.Pagamentos.Data\EduOnline.Pagamentos.Data.csproj" />
-		<ProjectReference Include="..\EventSourcing\EventSourcing.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Data\" />
+	  <Folder Include="Extensions\" />
+	  <Folder Include="Responses\" />
 	</ItemGroup>
 
 </Project>

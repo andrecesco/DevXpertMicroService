@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
-namespace EduOnline.WebApps.ApiRest.Extensions;
+namespace EduOnline.Alunos.ApiRest.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {

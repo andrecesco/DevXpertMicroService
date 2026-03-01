@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Alunos/">
+    <Project Path="src/EduOnline.Alunos.ApiRest/EduOnline.Alunos.ApiRest.csproj" Id="ee91cbd4-0d9d-4eb7-9c31-625898c2bbba" />
     <Project Path="src/EduOnline.Alunos.Application/EduOnline.Alunos.Application.csproj" Id="52be96b5-f232-49d2-989e-fcb5ec65e681" />
     <Project Path="src/EduOnline.Alunos.Data/EduOnline.Alunos.Data.csproj" Id="f7963a4f-9337-45ea-b7cc-2494726c0081" />
     <Project Path="src/EduOnline.Alunos.Domain/EduOnline.Alunos.Domain.csproj" Id="395e1f90-6303-442b-8595-5fb5fc1a165d" />
@@ -13,7 +14,11 @@
     <Project Path="test/EduOnline.Alunos.IntegrationTest/EduOnline.Alunos.IntegrationTest.csproj" Id="02dffc62-b1fa-4e81-b8da-19d6abe14df2" />
     <Project Path="test/EduOnline.Alunos.UnitTest/EduOnline.Alunos.UnitTest.csproj" Id="af47e2d6-d148-4d3e-9142-dd7f2f75ee99" />
   </Folder>
+  <Folder Name="/Services/Auth/">
+    <Project Path="src/EduOnline.Auth.ApiRest/EduOnline.Auth.ApiRest.csproj" Id="6a3cf0fe-b182-43e4-9ae5-920d0be6cf66" />
+  </Folder>
   <Folder Name="/Services/Conteudos/">
+    <Project Path="src/EduOnline.Conteudos.ApiRest/EduOnline.Conteudos.ApiRest.csproj" Id="ca954af9-a7b2-41e6-a933-86662427e32b" />
     <Project Path="src/EduOnline.Conteudos.Data/EduOnline.Conteudos.Data.csproj" Id="e3774cd8-e487-4a90-af7e-c2c5e6693f0f" />
     <Project Path="src/EduOnline.Conteudos.Domain/EduOnline.Conteudos.Domain.csproj" />
   </Folder>
@@ -22,6 +27,7 @@
     <Project Path="test/EduOnline.Conteudos.IntegrationTest/EduOnline.Conteudos.IntegrationTest.csproj" Id="b5430d66-1a65-4e00-9ee3-ee84b88e57fc" />
   </Folder>
   <Folder Name="/Services/Core/">
+    <Project Path="src/EduOnline.Core.Api/EduOnline.Core.Api.csproj" Id="33b7c318-7d7f-4d77-b5e6-ebd254abad9e" />
     <Project Path="src/EduOnline.Core/EduOnline.Core.csproj" />
   </Folder>
   <Folder Name="/Services/Pagamentos/">

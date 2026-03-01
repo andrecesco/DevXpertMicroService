@@ -1,6 +1,7 @@
 ﻿using EduOnline.Alunos.Application.Commands;
 using EduOnline.Alunos.Application.Queries;
 using EduOnline.Conteudos.Domain;
+using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens.Notifications;

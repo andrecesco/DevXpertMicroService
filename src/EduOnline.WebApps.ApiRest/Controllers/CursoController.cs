@@ -1,5 +1,6 @@
 ﻿using EduOnline.Conteudos.Domain;
 using EduOnline.Conteudos.Domain.Services;
+using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
 using EduOnline.WebApps.ApiRest.Models;

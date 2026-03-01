@@ -1,0 +1,6 @@
+@EduOnline.Auth.ApiRest_HostAddress = http://localhost:5063
+
+GET {{EduOnline.Auth.ApiRest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

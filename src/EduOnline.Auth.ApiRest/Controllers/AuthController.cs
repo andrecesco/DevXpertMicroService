@@ -1,9 +1,8 @@
-﻿using EduOnline.Alunos.Application.Commands;
-using EduOnline.Core.Communication.Mediator;
+﻿using EduOnline.Auth.ApiRest.Extensions;
+using EduOnline.Auth.ApiRest.Models;
+using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
-using EduOnline.WebApps.ApiRest.Extensions;
-using EduOnline.WebApps.ApiRest.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -12,10 +11,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace EduOnline.WebApps.ApiRest.Controllers;
+namespace EduOnline.Auth.ApiRest.Controllers;
 
 [Route("api/auth")]
-public class AuthController(IMediatorHandler mediatorHandler, INotificador notificador,
+public class AuthController(INotificador notificador,
                       SignInManager<IdentityUser> signInManager,
                       UserManager<IdentityUser> userManager,
                       IOptions<JwtSettings> jwtSettings,
@@ -39,21 +38,6 @@ public class AuthController(IMediatorHandler mediatorHandler, INotificador notif
         };
 
         var result = await _userManager.CreateAsync(user, usarioRegistro.Senha);
-        if (result.Succeeded)
-        {
-            var command = new AdicionarAlunoCommand(Guid.Parse(user.Id), usarioRegistro.Nome, usarioRegistro.Email);
-
-            var resultado = await mediatorHandler.EnviarComando(command);
-
-            if (!resultado)
-            {
-                await _userManager.DeleteAsync(user);
-                return CustomResponse();
-            }
-
-            await _signInManager.SignInAsync(user, false);
-            return CustomResponse(await GerarJwt(user.Email));
-        }
 
         foreach (var error in result.Errors)
         {
@@ -87,12 +71,13 @@ public class AuthController(IMediatorHandler mediatorHandler, INotificador notif
 
     private async Task<UsuarioRepostaModel> GerarJwt(string email)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(email)
+            ?? throw new Exception("Usuário/Senha inválidos");
         var claims = await _userManager.GetClaimsAsync(user);
         var userRoles = await _userManager.GetRolesAsync(user);
 
         claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""));
         claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
         claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
         claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
@@ -124,7 +109,7 @@ public class AuthController(IMediatorHandler mediatorHandler, INotificador notif
             UsuarioToken = new UsuarioTokenModel
             {
                 Id = user.Id,
-                Email = user.Email,
+                Email = user.Email ?? "",
                 Claims = claims.Select(c => new ClaimModel { Type = c.Type, Value = c.Value })
             }
         };

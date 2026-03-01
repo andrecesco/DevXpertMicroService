@@ -7,13 +7,12 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace EduOnline.WebApps.ApiRest.Controllers;
+namespace EduOnline.Core.Api.Controllers;
 
 [ApiController]
 public abstract class MainController : ControllerBase
 {
     private readonly DomainNotificationHandler _domainNotifications;
-    private readonly IMediatorHandler _mediatorHandler;
     private readonly INotificador _notificador;
     public readonly IUser AppUser;
 
@@ -34,11 +33,9 @@ public abstract class MainController : ControllerBase
     }
 
     protected MainController(INotificationHandler<DomainNotification> notifications,
-                                 IMediatorHandler mediatorHandler,
                                  IUser appUser)
     {
         _domainNotifications = (DomainNotificationHandler)notifications;
-        _mediatorHandler = mediatorHandler;
         AppUser = appUser;
 
         if (appUser.IsAuthenticated())

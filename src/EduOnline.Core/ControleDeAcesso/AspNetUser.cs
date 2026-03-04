@@ -1,5 +1,4 @@
-﻿using EduOnline.Core.ControleDeAcesso;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
 namespace EduOnline.Core.ControleDeAcesso;

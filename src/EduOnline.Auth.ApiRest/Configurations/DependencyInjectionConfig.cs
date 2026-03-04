@@ -1,9 +1,6 @@
 ﻿using EduOnline.Auth.ApiRest.Data;
-using EduOnline.Auth.ApiRest.Extensions;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
-using EduOnline.Core.Mensagens.Notifications;
-using MediatR;
 
 namespace EduOnline.Auth.ApiRest.Configurations;
 

@@ -1,5 +1,4 @@
-﻿using EduOnline.Core.Communication.Mediator;
-using EduOnline.Core.ControleDeAcesso;
+﻿using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.Notifications;
 using FluentValidation.Results;

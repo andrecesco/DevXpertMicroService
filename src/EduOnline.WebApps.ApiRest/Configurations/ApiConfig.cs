@@ -1,5 +1,4 @@
 ﻿using EduOnline.Bff.ApiRest.Options;
-using Microsoft.Extensions.Configuration;
 
 namespace EduOnline.WebApps.ApiRest.Configurations;
 

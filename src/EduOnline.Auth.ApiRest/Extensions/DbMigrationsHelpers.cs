@@ -31,7 +31,7 @@ public static class DbMigrationsHelpers
     public async static Task AdicionarAdministrador(ApplicationDbContext identityDb, IServiceProvider serviceProvider)
     {
         var userExists = await identityDb.Users.FirstOrDefaultAsync(a => a.UserName == "admin@admin.com");
-        
+
         if (userExists is not null) return;
 
         var roleManager = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole>>();
@@ -72,7 +72,7 @@ public static class DbMigrationsHelpers
     public static async Task AdicionarAluno(ApplicationDbContext identityDb, IServiceProvider serviceProvider)
     {
         var userExists = await identityDb.Users.FirstOrDefaultAsync(a => a.UserName == "aluno@aluno.com");
-        
+
         if (userExists is not null) return;
 
         var roleManager = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole>>();

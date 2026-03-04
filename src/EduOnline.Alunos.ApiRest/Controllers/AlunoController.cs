@@ -1,6 +1,6 @@
+using EduOnline.Alunos.ApiRest.Models;
 using EduOnline.Alunos.Application.Commands;
 using EduOnline.Alunos.Application.Queries;
-using EduOnline.Alunos.ApiRest.Models;
 using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;

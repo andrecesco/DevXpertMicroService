@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\EduOnline.Core\EduOnline.Core.csproj" />
+	  <ProjectReference Include="..\EduOnline.Core.Api\EduOnline.Core.Api.csproj" />
 	</ItemGroup>
 
 </Project>

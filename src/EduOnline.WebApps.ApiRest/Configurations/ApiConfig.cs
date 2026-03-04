@@ -1,10 +1,12 @@
-﻿namespace EduOnline.WebApps.ApiRest.Configurations;
+﻿using EduOnline.Bff.ApiRest.Options;
+
+namespace EduOnline.WebApps.ApiRest.Configurations;
 
 public static class ApiConfig
 {
     public static WebApplicationBuilder AddApiConfig(this WebApplicationBuilder builder)
     {
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        builder.Services.Configure<ServiceUrlOptions>(builder.Configuration);
 
         builder.Services.AddControllers()
             .ConfigureApiBehaviorOptions(options =>

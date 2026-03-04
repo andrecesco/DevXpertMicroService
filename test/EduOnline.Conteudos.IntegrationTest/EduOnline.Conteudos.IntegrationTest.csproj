@@ -18,7 +18,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\EduOnline.IntegrationTest\EduOnline.IntegrationTest.csproj" />
-	  <ProjectReference Include="..\..\src\EduOnline.WebApps.ApiRest\EduOnline.WebApps.ApiRest.csproj" />
+	  <ProjectReference Include="..\..\src\EduOnline.WebApps.ApiRest\EduOnline.Bff.ApiRest.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

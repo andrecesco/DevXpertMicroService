@@ -1,4 +1,4 @@
-namespace EduOnline.Conteudos.ApiRest.Extensions;
+namespace EduOnline.Pagamentos.ApiRest.Extensions;
 
 public class JwtSettings
 {

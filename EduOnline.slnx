@@ -3,6 +3,10 @@
     <Project Path="src/EduOnline.IntegrationTest/EduOnline.IntegrationTest.csproj" Id="ed2735de-ad45-406e-bd3b-b3e81f534ae2" />
     <Project Path="src/EventSourcing/EventSourcing.csproj" Id="d27573bc-6f47-4450-b339-500fcdf5e233" />
   </Folder>
+  <Folder Name="/Core/">
+    <Project Path="src/EduOnline.Core.Api/EduOnline.Core.Api.csproj" Id="33b7c318-7d7f-4d77-b5e6-ebd254abad9e" />
+    <Project Path="src/EduOnline.Core/EduOnline.Core.csproj" />
+  </Folder>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Alunos/">
     <Project Path="src/EduOnline.Alunos.ApiRest/EduOnline.Alunos.ApiRest.csproj" Id="ee91cbd4-0d9d-4eb7-9c31-625898c2bbba" />
@@ -26,12 +30,9 @@
     <Project Path="test/EduOnline.Conteudos.Domain.UnitTest/EduOnline.Conteudos.Domain.UnitTest.csproj" Id="d89fce25-f7c8-4f87-b5fd-ada505e6bd18" />
     <Project Path="test/EduOnline.Conteudos.IntegrationTest/EduOnline.Conteudos.IntegrationTest.csproj" Id="b5430d66-1a65-4e00-9ee3-ee84b88e57fc" />
   </Folder>
-  <Folder Name="/Services/Core/">
-    <Project Path="src/EduOnline.Core.Api/EduOnline.Core.Api.csproj" Id="33b7c318-7d7f-4d77-b5e6-ebd254abad9e" />
-    <Project Path="src/EduOnline.Core/EduOnline.Core.csproj" />
-  </Folder>
   <Folder Name="/Services/Pagamentos/">
     <Project Path="src/EduOnline.Pagamentos.AntiCorruption/EduOnline.Pagamentos.AntiCorruption.csproj" Id="1ad71753-0d7c-47a6-844b-30bfac018dbe" />
+    <Project Path="src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" Id="f1dabc71-8848-4ea5-8476-b2895daaf8eb" />
     <Project Path="src/EduOnline.Pagamentos.Data/EduOnline.Pagamentos.Data.csproj" Id="10933e57-63a8-40ca-9684-7194bc6ee6e4" />
     <Project Path="src/EduOnline.Pagamentos.Domain/EduOnline.Pagamentos.Domain.csproj" Id="0e349e2a-08e1-4be8-b714-99a9fc7052dd" />
   </Folder>

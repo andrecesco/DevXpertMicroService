@@ -84,6 +84,19 @@ IAspNetUser user) : MainController(notifications, user)
         return CustomResponse(certificado);
     }
 
+    [HttpPost("{id}")]
+    public async Task<IActionResult> Cadastrar(Guid id, AdicionarAlunoRequest request)
+    {
+        var command = new AdicionarAlunoCommand(id, request.Nome, request.Email);
+
+        var resultado = await _mediatorHandler.EnviarComando(command);
+
+        if (!resultado)
+            return CustomResponse();
+
+        return CreatedAtAction(actionName: nameof(ObterPorId), routeValues: id, value: null);
+    }
+
     [HttpPatch]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ResponseResult))]

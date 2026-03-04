@@ -82,7 +82,7 @@ public static class DbMigrationsHelpers
             await roleManager.CreateAsync(new Microsoft.AspNetCore.Identity.IdentityRole("Aluno"));
         }
 
-        var idUsuario = Guid.NewGuid();
+        var idUsuario = Guid.Parse("d9475e09-793f-4bd8-8f63-93e5038c0d16");
         await identityDb.Users.AddAsync(new Microsoft.AspNetCore.Identity.IdentityUser
         {
             Id = idUsuario.ToString(),

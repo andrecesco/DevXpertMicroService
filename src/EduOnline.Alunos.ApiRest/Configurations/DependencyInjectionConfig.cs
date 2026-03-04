@@ -5,13 +5,14 @@ using EduOnline.Alunos.Application.Queries;
 using EduOnline.Alunos.Data.Context;
 using EduOnline.Alunos.Data.Repository;
 using EduOnline.Alunos.Domain.Interfaces;
-using EduOnline.Alunos.ApiRest.Extensions;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
+using EduOnline.Core.Data.EventSourcing;
+using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.IntegrationEvents;
 using EduOnline.Core.Mensagens.Notifications;
+using EventSourcing;
 using MediatR;
-using EduOnline.Core.Mensagens;
 
 namespace EduOnline.Alunos.ApiRest.Configurations;
 
@@ -51,6 +52,8 @@ public static class DependencyInjectionConfig
     {
         builder.Services.AddScoped<IAlunoQuery, AlunoQuery>();
         builder.Services.AddAutoMapperApplication();
+        builder.Services.AddSingleton<IEventStoreService, EventStoreService>();
+        builder.Services.AddSingleton<IEventSourcingRepository, EventSourcingRepository>();
     }
 
     private static void AddRequestHandlers(WebApplicationBuilder builder)

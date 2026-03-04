@@ -48,4 +48,15 @@ public abstract class BaseService
         IEnumerable<HttpStatusCode> respostasVazias = [HttpStatusCode.NoContent, HttpStatusCode.NotFound];
         return respostasVazias.Contains(responseMessage.StatusCode);
     }
+
+    protected static Guid CapturarGuidInserido(HttpResponseMessage response)
+    {
+        if (response.StatusCode != HttpStatusCode.Created) return Guid.Empty;
+
+        var temId = Guid.TryParse(response.Headers.Location.Segments.LastOrDefault(), out var id);
+
+        if (!temId) throw new Exception("O id de cadastro não foi retornado");
+
+        return id;
+    }
 }

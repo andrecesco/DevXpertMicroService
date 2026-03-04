@@ -3,11 +3,13 @@ using EduOnline.Auth.ApiRest.Models;
 using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
 
@@ -44,7 +46,7 @@ public class AuthController(INotificador notificador,
             NotificarErro(error.Description);
         }
 
-        return CustomResponse();
+        return CreatedAtAction(actionName: nameof(ObterPorId), routeValues: new { id = user.Id }, null);
     }
 
     [HttpPost("entrar")]
@@ -67,6 +69,20 @@ public class AuthController(INotificador notificador,
 
         NotificarErro("Usuário ou Senha incorretos");
         return CustomResponse(loginUser);
+    }
+
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> ObterPorId(Guid id)
+    {
+        if (id != user.GetUserId() && !user.IsInRole("Administrador"))
+            return Unauthorized();
+
+        var result = await _userManager.FindByIdAsync(id.ToString());
+
+        if (result is null) return NotFound();
+
+        return CustomResponse(result);
     }
 
     private async Task<UsuarioRepostaModel> GerarJwt(string email)

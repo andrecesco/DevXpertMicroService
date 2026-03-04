@@ -9,15 +9,13 @@ public static class DatabaseSelectExtension
     {
         if (!builder.Environment.IsDevelopment())
         {
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionLite")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnectionLite' not found.");
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionLite") ?? throw new InvalidOperationException("Connection string 'DefaultConnectionLite' not found.");
             builder.Services.AddDbContext<AlunosContext>(options =>
                 options.UseSqlite(connectionString));
         }
         else
         {
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<AlunosContext>(options =>
                 options.UseSqlServer(connectionString));
         }

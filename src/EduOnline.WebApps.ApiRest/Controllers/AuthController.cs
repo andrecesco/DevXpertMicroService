@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EduOnline.Bff.ApiRest.Controllers;
 
+[Route("api/bff/auth")]
 public class AuthController(IAuthService authService, IAlunoService alunoService, INotificador notificador, IAspNetUser user) : MainController(notificador, user)
 {
     [HttpPost]
@@ -16,7 +17,7 @@ public class AuthController(IAuthService authService, IAlunoService alunoService
 
         if (!responseAuth.Success) return BadRequest(responseAuth);
 
-        var responseAluno = await alunoService.CriarAluno(Guid.NewGuid(), new CriarAlunoRequest { Email = request.Email, Nome = request.Nome }) ?? throw new Exception("Ocorreu um erro ao se comunicar com a api de Aluno");
+        var responseAluno = await alunoService.CriarAluno(authService.AggregateId, new CriarAlunoRequest { Email = request.Email, Nome = request.Nome }) ?? throw new Exception("Ocorreu um erro ao se comunicar com a api de Aluno");
 
         if (!responseAluno.Success) return BadRequest(responseAluno);
 

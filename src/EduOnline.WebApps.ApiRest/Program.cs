@@ -4,7 +4,8 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.RegisterServices()
+builder.AddApiConfig()
+    .RegisterServices()
     .AddSwaggerConfig();
 
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
@@ -20,11 +21,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("Total");
 
-app.UseHttpsRedirection();
-
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

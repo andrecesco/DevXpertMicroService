@@ -1,11 +1,12 @@
 ﻿using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.DomainObjects;
+using Microsoft.EntityFrameworkCore;
 
-namespace EduOnline.Alunos.Data.Context;
+namespace EduOnline.Core.Extensions;
 
-public static class MediatorExtension
+public static class MediatorDbContextExtension
 {
-    public static async Task PublicarEventos(this IMediatorHandler mediator, AlunosContext ctx)
+    public static async Task PublicarEventos<T>(this IMediatorHandler mediator, T ctx) where T : DbContext
     {
         var domainEntities = ctx.ChangeTracker
             .Entries<Entity>()

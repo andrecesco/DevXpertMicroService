@@ -15,4 +15,9 @@
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EduOnline.Conteudos.Data\EduOnline.Conteudos.Data.csproj" />
+    <ProjectReference Include="..\EventSourcing\EventSourcing.csproj" />
+  </ItemGroup>
+
 </Project>

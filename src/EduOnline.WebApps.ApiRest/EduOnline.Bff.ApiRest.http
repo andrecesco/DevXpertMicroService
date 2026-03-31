@@ -1,6 +1,0 @@
-@EduOnline.WebApps.ApiRest_HostAddress = http://localhost:5226
-
-GET {{EduOnline.WebApps.ApiRest_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

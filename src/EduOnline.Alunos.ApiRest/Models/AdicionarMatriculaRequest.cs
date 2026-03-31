@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EduOnline.Alunos.ApiRest.Models;
 
+[ExcludeFromCodeCoverage]
 public class AdicionarMatriculaRequest
 {
     public Guid CursoId { get; set; }

@@ -1,26 +1,25 @@
-﻿namespace EduOnline.Auth.ApiRest.Configurations;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace EduOnline.Auth.ApiRest.Configurations;
+
+[ExcludeFromCodeCoverage]
 public static class ApiConfig
 {
     public static WebApplicationBuilder AddApiConfig(this WebApplicationBuilder builder)
     {
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        builder.Services.AddControllers()
-            .ConfigureApiBehaviorOptions(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+        builder.Services.AddControllers();
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("Total",
-                builder =>
-                    builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-        });
+        //builder.Services.AddCors(options =>
+        //{
+        //    options.AddPolicy("Total",
+        //        builder =>
+        //            builder
+        //                .AllowAnyOrigin()
+        //                .AllowAnyMethod()
+        //                .AllowAnyHeader());
+        //});
 
         return builder;
     }

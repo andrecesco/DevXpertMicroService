@@ -26,7 +26,7 @@ public class EventSourcingRepository(IEventStoreService eventStoreService) : IEv
 
         var listaEventos = new List<StoredEvent>();
 
-        foreach (var resolvedEvent in await eventos.ToListAsync())
+        await foreach (var resolvedEvent in eventos)
         {
             var dataEncoded = Encoding.UTF8.GetString(resolvedEvent.OriginalEvent.Data.ToArray());
             var jsonData = JsonSerializer.Deserialize<BaseEvent>(dataEncoded);

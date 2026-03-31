@@ -1,15 +1,18 @@
 ﻿using EduOnline.Core.Data.EventSourcing;
 using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.DomainEvents;
+using EduOnline.Core.Mensagens.IntegrationEvents;
 using EduOnline.Core.Mensagens.Notifications;
+using EduOnline.Core.Mensagens.RabbitMq;
 using MediatR;
 
 namespace EduOnline.Core.Communication.Mediator;
 
-public class MediatorHandler(IMediator mediator, IEventSourcingRepository eventSourcingRepository) : IMediatorHandler
+public class MediatorHandler(IMediator mediator, IEventSourcingRepository eventSourcingRepository, IRabbitMqEventBus? rabbitMqEventBus = null) : IMediatorHandler
 {
     private readonly IMediator _mediator = mediator;
     private readonly IEventSourcingRepository _eventSourcingRepository = eventSourcingRepository;
+    private readonly IRabbitMqEventBus? _rabbitMqEventBus = rabbitMqEventBus;
 
     public async Task<bool> EnviarComando<T>(T comando) where T : Command
     {
@@ -20,6 +23,11 @@ public class MediatorHandler(IMediator mediator, IEventSourcingRepository eventS
     {
         await _mediator.Publish(evento);
         await _eventSourcingRepository.SalvarEvento(evento);
+
+        if (evento is IntegrationEvent integrationEvent && _rabbitMqEventBus is not null)
+        {
+            await _rabbitMqEventBus.PublishAsync(integrationEvent);
+        }
     }
 
     public async Task PublicarNotificacao<T>(T notificacao) where T : DomainNotification

@@ -1,65 +1,153 @@
-﻿using EduOnline.Auth.ApiRest.Extensions;
+﻿using EduOnline.Auth.ApiRest.Data;
 using EduOnline.Auth.ApiRest.Models;
+using EduOnline.Auth.ApiRest.Services;
 using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace EduOnline.Auth.ApiRest.Controllers;
 
+/// <summary>
+/// Endpoints de autenticação e gestão de contas de usuários.
+/// </summary>
+[Produces("application/json")]
+[Consumes("application/json")]
+[ProducesResponseType(typeof(ResponseResult), StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 [Route("api/auth")]
 public class AuthController(INotificador notificador,
-                      SignInManager<IdentityUser> signInManager,
-                      UserManager<IdentityUser> userManager,
-                      IOptions<JwtSettings> jwtSettings,
-                      IAspNetUser user, ILogger<AuthController> logger) : MainController(notificador, user)
+                      AuthenticationService authenticationService,
+                      IAspNetUser user,
+                      RoleManager<IdentityRole> roleManager,
+                      ILogger<AuthController> logger) : MainController(notificador, user)
 {
-    private readonly SignInManager<IdentityUser> _signInManager = signInManager;
-    private readonly UserManager<IdentityUser> _userManager = userManager;
-    private readonly JwtSettings _jwtSettings = jwtSettings.Value;
     private readonly ILogger _logger = logger;
 
-    [HttpPost("nova/conta")]
+    /// <summary>
+    /// Obtém dados de um usuário pelo identificador.
+    /// </summary>
+    [Authorize]
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ResponseResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ObterPorId(Guid id)
+    {
+        if (user != null && id != user.GetUserId() && !user.IsInRole("Administrador"))
+            return Unauthorized();
+
+        var result = await authenticationService.ObterUserId(id);
+
+        if (result is null) return NotFound();
+
+        return CustomResponse(result);
+    }
+
+    /// <summary>
+    /// Registra uma nova conta de usuário.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpPost("nova-conta")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult> Registrar(UsuarioRegistroModel usarioRegistro)
     {
         if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-        var user = new IdentityUser
+        var perfil = usarioRegistro.Perfil.Trim();
+        perfil = perfil.Equals("Administrador", StringComparison.OrdinalIgnoreCase)
+            ? "Administrador"
+            : "Aluno";
+
+        if (perfil == "Administrador" && (!user.IsAuthenticated() || !user.IsInRole("Administrador")))
+        {
+            NotificarErro("Somente administradores podem cadastrar novos administradores.");
+            return CustomResponse();
+        }
+
+        var usuario = new EduOnlineUser
         {
             UserName = usarioRegistro.Email,
             Email = usarioRegistro.Email,
             EmailConfirmed = true
         };
 
-        var result = await _userManager.CreateAsync(user, usarioRegistro.Senha);
+        var result = await authenticationService.UserManager.CreateAsync(usuario, usarioRegistro.Senha);
 
-        foreach (var error in result.Errors)
+        if (!result.Succeeded)
         {
-            NotificarErro(error.Description);
+            foreach (var error in result.Errors)
+            {
+                NotificarErro(error.Description);
+            }
+
+            return CustomResponse();
         }
 
-        return CreatedAtAction(actionName: nameof(ObterPorId), routeValues: new { id = user.Id }, null);
+        if (!await roleManager.RoleExistsAsync(perfil))
+        {
+            await roleManager.CreateAsync(new IdentityRole(perfil));
+        }
+
+        var roleResult = await authenticationService.UserManager.AddToRoleAsync(usuario, perfil);
+        if (!roleResult.Succeeded)
+        {
+            await authenticationService.UserManager.DeleteAsync(usuario);
+
+            foreach (var error in roleResult.Errors)
+            {
+                NotificarErro(error.Description);
+            }
+
+            return CustomResponse();
+        }
+
+        return CreatedAtAction(actionName: nameof(ObterPorId), routeValues: new { id = usuario.Id }, null);
     }
 
+    /// <summary>
+    /// Realiza autenticação com e-mail e senha e retorna token JWT.
+    /// </summary>
+    [AllowAnonymous]
     [HttpPost("entrar")]
+    [ProducesResponseType(typeof(ResponseResult), StatusCodes.Status200OK)]
     public async Task<ActionResult> Login(UsuarioLoginModel loginUser)
     {
         if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-        var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Senha, false, true);
+        var result = await authenticationService.SignInManager.PasswordSignInAsync(loginUser.Email, loginUser.Senha,
+            false, true);
+
+        var userAuth = await authenticationService.UserManager.FindByEmailAsync(loginUser.Email);
+
+        if (userAuth is null)
+        {
+            NotificarErro("Usuário ou Senha incorretos");
+            return CustomResponse(loginUser);
+        }
+
+        if (userAuth.StatusId == Status.Pendente.Id)
+        {
+            userAuth.StatusId = Status.Cadastrado.Id;
+            userAuth.StatusNome = Status.Cadastrado.Nome;
+            var resultadoUpdate = await authenticationService.UserManager.UpdateAsync(userAuth);
+
+            if (!resultadoUpdate.Succeeded)
+            {
+                NotificarErro($"Erro ao atualizar o usuário para Cadastrado: {resultadoUpdate.Errors.First().Description}");
+                return CustomResponse();
+            }
+        }
 
         if (result.Succeeded)
         {
             _logger.LogInformation("Usuario " + loginUser.Email + " logado com sucesso");
-            return CustomResponse(await GerarJwt(loginUser.Email));
+            return CustomResponse(await authenticationService.GerarJwt(loginUser.Email));
         }
+
         if (result.IsLockedOut)
         {
             NotificarErro("Usuário temporariamente bloqueado por tentativas inválidas");
@@ -70,68 +158,65 @@ public class AuthController(INotificador notificador,
         return CustomResponse(loginUser);
     }
 
-    [Authorize]
-    [HttpGet("{id}")]
-    public async Task<IActionResult> ObterPorId(Guid id)
+    /// <summary>
+    /// Exclui um usuário existente.
+    /// </summary>
+    [Authorize(Roles = "Administrador")]
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Excluir(Guid id)
     {
-        if (id != user.GetUserId() && !user.IsInRole("Administrador"))
-            return Unauthorized();
-
-        var result = await _userManager.FindByIdAsync(id.ToString());
+        var result = await authenticationService.ObterUserId(id);
 
         if (result is null) return NotFound();
 
-        return CustomResponse(result);
+        var deleteResult = await authenticationService.RemoverUser(result);
+        if (!deleteResult.Succeeded)
+        {
+            foreach (var error in deleteResult.Errors)
+            {
+                NotificarErro(error.Description);
+            }
+            return CustomResponse();
+        }
+        return NoContent();
     }
 
-    private async Task<UsuarioRepostaModel> GerarJwt(string email)
+    /// <summary>
+    /// Renova o token de acesso com base em um refresh token válido.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpPost("refresh-token")]
+    [ProducesResponseType(typeof(ResponseResult), StatusCodes.Status200OK)]
+    public async Task<ActionResult> RefreshToken([FromBody] string refreshToken)
     {
-        var user = await _userManager.FindByEmailAsync(email)
-            ?? throw new Exception("Usuário/Senha inválidos");
-        var claims = await _userManager.GetClaimsAsync(user);
-        var userRoles = await _userManager.GetRolesAsync(user);
-
-        claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
-        foreach (var userRole in userRoles)
+        if (string.IsNullOrWhiteSpace(refreshToken) || !Guid.TryParse(refreshToken, out var refreshTokenGuid))
         {
-            claims.Add(new Claim("role", userRole));
+            NotificarErro("Refresh Token inválido");
+            return CustomResponse();
         }
 
-        var identityClaims = new ClaimsIdentity();
-        identityClaims.AddClaims(claims);
+        var token = await authenticationService.ObterRefreshToken(refreshTokenGuid);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.Segredo);
-        var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
+        if (token is null)
         {
-            Issuer = _jwtSettings.Emissor,
-            Audience = _jwtSettings.Audiencia,
-            Subject = identityClaims,
-            Expires = DateTime.UtcNow.AddHours(_jwtSettings.ExpiracaoHoras),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        });
+            NotificarErro("Refresh Token expirado");
+            return CustomResponse();
+        }
 
-        var encodedToken = tokenHandler.WriteToken(token);
-
-        var response = new UsuarioRepostaModel
-        {
-            AccessToken = encodedToken,
-            ExpiraEm = TimeSpan.FromHours(_jwtSettings.ExpiracaoHoras).TotalSeconds,
-            UsuarioToken = new UsuarioTokenModel
-            {
-                Id = user.Id,
-                Email = user.Email ?? "",
-                Claims = claims.Select(c => new ClaimModel { Type = c.Type, Value = c.Value })
-            }
-        };
-
-        return response;
+        return CustomResponse(await authenticationService.GerarJwt(token.Username));
     }
 
-    private static long ToUnixEpochDate(DateTime date)
-        => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
+    /// <summary>
+    /// Encerra a sessão do usuário autenticado.
+    /// </summary>
+    [Authorize]
+    [HttpPost("sair")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Logout()
+    {
+        await authenticationService.SignInManager.SignOutAsync();
+        return NoContent();
+    }
 }

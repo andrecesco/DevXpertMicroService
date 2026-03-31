@@ -39,7 +39,14 @@ public abstract class Enumerador(int id, string nome) : IComparable
         return typeMatches && valueMatches;
     }
 
-    public int CompareTo(object other) => Id.CompareTo(((Enumerador)other).Id);
+    public int CompareTo(object? other)
+    {
+        if (other is null) return 1;
+        if (other is not Enumerador enumerador)
+            throw new ArgumentException($"Objeto deve ser do tipo {nameof(Enumerador)}", nameof(other));
+
+        return Id.CompareTo(enumerador.Id);
+    }
 
     #region Static utils
     public static IEnumerable<T> GetAll<T>() where T : Enumerador

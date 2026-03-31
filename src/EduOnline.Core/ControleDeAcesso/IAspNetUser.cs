@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace EduOnline.Core.ControleDeAcesso;
 
@@ -10,4 +11,5 @@ public interface IAspNetUser
     bool IsAuthenticated();
     bool IsInRole(string role);
     IEnumerable<Claim> GetClaimsIdentity();
+    HttpContext ObterHttpContext();
 }

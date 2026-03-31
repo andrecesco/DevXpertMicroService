@@ -178,7 +178,7 @@ public class AlunoCommandHandler(IAlunoRepository repository, IMediatorHandler m
         var aluno = await repository.BuscarAsync(a => a.Email == email);
         if (aluno != null && aluno.Count > 0)
         {
-            await mediatorHandler.PublicarNotificacao(new DomainNotification("AlunoExistente", "Já existe um aluno cadastrado com esse Id"));
+            await mediatorHandler.PublicarNotificacao(new DomainNotification("AlunoExistente", "Já existe um aluno cadastrado com esse e-mail"));
             return true;
         }
         return false;

@@ -7,7 +7,7 @@ namespace EduOnline.Core.Data;
 
 public abstract class EduOnlineContext : DbContext, IUnitOfWork
 {
-    private readonly IMediatorHandler _mediatorHandler;
+    private readonly IMediatorHandler? _mediatorHandler;
 
     protected EduOnlineContext() { }
 
@@ -48,7 +48,7 @@ public abstract class EduOnlineContext : DbContext, IUnitOfWork
         }
 
         var sucesso = await base.SaveChangesAsync() > 0;
-        if (sucesso) await _mediatorHandler.PublicarEventos(this);
+        if (sucesso && _mediatorHandler is not null) await _mediatorHandler.PublicarEventos(this);
 
         return sucesso;
     }

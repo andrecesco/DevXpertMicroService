@@ -1,5 +1,8 @@
-﻿namespace EduOnline.Core.DomainObjects.Dtos;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace EduOnline.Core.DomainObjects.Dtos;
+
+[ExcludeFromCodeCoverage]
 public class PagamentoCurso
 {
     public Guid MatriculaId { get; set; }

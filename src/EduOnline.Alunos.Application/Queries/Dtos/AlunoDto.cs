@@ -1,5 +1,8 @@
-﻿namespace EduOnline.Alunos.Application.Queries.Dtos;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace EduOnline.Alunos.Application.Queries.Dtos;
+
+[ExcludeFromCodeCoverage]
 public class AlunoDto
 {
     public Guid Id { get; set; }

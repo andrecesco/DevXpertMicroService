@@ -1,3 +1,4 @@
+using EduOnline.Alunos.ApiRest.BackgroundServices;
 using EduOnline.Alunos.Application.Automapper;
 using EduOnline.Alunos.Application.Commands;
 using EduOnline.Alunos.Application.Events;
@@ -11,11 +12,14 @@ using EduOnline.Core.Data.EventSourcing;
 using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.IntegrationEvents;
 using EduOnline.Core.Mensagens.Notifications;
+using EduOnline.Core.Mensagens.RabbitMq;
 using EventSourcing;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Alunos.ApiRest.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class DependencyInjectionConfig
 {
     public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
@@ -31,9 +35,9 @@ public static class DependencyInjectionConfig
 
     private static void AddContexts(WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddScoped<AlunosContext>();
+        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<IAspNetUser, AspNetUser>();
+        builder.Services.AddScoped<AlunosContext>();
     }
 
     private static void AddNotificators(WebApplicationBuilder builder)
@@ -54,6 +58,10 @@ public static class DependencyInjectionConfig
         builder.Services.AddAutoMapperApplication();
         builder.Services.AddSingleton<IEventStoreService, EventStoreService>();
         builder.Services.AddSingleton<IEventSourcingRepository, EventSourcingRepository>();
+
+        builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMq"));
+        builder.Services.AddSingleton<IRabbitMqEventBus, RabbitMqEventBus>();
+        builder.Services.AddHostedService<PagamentoIntegrationEventsConsumerHostedService>();
     }
 
     private static void AddRequestHandlers(WebApplicationBuilder builder)

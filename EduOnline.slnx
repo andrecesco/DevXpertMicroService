@@ -21,4 +21,9 @@
   <Folder Name="/Services/Auth/">
     <Project Path="src/EduOnline.Auth.ApiRest/EduOnline.Auth.ApiRest.csproj" Id="6a3cf0fe-b182-43e4-9ae5-920d0be6cf66" />
   </Folder>
+  <Folder Name="/Services/Conteudos/">
+    <Project Path="src/EduOnline.Conteudos.ApiRest/EduOnline.Conteudos.ApiRest.csproj" />
+    <Project Path="src/EduOnline.Conteudos.Data/EduOnline.Conteudos.Data.csproj" />
+    <Project Path="src/EduOnline.Conteudos.Domain/EduOnline.Conteudos.Domain.csproj" />
+  </Folder>
 </Solution>

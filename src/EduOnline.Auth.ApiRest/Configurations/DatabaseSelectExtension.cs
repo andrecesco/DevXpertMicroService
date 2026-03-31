@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EduOnline.Auth.ApiRest.Data;
+﻿using EduOnline.Auth.ApiRest.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Auth.ApiRest.Configurations;
 

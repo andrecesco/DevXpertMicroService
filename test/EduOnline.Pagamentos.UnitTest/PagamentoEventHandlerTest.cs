@@ -39,7 +39,7 @@ public class PagamentoEventHandlerTest
 
         // Assert
         _pagamentoServiceMock.Verify(s => s.RealizarPagamentoCurso(It.IsAny<PagamentoCurso>()), Times.Once);
-        
+
         pagamentoCursoCapturado.Should().NotBeNull();
         pagamentoCursoCapturado!.MatriculaId.Should().Be(evento.AggregateId);
         pagamentoCursoCapturado.AlunoId.Should().Be(evento.AlunoId);

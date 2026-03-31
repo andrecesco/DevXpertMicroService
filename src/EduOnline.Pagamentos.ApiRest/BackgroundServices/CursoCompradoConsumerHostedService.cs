@@ -1,6 +1,5 @@
 using EduOnline.Core.Mensagens.IntegrationEvents;
 using EduOnline.Core.Mensagens.RabbitMq;
-using JetBrains.Annotations;
 using MediatR;
 using System.Diagnostics.CodeAnalysis;
 
@@ -22,11 +21,10 @@ public class CursoCompradoConsumerHostedService(IServiceProvider serviceProvider
 
     public async Task RealizarPagamento(CursoCompradoIntegrationEvent message)
     {
-        await using (var scope = serviceProvider.CreateAsyncScope())
-        {
-            var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<CursoCompradoIntegrationEvent>>();
-            
-            await handler.Handle(message, CancellationToken.None);
-        }
+        await using var scope = serviceProvider.CreateAsyncScope();
+
+        var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<CursoCompradoIntegrationEvent>>();
+
+        await handler.Handle(message, CancellationToken.None);
     }
 }

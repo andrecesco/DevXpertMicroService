@@ -120,7 +120,7 @@ public class AuthenticationServiceJwtGenerationTest
 
         // Assert
         resultado.RefreshToken.Should().NotBe(Guid.Empty);
-        
+
         // Validar que refresh token foi persistido
         var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == resultado.RefreshToken);
         refreshToken.Should().NotBeNull();

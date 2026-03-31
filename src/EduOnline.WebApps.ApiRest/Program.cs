@@ -1,8 +1,8 @@
-using EduOnline.WebApps.ApiRest.Configurations;
-using EduOnline.Core.Api.Identidade;
 using EduOnline.Core.Api.Extensions;
-using System.Reflection;
+using EduOnline.Core.Api.Identidade;
+using EduOnline.WebApps.ApiRest.Configurations;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,8 +1,8 @@
+using EduOnline.Core.Api.Extensions;
+using EduOnline.Core.Api.Identidade;
 using EduOnline.Pagamentos.ApiRest.Configurations;
 using EduOnline.Pagamentos.ApiRest.Extensions;
 using EduOnline.Pagamentos.Data;
-using EduOnline.Core.Api.Identidade;
-using EduOnline.Core.Api.Extensions;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);

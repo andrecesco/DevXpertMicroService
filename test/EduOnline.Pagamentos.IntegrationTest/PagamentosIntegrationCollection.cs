@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace EduOnline.Pagamentos.IntegrationTest;
 
 [CollectionDefinition(Name, DisableParallelization = true)]

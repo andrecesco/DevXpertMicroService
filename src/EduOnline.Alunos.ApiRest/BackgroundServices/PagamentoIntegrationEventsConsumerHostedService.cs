@@ -1,8 +1,6 @@
 using EduOnline.Core.Mensagens.IntegrationEvents;
 using EduOnline.Core.Mensagens.RabbitMq;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Alunos.ApiRest.BackgroundServices;
@@ -24,21 +22,19 @@ public class PagamentoIntegrationEventsConsumerHostedService(IServiceProvider se
 
     public async Task PagamentoRealizado(PagamentoRealizadoIntegrationEvent message)
     {
-        await using (var scope = serviceProvider.CreateAsyncScope())
-        {
-            var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<PagamentoRealizadoIntegrationEvent>>();
+        await using var scope = serviceProvider.CreateAsyncScope();
 
-            await handler.Handle(message, CancellationToken.None);
-        }
+        var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<PagamentoRealizadoIntegrationEvent>>();
+
+        await handler.Handle(message, CancellationToken.None);
     }
 
     public async Task PagamentoRecusado(PagamentoRecusadoIntegrationEvent message)
     {
-        await using (var scope = serviceProvider.CreateAsyncScope())
-        {
-            var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<PagamentoRecusadoIntegrationEvent>>();
+        await using var scope = serviceProvider.CreateAsyncScope();
 
-            await handler.Handle(message, CancellationToken.None);
-        }
+        var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<PagamentoRecusadoIntegrationEvent>>();
+
+        await handler.Handle(message, CancellationToken.None);
     }
 }

@@ -7,8 +7,8 @@ namespace EduOnline.Alunos.Application.Events;
 
 public class MatriculaEventHandler(IMediatorHandler mediatorHandler) :
     INotificationHandler<CursoFinalizadoEvent>,
-    INotificationHandler<PagamentoRealizadoEvent>,
-    INotificationHandler<PagamentoRecusadoEvent>
+    INotificationHandler<PagamentoRealizadoIntegrationEvent>,
+    INotificationHandler<PagamentoRecusadoIntegrationEvent>
 {
     private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
 
@@ -17,12 +17,12 @@ public class MatriculaEventHandler(IMediatorHandler mediatorHandler) :
         await _mediatorHandler.EnviarComando(new GerarCertificadoCommand(notification.AggregateId));
     }
 
-    public async Task Handle(PagamentoRealizadoEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(PagamentoRealizadoIntegrationEvent notification, CancellationToken cancellationToken)
     {
         await _mediatorHandler.EnviarComando(new MatriculaPagaCommand(notification.AggregateId));
     }
 
-    public async Task Handle(PagamentoRecusadoEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(PagamentoRecusadoIntegrationEvent notification, CancellationToken cancellationToken)
     {
         await _mediatorHandler.EnviarComando(new MatriculaRecusadaCommand(notification.AggregateId));
     }

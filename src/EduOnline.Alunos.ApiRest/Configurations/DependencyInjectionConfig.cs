@@ -75,7 +75,7 @@ public static class DependencyInjectionConfig
         builder.Services.AddScoped<IRequestHandler<MatriculaRecusadaCommand, bool>, AlunoCommandHandler>();
 
         builder.Services.AddScoped<INotificationHandler<CursoFinalizadoEvent>, MatriculaEventHandler>();
-        builder.Services.AddScoped<INotificationHandler<PagamentoRealizadoEvent>, MatriculaEventHandler>();
-        builder.Services.AddScoped<INotificationHandler<PagamentoRecusadoEvent>, MatriculaEventHandler>();
+        builder.Services.AddScoped<INotificationHandler<PagamentoRealizadoIntegrationEvent>, MatriculaEventHandler>();
+        builder.Services.AddScoped<INotificationHandler<PagamentoRecusadoIntegrationEvent>, MatriculaEventHandler>();
     }
 }

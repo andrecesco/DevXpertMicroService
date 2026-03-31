@@ -1,6 +1,6 @@
 ﻿namespace EduOnline.Core.Mensagens.IntegrationEvents;
 
-public class PagamentoRecusadoEvent : IntegrationEvent
+public class PagamentoRecusadoIntegrationEvent : IntegrationEvent
 {
     public Guid CursoId { get; private set; }
     public Guid AlunoId { get; private set; }
@@ -8,9 +8,9 @@ public class PagamentoRecusadoEvent : IntegrationEvent
     public Guid TransacaoId { get; private set; }
     public decimal Total { get; private set; }
 
-    public PagamentoRecusadoEvent(Guid matriculaId, Guid cursoId, Guid alunoId, Guid pagamentoId, Guid transacaoId, decimal total)
+    public PagamentoRecusadoIntegrationEvent(Guid aggregateId, Guid cursoId, Guid alunoId, Guid pagamentoId, Guid transacaoId, decimal total)
     {
-        AggregateId = matriculaId;
+        AggregateId = aggregateId;
         CursoId = cursoId;
         AlunoId = alunoId;
         PagamentoId = pagamentoId;

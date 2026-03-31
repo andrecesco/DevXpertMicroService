@@ -33,7 +33,7 @@ public class PagamentoService(IPagamentoCartaoCreditoFacade pagamentoCartaoCredi
             pagamentoRepository.Adicionar(pagamento);
             pagamentoRepository.AdicionarTransacao(transacao);
 
-            pagamento.AdicionarEvento(new PagamentoRealizadoEvent(pagamentoCurso.MatriculaId, curso.Id, pagamento.AlunoId, pagamento.Id, transacao.Id, transacao.Total));
+            pagamento.AdicionarEvento(new PagamentoRealizadoIntegrationEvent(pagamentoCurso.MatriculaId, curso.Id, pagamento.AlunoId, pagamento.Id, transacao.Id, transacao.Total));
 
             await pagamentoRepository.UnitOfWork.Commit();
 
@@ -41,7 +41,7 @@ public class PagamentoService(IPagamentoCartaoCreditoFacade pagamentoCartaoCredi
         }
 
         await mediatorHandler.PublicarNotificacao(new DomainNotification("pagamento", "O pagamento foi recusado pela operadora"));
-        await mediatorHandler.PublicarEvento(new PagamentoRecusadoEvent(pagamentoCurso.MatriculaId, curso.Id, pagamento.AlunoId, pagamento.Id, transacao.Id, pagamento.Total));
+        await mediatorHandler.PublicarEvento(new PagamentoRecusadoIntegrationEvent(pagamentoCurso.MatriculaId, curso.Id, pagamento.AlunoId, pagamento.Id, transacao.Id, pagamento.Total));
 
         return transacao;
     }

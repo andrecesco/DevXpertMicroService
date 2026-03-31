@@ -5,6 +5,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections.Concurrent;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace EduOnline.Core.Mensagens.RabbitMq;
@@ -44,8 +45,17 @@ public class RabbitMqEventBus : IRabbitMqEventBus, IDisposable
             if (_publisherChannel is null)
                 return;
 
-            var routingKey = typeof(T).Name;
-            var payload = JsonSerializer.Serialize(integrationEvent);
+            JsonSerializerOptions jsonSerializerOptions = new()
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = true
+            };
+
+            var optionsJson = jsonSerializerOptions;
+
+            var routingKey = integrationEvent.GetType().Name;
+            var payload = JsonSerializer.Serialize(integrationEvent, integrationEvent.GetType(), optionsJson);
             var body = Encoding.UTF8.GetBytes(payload);
 
             await _publisherChannel.BasicPublishAsync<BasicProperties>(
@@ -87,7 +97,8 @@ public class RabbitMqEventBus : IRabbitMqEventBus, IDisposable
                 try
                 {
                     var json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    var message = JsonSerializer.Deserialize<T>(json);
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var message = JsonSerializer.Deserialize<T>(json, options);
 
                     if (message is null)
                     {
@@ -101,7 +112,7 @@ public class RabbitMqEventBus : IRabbitMqEventBus, IDisposable
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Erro ao processar evento de integração {EventType} vindo do RabbitMQ", typeof(T).Name);
-                    await channel.BasicNackAsync(ea.DeliveryTag, false, requeue: true, cancellationToken);
+                    await channel.BasicNackAsync(ea.DeliveryTag, false, requeue: false, cancellationToken);
                 }
             };
 

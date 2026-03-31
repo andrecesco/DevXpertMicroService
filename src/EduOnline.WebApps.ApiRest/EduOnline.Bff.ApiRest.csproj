@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Data\**" />
+	  <Compile Remove="Extensions\**" />
+	  <Compile Remove="Responses\**" />
+	  <Content Remove="Data\**" />
+	  <Content Remove="Extensions\**" />
+	  <Content Remove="Responses\**" />
+	  <EmbeddedResource Remove="Data\**" />
+	  <EmbeddedResource Remove="Extensions\**" />
+	  <EmbeddedResource Remove="Responses\**" />
+	  <None Remove="Data\**" />
+	  <None Remove="Extensions\**" />
+	  <None Remove="Responses\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\EduOnline.Core.Api\EduOnline.Core.Api.csproj" />
+	</ItemGroup>
+
+</Project>

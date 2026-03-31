@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Bff/">
+    <Project Path="src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" />
+  </Folder>
   <Folder Name="/BuildingBlocks/">
     <Project Path="src/EduOnline.IntegrationTest/EduOnline.IntegrationTest.csproj" Id="ed2735de-ad45-406e-bd3b-b3e81f534ae2" />
     <Project Path="src/EventSourcing/EventSourcing.csproj" Id="d27573bc-6f47-4450-b339-500fcdf5e233" />
@@ -21,9 +24,28 @@
   <Folder Name="/Services/Auth/">
     <Project Path="src/EduOnline.Auth.ApiRest/EduOnline.Auth.ApiRest.csproj" Id="6a3cf0fe-b182-43e4-9ae5-920d0be6cf66" />
   </Folder>
+  <Folder Name="/Services/Auth/Testes/">
+    <Project Path="test/EduOnline.Auth.ApiRest.IntegrationTest/EduOnline.Auth.ApiRest.IntegrationTest.csproj" />
+    <Project Path="test/EduOnline.Auth.ApiRest.UnitTest/EduOnline.Auth.ApiRest.UnitTest.csproj" />
+  </Folder>
   <Folder Name="/Services/Conteudos/">
     <Project Path="src/EduOnline.Conteudos.ApiRest/EduOnline.Conteudos.ApiRest.csproj" />
     <Project Path="src/EduOnline.Conteudos.Data/EduOnline.Conteudos.Data.csproj" />
     <Project Path="src/EduOnline.Conteudos.Domain/EduOnline.Conteudos.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Services/Conteudos/Testes/">
+    <Project Path="test/EduOnline.Conteudos.Domain.UnitTest/EduOnline.Conteudos.Domain.UnitTest.csproj" />
+    <Project Path="test/EduOnline.Conteudos.IntegrationTest/EduOnline.Conteudos.IntegrationTest.csproj" />
+    <Project Path="test/EduOnline.Conteudos.UnitTest/EduOnline.Conteudos.UnitTest.csproj" />
+  </Folder>
+  <Folder Name="/Services/Pagamentos/">
+    <Project Path="src/EduOnline.Pagamentos.AntiCorruption/EduOnline.Pagamentos.AntiCorruption.csproj" />
+    <Project Path="src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" />
+    <Project Path="src/EduOnline.Pagamentos.Data/EduOnline.Pagamentos.Data.csproj" />
+    <Project Path="src/EduOnline.Pagamentos.Domain/EduOnline.Pagamentos.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Services/Pagamentos/Testes/">
+    <Project Path="test/EduOnline.Pagamentos.IntegrationTest/EduOnline.Pagamentos.IntegrationTest.csproj" />
+    <Project Path="test/EduOnline.Pagamentos.UnitTest/EduOnline.Pagamentos.UnitTest.csproj" />
   </Folder>
 </Solution>

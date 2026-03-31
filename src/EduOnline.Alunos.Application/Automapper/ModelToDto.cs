@@ -4,9 +4,11 @@ using EduOnline.Alunos.Domain.Enumeradores;
 using EduOnline.Alunos.Domain.Models;
 using EduOnline.Alunos.Domain.ValueObjects;
 using EduOnline.Core.DomainObjects;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Alunos.Application.Automapper;
 
+[ExcludeFromCodeCoverage]
 public class ModelToDto : Profile
 {
     public ModelToDto()

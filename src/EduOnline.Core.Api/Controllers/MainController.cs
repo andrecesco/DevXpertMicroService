@@ -11,8 +11,8 @@ namespace EduOnline.Core.Api.Controllers;
 [ApiController]
 public abstract class MainController : ControllerBase
 {
-    private readonly DomainNotificationHandler _domainNotifications;
-    private readonly INotificador _notificador;
+    private readonly DomainNotificationHandler? _domainNotifications;
+    private readonly INotificador? _notificador;
     public readonly IAspNetUser AppUser;
 
     protected Guid UsuarioId { get; set; }
@@ -46,7 +46,10 @@ public abstract class MainController : ControllerBase
 
     protected bool OperacaoValida()
     {
-        return !_notificador?.TemNotificacao() ?? false || !_domainNotifications.TemNotificacao();
+        var semNotificacoesNotificador = _notificador is null || !_notificador.TemNotificacao();
+        var semNotificacoesDomain = _domainNotifications is null || !_domainNotifications.TemNotificacao();
+
+        return semNotificacoesNotificador && semNotificacoesDomain;
     }
 
     protected ActionResult CustomResponse(object? result = null)
@@ -58,7 +61,11 @@ public abstract class MainController : ControllerBase
             return Ok(okResult);
         }
 
-        var errorResponse = new ResponseResult(null, _notificador?.ObterNotificacoes().Select(n => new DomainNotification(string.Empty, n.Mensagem)) ?? _domainNotifications.ObterNotificacoes());
+        var notificacoes = _notificador?.ObterNotificacoes().Select(n => new DomainNotification(string.Empty, n.Mensagem))
+                          ?? _domainNotifications?.ObterNotificacoes()
+                          ?? [];
+
+        var errorResponse = new ResponseResult(null, notificacoes);
 
         return BadRequest(errorResponse);
     }

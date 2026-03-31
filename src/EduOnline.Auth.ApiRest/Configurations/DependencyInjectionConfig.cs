@@ -1,9 +1,12 @@
-﻿using EduOnline.Auth.ApiRest.Data;
+﻿using System.Diagnostics.CodeAnalysis;
+using EduOnline.Auth.ApiRest.Data;
+using EduOnline.Auth.ApiRest.Services;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
 
 namespace EduOnline.Auth.ApiRest.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class DependencyInjectionConfig
 {
     public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
@@ -16,8 +19,8 @@ public static class DependencyInjectionConfig
 
     private static void AddContexts(WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ApplicationDbContext>();
+        builder.Services.AddScoped<AuthenticationService>();
         builder.Services.AddScoped<IAspNetUser, AspNetUser>();
     }
 

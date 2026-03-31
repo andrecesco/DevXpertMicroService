@@ -1,5 +1,9 @@
+using EduOnline.Core.Api.Extensions;
+using System.Diagnostics.CodeAnalysis;
+
 namespace EduOnline.Alunos.ApiRest.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class ApiConfig
 {
     public static WebApplicationBuilder AddApiConfig(this WebApplicationBuilder builder)
@@ -7,20 +11,12 @@ public static class ApiConfig
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddControllers()
-            .ConfigureApiBehaviorOptions(options =>
+            .AddJsonOptions(options =>
             {
-                options.SuppressModelStateInvalidFilter = true;
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
             });
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("Total",
-                builder =>
-                    builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-        });
+        builder.Services.AddDefaultCorsByEnvironment(builder.Environment, builder.Configuration);
 
         return builder;
     }

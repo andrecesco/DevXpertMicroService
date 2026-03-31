@@ -21,25 +21,4 @@
   <Folder Name="/Services/Auth/">
     <Project Path="src/EduOnline.Auth.ApiRest/EduOnline.Auth.ApiRest.csproj" Id="6a3cf0fe-b182-43e4-9ae5-920d0be6cf66" />
   </Folder>
-  <Folder Name="/Services/Conteudos/">
-    <Project Path="src/EduOnline.Conteudos.ApiRest/EduOnline.Conteudos.ApiRest.csproj" Id="ca954af9-a7b2-41e6-a933-86662427e32b" />
-    <Project Path="src/EduOnline.Conteudos.Data/EduOnline.Conteudos.Data.csproj" Id="e3774cd8-e487-4a90-af7e-c2c5e6693f0f" />
-    <Project Path="src/EduOnline.Conteudos.Domain/EduOnline.Conteudos.Domain.csproj" />
-  </Folder>
-  <Folder Name="/Services/Conteudos/Testes/">
-    <Project Path="test/EduOnline.Conteudos.Domain.UnitTest/EduOnline.Conteudos.Domain.UnitTest.csproj" Id="d89fce25-f7c8-4f87-b5fd-ada505e6bd18" />
-    <Project Path="test/EduOnline.Conteudos.IntegrationTest/EduOnline.Conteudos.IntegrationTest.csproj" Id="b5430d66-1a65-4e00-9ee3-ee84b88e57fc" />
-  </Folder>
-  <Folder Name="/Services/Pagamentos/">
-    <Project Path="src/EduOnline.Pagamentos.AntiCorruption/EduOnline.Pagamentos.AntiCorruption.csproj" Id="1ad71753-0d7c-47a6-844b-30bfac018dbe" />
-    <Project Path="src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" Id="f1dabc71-8848-4ea5-8476-b2895daaf8eb" />
-    <Project Path="src/EduOnline.Pagamentos.Data/EduOnline.Pagamentos.Data.csproj" Id="10933e57-63a8-40ca-9684-7194bc6ee6e4" />
-    <Project Path="src/EduOnline.Pagamentos.Domain/EduOnline.Pagamentos.Domain.csproj" Id="0e349e2a-08e1-4be8-b714-99a9fc7052dd" />
-  </Folder>
-  <Folder Name="/Services/Pagamentos/Testes/">
-    <Project Path="test/EduOnline.Pagamentos.UnitTest/EduOnline.Pagamentos.UnitTest.csproj" Id="7161a36f-1c2b-4c45-a753-04e780b7b0fe" />
-  </Folder>
-  <Folder Name="/WebApps/">
-    <Project Path="src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" Id="efa6d407-a541-418c-a8b2-b9cc4b4e76f4" />
-  </Folder>
 </Solution>

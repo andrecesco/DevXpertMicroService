@@ -15,11 +15,18 @@ public class HttpClientAuthorizationDelegatingHandler(IHttpContextAccessor httpC
             "Content-Length",
             "Content-Type",
             "Transfer-Encoding",
-            "Connection"
+            "Connection",
+            "Authorization"
         };
 
         if (currentRequestHeaders != null)
         {
+            if (currentRequestHeaders.TryGetValue("Authorization", out var authorizationValues))
+            {
+                request.Headers.Remove("Authorization");
+                request.Headers.TryAddWithoutValidation("Authorization", authorizationValues.ToArray());
+            }
+
             foreach (var header in currentRequestHeaders)
             {
                 if (!string.IsNullOrEmpty(header.Key) &&

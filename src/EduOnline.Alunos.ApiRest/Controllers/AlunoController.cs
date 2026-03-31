@@ -11,7 +11,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EduOnline.Alunos.ApiRest.Controllers;
 
-[Authorize]
+/// <summary>
+/// Endpoints para gestão de alunos, matrículas, progresso e certificados.
+/// </summary>
+[Produces("application/json")]
+[Consumes("application/json")]
+[ProducesResponseType(typeof(ResponseResult), StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+[Authorize(Roles = "Aluno,Administrador")]
 [Route("api/alunos")]
 public class AlunoController(IMediatorHandler mediatorHandler,
 INotificationHandler<DomainNotification> notifications,
@@ -19,13 +28,14 @@ IAlunoQuery alunoQuery,
 IAspNetUser user) : MainController(notifications, user)
 {
     private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
-    private readonly INotificationHandler<DomainNotification> _notifications = notifications;
     private readonly IAlunoQuery _alunoQuery = alunoQuery;
     private readonly IAspNetUser _user = user;
 
+    /// <summary>
+    /// Lista todos os alunos cadastrados.
+    /// </summary>
     [Authorize(Roles = "Administrador")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseResult))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet()]
     public async Task<IActionResult> ObterTodos()
     {
@@ -33,18 +43,27 @@ IAspNetUser user) : MainController(notifications, user)
         return CustomResponse(alunos);
     }
 
-    [Authorize(Roles = "Administrador")]
+    /// <summary>
+    /// Obtém um aluno pelo identificador.
+    /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseResult))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id}")]
     public async Task<IActionResult> ObterPorId(Guid id)
     {
+        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+            return Unauthorized();
+
         var aluno = await _alunoQuery.ObterPorId(id);
         if (aluno is null)
             return NotFound();
         return CustomResponse(aluno);
     }
 
+    /// <summary>
+    /// Lista matrículas de um aluno.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseResult))]
     [HttpGet("{id}/matriculas")]
     public async Task<IActionResult> ObterMatriculasPorAlunoId(Guid id)
     {
@@ -56,6 +75,10 @@ IAspNetUser user) : MainController(notifications, user)
         return CustomResponse(matriculas);
     }
 
+    /// <summary>
+    /// Obtém uma matrícula específica de um aluno.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseResult))]
     [HttpGet("{id}/matriculas/{matriculaId}")]
     public async Task<IActionResult> ObterMatriculaPorId(Guid id, Guid matriculaId)
     {
@@ -67,6 +90,11 @@ IAspNetUser user) : MainController(notifications, user)
         return CustomResponse(matricula);
     }
 
+    /// <summary>
+    /// Obtém o certificado gerado para uma matrícula.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id}/matriculas/{matriculaId}/certificado")]
     public async Task<IActionResult> ObterCertificadoPorMatriculaId(Guid id, Guid matriculaId)
     {
@@ -84,7 +112,12 @@ IAspNetUser user) : MainController(notifications, user)
         return CustomResponse(certificado);
     }
 
+    /// <summary>
+    /// Cadastra um aluno vinculado a um usuário já criado na autenticação.
+    /// </summary>
+    [AllowAnonymous]
     [HttpPost("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Cadastrar(Guid id, AdicionarAlunoRequest request)
     {
         var command = new AdicionarAlunoCommand(id, request.Nome, request.Email);
@@ -94,9 +127,12 @@ IAspNetUser user) : MainController(notifications, user)
         if (!resultado)
             return CustomResponse();
 
-        return CreatedAtAction(actionName: nameof(ObterPorId), routeValues: id, value: null);
+        return NoContent();
     }
 
+    /// <summary>
+    /// Atualiza dados cadastrais de um aluno.
+    /// </summary>
     [HttpPatch]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ResponseResult))]
@@ -118,7 +154,11 @@ IAspNetUser user) : MainController(notifications, user)
         return NoContent();
     }
 
+    /// <summary>
+    /// Realiza a matrícula do aluno em um curso.
+    /// </summary>
     [HttpPost("{id}/matriculas")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> MatricularAluno(Guid id, [FromBody] AdicionarMatriculaRequest request)
     {
         if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
@@ -143,7 +183,11 @@ IAspNetUser user) : MainController(notifications, user)
         return CreatedAtAction(nameof(ObterMatriculaPorId), new { id, matriculaId = command.AggregateId }, null);
     }
 
+    /// <summary>
+    /// Atualiza o progresso do aluno em uma aula.
+    /// </summary>
     [HttpPatch]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [Route("{id}/matriculas/{matriculaId}/progresso/{aulaId}")]
     public async Task<IActionResult> AtualizarProgressoCurso(Guid id, Guid matriculaId, Guid aulaId)
     {
@@ -151,6 +195,27 @@ IAspNetUser user) : MainController(notifications, user)
             return Unauthorized();
 
         var command = new AtualizarHistoricoCommand(matriculaId, aulaId);
+
+        var resultado = await _mediatorHandler.EnviarComando(command);
+
+        if (!resultado)
+            return CustomResponse();
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Solicita a finalização de um curso e geração de certificado.
+    /// </summary>
+    [HttpPatch]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [Route("{id}/matriculas/{matriculaId}/finalizar")]
+    public async Task<IActionResult> FinalizarCurso(Guid id, Guid matriculaId)
+    {
+        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+            return Unauthorized();
+
+        var command = new GerarCertificadoCommand(matriculaId);
 
         var resultado = await _mediatorHandler.EnviarComando(command);
 

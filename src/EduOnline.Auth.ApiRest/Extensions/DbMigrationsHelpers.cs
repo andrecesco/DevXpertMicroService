@@ -1,112 +1,147 @@
 ﻿using EduOnline.Auth.ApiRest.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Auth.ApiRest.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class DbMigrationsHelpers
 {
+    private const string DefaultAlunoId = "d9475e09-793f-4bd8-8f63-93e5038c0d16";
+    private const string DefaultSeedPassword = "Teste@123";
+    private const string DefaultAdminEmail = "admin@eduonline.com";
+    private const string DefaultAlunoEmail = "aluno@eduonline.com";
+
     public static void UseDbMigrationHelper(this WebApplication app)
     {
         EnsureSeedData(app).Wait();
     }
 
-    public static async Task EnsureSeedData(WebApplication serviceScope)
+    public static async Task EnsureSeedData(WebApplication app)
     {
-        var services = serviceScope.Services.CreateScope().ServiceProvider;
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
 
-        using var scope = services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-
-        var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-
-        var contextId = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var env = services.GetRequiredService<IWebHostEnvironment>();
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var configuration = services.GetRequiredService<IConfiguration>();
 
         if (env.IsDevelopment())
         {
-            await contextId.Database.MigrateAsync();
-            await AdicionarAdministrador(contextId, scope.ServiceProvider);
-            await AdicionarAluno(contextId, scope.ServiceProvider);
+            var enableMigrations = ObterBoolean(configuration, "SeedSettings:EnableMigrations", true);
+            if (enableMigrations)
+            {
+                await context.Database.EnsureDeletedAsync();
+
+                var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+                if (pendingMigrations.Any())
+                {
+                    await context.Database.MigrateAsync();
+                }
+            }
+
+            var enableSeedData = ObterBoolean(configuration, "SeedSettings:EnableSeedData", true);
+            if (enableSeedData)
+            {
+                var seedPassword = configuration["SeedSettings:SenhaPadrao"] ?? DefaultSeedPassword;
+                var adminEmail = configuration["SeedSettings:AdminEmailPadrao"] ?? DefaultAdminEmail;
+                var alunoEmail = configuration["SeedSettings:AlunoEmailPadrao"] ?? DefaultAlunoEmail;
+                var alunoId = ObterAlunoSeedId(configuration);
+
+                await AdicionarAdministrador(services, adminEmail, seedPassword);
+                await AdicionarAluno(services, alunoId, alunoEmail, seedPassword);
+            }
         }
     }
 
-    public async static Task AdicionarAdministrador(ApplicationDbContext identityDb, IServiceProvider serviceProvider)
+    public static async Task AdicionarAdministrador(IServiceProvider services, string email, string senhaPadrao)
     {
-        var userExists = await identityDb.Users.FirstOrDefaultAsync(a => a.UserName == "admin@admin.com");
+        var userManager = services.GetRequiredService<UserManager<EduOnlineUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
+        var userExists = await userManager.FindByEmailAsync(email);
         if (userExists is not null) return;
-
-        var roleManager = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole>>();
 
         if (!await roleManager.RoleExistsAsync("Administrador"))
         {
-            await roleManager.CreateAsync(new Microsoft.AspNetCore.Identity.IdentityRole("Administrador"));
+            await roleManager.CreateAsync(new IdentityRole("Administrador"));
         }
 
-        var idUsuario = Guid.NewGuid();
-        await identityDb.Users.AddAsync(new Microsoft.AspNetCore.Identity.IdentityUser
+        var adminUser = new EduOnlineUser
         {
-            Id = idUsuario.ToString(),
-            UserName = "admin@admin.com",
-            NormalizedUserName = "ADMIN@ADMIN.COM",
-            Email = "admin@admin.com",
-            NormalizedEmail = "ADMIN@ADMIN.COM",
-            AccessFailedCount = 0,
-            LockoutEnabled = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEA8BzmHCVEcOD+VNHR7Z91SjCRm9Zc4yodRPaowNC98ttq1IuwawRlqBzwUPidXCnw==",
-            TwoFactorEnabled = false,
-            ConcurrencyStamp = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid().ToString(),
+            UserName = email,
+            Email = email,
             EmailConfirmed = true,
-            SecurityStamp = Guid.NewGuid().ToString()
-        });
+            StatusId = Status.Cadastrado.Id,
+            StatusNome = Status.Cadastrado.Nome
+        };
 
-        await identityDb.SaveChangesAsync();
+        var createResult = await userManager.CreateAsync(adminUser, senhaPadrao);
 
-        //set role Administrador for user
-        var userManager = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser>>();
-        var user = await userManager.FindByIdAsync(idUsuario.ToString());
-        if (user != null)
+        if (!createResult.Succeeded)
         {
-            await userManager.AddToRoleAsync(user, "Administrador");
+            throw new InvalidOperationException($"Falha ao criar usuário administrador de seed: {string.Join(" | ", createResult.Errors.Select(e => e.Description))}");
+        }
+
+        var addRoleResult = await userManager.AddToRoleAsync(adminUser, "Administrador");
+        if (!addRoleResult.Succeeded)
+        {
+            throw new InvalidOperationException($"Falha ao vincular papel Administrador ao usuário de seed: {string.Join(" | ", addRoleResult.Errors.Select(e => e.Description))}");
         }
     }
 
-    public static async Task AdicionarAluno(ApplicationDbContext identityDb, IServiceProvider serviceProvider)
+    public static async Task AdicionarAluno(IServiceProvider services, Guid alunoId, string email, string senhaPadrao)
     {
-        var userExists = await identityDb.Users.FirstOrDefaultAsync(a => a.UserName == "aluno@aluno.com");
+        var userManager = services.GetRequiredService<UserManager<EduOnlineUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
+        var userExists = await userManager.FindByEmailAsync(email);
         if (userExists is not null) return;
-
-        var roleManager = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole>>();
 
         if (!await roleManager.RoleExistsAsync("Aluno"))
         {
-            await roleManager.CreateAsync(new Microsoft.AspNetCore.Identity.IdentityRole("Aluno"));
+            await roleManager.CreateAsync(new IdentityRole("Aluno"));
         }
 
-        var idUsuario = Guid.Parse("d9475e09-793f-4bd8-8f63-93e5038c0d16");
-        await identityDb.Users.AddAsync(new Microsoft.AspNetCore.Identity.IdentityUser
+        var alunoUser = new EduOnlineUser
         {
-            Id = idUsuario.ToString(),
-            UserName = "aluno@aluno.com",
-            NormalizedUserName = "ALUNO@ALUNO.COM",
-            Email = "aluno@aluno.com",
-            NormalizedEmail = "ALUNO@ALUNO.COM",
-            AccessFailedCount = 0,
-            LockoutEnabled = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEA8BzmHCVEcOD+VNHR7Z91SjCRm9Zc4yodRPaowNC98ttq1IuwawRlqBzwUPidXCnw==",
-            TwoFactorEnabled = false,
-            ConcurrencyStamp = Guid.NewGuid().ToString(),
+            Id = alunoId.ToString(),
+            UserName = email,
+            Email = email,
             EmailConfirmed = true,
-            SecurityStamp = Guid.NewGuid().ToString()
-        });
+            StatusId = Status.Cadastrado.Id,
+            StatusNome = Status.Cadastrado.Nome
+        };
 
-        await identityDb.SaveChangesAsync();
+        var createResult = await userManager.CreateAsync(alunoUser, senhaPadrao);
 
-        //set role Administrador for user
-        var userManager = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser>>();
-        var user = await userManager.FindByIdAsync(idUsuario.ToString());
-        if (user != null)
+        if (!createResult.Succeeded)
         {
-            await userManager.AddToRoleAsync(user, "Aluno");
+            throw new InvalidOperationException($"Falha ao criar usuário aluno de seed: {string.Join(" | ", createResult.Errors.Select(e => e.Description))}");
         }
+
+        var addRoleResult = await userManager.AddToRoleAsync(alunoUser, "Aluno");
+        if (!addRoleResult.Succeeded)
+        {
+            throw new InvalidOperationException($"Falha ao vincular papel Aluno ao usuário de seed: {string.Join(" | ", addRoleResult.Errors.Select(e => e.Description))}");
+        }
+    }
+
+    private static Guid ObterAlunoSeedId(IConfiguration configuration)
+    {
+        var raw = configuration["SeedSettings:AlunoIdPadrao"];
+        return Guid.TryParse(raw, out var id)
+            ? id
+            : Guid.Parse(DefaultAlunoId);
+    }
+
+    private static bool ObterBoolean(IConfiguration configuration, string key, bool defaultValue)
+    {
+        var raw = configuration[key];
+        return bool.TryParse(raw, out var value)
+            ? value
+            : defaultValue;
     }
 }

@@ -1,8 +1,10 @@
 using EduOnline.Alunos.Data.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Alunos.ApiRest.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class DatabaseSelectExtension
 {
     public static WebApplicationBuilder AddDatabaseSelector(this WebApplicationBuilder builder)

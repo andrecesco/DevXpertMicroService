@@ -9,9 +9,9 @@ public class CursoCompradoIntegrationEvent : IntegrationEvent
     public string NumeroCartao { get; private set; }
     public string ExpiracaoCartao { get; private set; }
     public string CvvCartao { get; private set; }
-    public CursoCompradoIntegrationEvent(Guid matriculaId, Guid cursoId, Guid alunoId, decimal total, string nomeCartao, string numeroCartao, string expiracaoCartao, string cvvCartao)
+    public CursoCompradoIntegrationEvent(Guid aggregateId, Guid cursoId, Guid alunoId, decimal total, string nomeCartao, string numeroCartao, string expiracaoCartao, string cvvCartao)
     {
-        AggregateId = matriculaId;
+        AggregateId = aggregateId;
         CursoId = cursoId;
         AlunoId = alunoId;
         Total = total;

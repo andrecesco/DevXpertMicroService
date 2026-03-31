@@ -1,8 +1,8 @@
 using EduOnline.Alunos.ApiRest.Configurations;
 using EduOnline.Alunos.ApiRest.Extensions;
 using EduOnline.Alunos.Data.Context;
-using EduOnline.Core.Api.Identidade;
 using EduOnline.Core.Api.Extensions;
+using EduOnline.Core.Api.Identidade;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -55,12 +55,12 @@ public class AuthenticationService
     public async Task<UsuarioRepostaModel> GerarJwt(string email)
     {
         var user = await UserManager.FindByEmailAsync(email);
-        
+
         if (user == null)
         {
             throw new InvalidOperationException($"Usuário com email '{email}' não encontrado.");
         }
-        
+
         var claims = await UserManager.GetClaimsAsync(user);
 
         var identityClaims = await ObterClaimsUsuario(claims, user);

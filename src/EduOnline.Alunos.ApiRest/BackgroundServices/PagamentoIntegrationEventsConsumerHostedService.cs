@@ -6,24 +6,35 @@ using System.Diagnostics.CodeAnalysis;
 namespace EduOnline.Alunos.ApiRest.BackgroundServices;
 
 [ExcludeFromCodeCoverage]
-public class PagamentoIntegrationEventsConsumerHostedService(IRabbitMqEventBus eventBus, IMediator mediator) : BackgroundService
+public class PagamentoIntegrationEventsConsumerHostedService(IServiceProvider serviceProvider, IRabbitMqEventBus eventBus) : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await eventBus.SubscribeAsync<PagamentoRealizadoEvent>(
-            async integrationEvent => await mediator.Publish(integrationEvent, stoppingToken),
-            stoppingToken);
+        SetSubscriber(stoppingToken);
+        return Task.CompletedTask;
+    }
 
-        await eventBus.SubscribeAsync<PagamentoRecusadoEvent>(
-            async integrationEvent => await mediator.Publish(integrationEvent, stoppingToken),
-            stoppingToken);
+    public void SetSubscriber(CancellationToken stoppingToken)
+    {
+        eventBus.SubscribeAsync<PagamentoRealizadoIntegrationEvent>(PagamentoRealizado, stoppingToken);
+        eventBus.SubscribeAsync<PagamentoRecusadoIntegrationEvent>(PagamentoRecusado, stoppingToken);
+    }
 
-        try
-        {
-            await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-        catch (TaskCanceledException)
-        {
-        }
+    public async Task PagamentoRealizado(PagamentoRealizadoIntegrationEvent message)
+    {
+        await using var scope = serviceProvider.CreateAsyncScope();
+
+        var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<PagamentoRealizadoIntegrationEvent>>();
+
+        await handler.Handle(message, CancellationToken.None);
+    }
+
+    public async Task PagamentoRecusado(PagamentoRecusadoIntegrationEvent message)
+    {
+        await using var scope = serviceProvider.CreateAsyncScope();
+
+        var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<PagamentoRecusadoIntegrationEvent>>();
+
+        await handler.Handle(message, CancellationToken.None);
     }
 }

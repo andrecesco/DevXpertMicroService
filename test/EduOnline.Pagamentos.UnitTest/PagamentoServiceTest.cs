@@ -69,7 +69,7 @@ public class PagamentoServiceTest
         // O evento de PagamentoRealizado deve ser adicionado ao pagamento antes do commit
         Assert.NotNull(pagamentoAdicionado);
         Assert.NotNull(pagamentoAdicionado!.Notificacoes);
-        Assert.Contains(pagamentoAdicionado.Notificacoes!, e => e is PagamentoRealizadoEvent);
+        Assert.Contains(pagamentoAdicionado.Notificacoes!, e => e is PagamentoRealizadoIntegrationEvent);
     }
 
     [Fact]
@@ -124,6 +124,6 @@ public class PagamentoServiceTest
 
         // Deve publicar a DomainNotification e o evento PagamentoRecusado
         mediatorMock.Verify(m => m.PublicarNotificacao(It.Is<DomainNotification>(n => n.Key == "pagamento")), Times.Once);
-        mediatorMock.Verify(m => m.PublicarEvento(It.Is<PagamentoRecusadoEvent>(e => e.AggregateId == pagamentoCurso.MatriculaId && e.Total == pagamentoCurso.Total)), Times.Once);
+        mediatorMock.Verify(m => m.PublicarEvento(It.Is<PagamentoRecusadoIntegrationEvent>(e => e.AggregateId == pagamentoCurso.MatriculaId && e.Total == pagamentoCurso.Total)), Times.Once);
     }
 }

@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EduOnline.Auth.ApiRest.Data;
+﻿using EduOnline.Auth.ApiRest.Data;
 using EduOnline.Auth.ApiRest.Services;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Auth.ApiRest.Configurations;
 

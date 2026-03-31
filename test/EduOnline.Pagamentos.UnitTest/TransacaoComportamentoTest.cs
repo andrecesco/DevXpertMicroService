@@ -187,7 +187,7 @@ public class TransacaoComportamentoTest
     {
         // Arrange
         var pagamento = GerarPagamento();
-        
+
         // Act - Criar transação aprovada
         var transacao = new Transacao
         {

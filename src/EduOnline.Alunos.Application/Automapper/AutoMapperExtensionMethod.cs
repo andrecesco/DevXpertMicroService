@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace EduOnline.Alunos.Application.Automapper;
 

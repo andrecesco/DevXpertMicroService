@@ -1,16 +1,18 @@
-using System.Diagnostics.CodeAnalysis;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Data.EventSourcing;
 using EduOnline.Core.Mensagens;
+using EduOnline.Core.Mensagens.IntegrationEvents;
 using EduOnline.Core.Mensagens.Notifications;
 using EduOnline.Core.Mensagens.RabbitMq;
 using EduOnline.Pagamentos.AntiCorruption;
 using EduOnline.Pagamentos.ApiRest.BackgroundServices;
 using EduOnline.Pagamentos.Data;
 using EduOnline.Pagamentos.Domain;
+using EduOnline.Pagamentos.Domain.Events;
 using EventSourcing;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Pagamentos.ApiRest.Configurations;
 
@@ -39,6 +41,7 @@ public static class DependencyInjectionConfig
         builder.Services.AddScoped<IMediatorHandler, MediatorHandler>();
         builder.Services.AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>();
         builder.Services.AddScoped<INotificador, Notificador>();
+        builder.Services.AddScoped<INotificationHandler<CursoCompradoIntegrationEvent>, PagamentoEventHandler>();
     }
 
     private static void AddRepositories(WebApplicationBuilder builder)

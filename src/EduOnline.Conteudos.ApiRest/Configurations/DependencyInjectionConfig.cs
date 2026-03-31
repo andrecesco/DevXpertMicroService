@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using EduOnline.Conteudos.Data.Context;
 using EduOnline.Conteudos.Data.Repository;
 using EduOnline.Conteudos.Domain;
@@ -10,6 +9,7 @@ using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.Notifications;
 using EventSourcing;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Conteudos.ApiRest.Configurations;
 

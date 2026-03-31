@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EduOnline.Bff.ApiRest.Services;
+﻿using EduOnline.Bff.ApiRest.Services;
 using EduOnline.Core.Api.Extensions;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.WebApps.ApiRest.Configurations;
 

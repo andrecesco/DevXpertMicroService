@@ -6,20 +6,25 @@ using System.Diagnostics.CodeAnalysis;
 namespace EduOnline.Pagamentos.ApiRest.BackgroundServices;
 
 [ExcludeFromCodeCoverage]
-public class CursoCompradoConsumerHostedService(IRabbitMqEventBus eventBus, IMediator mediator) : BackgroundService
+public class CursoCompradoConsumerHostedService(IServiceProvider serviceProvider, IRabbitMqEventBus eventBus) : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await eventBus.SubscribeAsync<CursoCompradoIntegrationEvent>(
-            async integrationEvent => await mediator.Publish(integrationEvent, stoppingToken),
-            stoppingToken);
+        SetSubscriber(stoppingToken);
+        return Task.CompletedTask;
+    }
 
-        try
-        {
-            await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-        catch (TaskCanceledException)
-        {
-        }
+    public void SetSubscriber(CancellationToken stoppingToken)
+    {
+        eventBus.SubscribeAsync<CursoCompradoIntegrationEvent>(RealizarPagamento, stoppingToken);
+    }
+
+    public async Task RealizarPagamento(CursoCompradoIntegrationEvent message)
+    {
+        await using var scope = serviceProvider.CreateAsyncScope();
+
+        var handler = scope.ServiceProvider.GetRequiredService<INotificationHandler<CursoCompradoIntegrationEvent>>();
+
+        await handler.Handle(message, CancellationToken.None);
     }
 }

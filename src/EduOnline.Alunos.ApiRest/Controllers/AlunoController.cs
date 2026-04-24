@@ -4,6 +4,7 @@ using EduOnline.Alunos.Application.Queries;
 using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
+using EduOnline.Core.DomainObjects;
 using EduOnline.Core.Mensagens.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -39,8 +40,21 @@ IAspNetUser user) : MainController(notifications, user)
     [HttpGet()]
     public async Task<IActionResult> ObterTodos()
     {
-        var alunos = await _alunoQuery.ObterTodos();
-        return CustomResponse(alunos);
+        try
+        {
+            var alunos = await _alunoQuery.ObterTodos();
+            return CustomResponse(alunos);
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
+            return CustomResponse();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -51,13 +65,27 @@ IAspNetUser user) : MainController(notifications, user)
     [HttpGet("{id}")]
     public async Task<IActionResult> ObterPorId(Guid id)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
 
-        var aluno = await _alunoQuery.ObterPorId(id);
-        if (aluno is null)
-            return NotFound();
-        return CustomResponse(aluno);
+            var aluno = await _alunoQuery.ObterPorId(id);
+            if (aluno is null)
+                return NotFound();
+            return CustomResponse(aluno);
+
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
+            return CustomResponse();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -67,12 +95,25 @@ IAspNetUser user) : MainController(notifications, user)
     [HttpGet("{id}/matriculas")]
     public async Task<IActionResult> ObterMatriculasPorAlunoId(Guid id)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
 
-        var matriculas = await _alunoQuery.ObterMatriculasPorAlunoId(id);
+            var matriculas = await _alunoQuery.ObterMatriculasPorAlunoId(id);
 
-        return CustomResponse(matriculas);
+            return CustomResponse(matriculas);
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
+            return CustomResponse();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -82,12 +123,25 @@ IAspNetUser user) : MainController(notifications, user)
     [HttpGet("{id}/matriculas/{matriculaId}")]
     public async Task<IActionResult> ObterMatriculaPorId(Guid id, Guid matriculaId)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
 
-        var matricula = await _alunoQuery.ObterMatriculaPorId(matriculaId);
+            var matricula = await _alunoQuery.ObterMatriculaPorId(matriculaId);
 
-        return CustomResponse(matricula);
+            return CustomResponse(matricula);
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
+            return CustomResponse();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -98,18 +152,31 @@ IAspNetUser user) : MainController(notifications, user)
     [HttpGet("{id}/matriculas/{matriculaId}/certificado")]
     public async Task<IActionResult> ObterCertificadoPorMatriculaId(Guid id, Guid matriculaId)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
-
-        var certificado = await _alunoQuery.ObterCertificadoPorMatriculaId(matriculaId);
-
-        if (certificado is null)
+        try
         {
-            NotificarErro("Certificado não encontrado");
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
+
+            var certificado = await _alunoQuery.ObterCertificadoPorMatriculaId(matriculaId);
+
+            if (certificado is null)
+            {
+                NotificarErro("Certificado não encontrado");
+                return CustomResponse();
+            }
+
+            return CustomResponse(certificado);
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
             return CustomResponse();
         }
-
-        return CustomResponse(certificado);
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -120,14 +187,27 @@ IAspNetUser user) : MainController(notifications, user)
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Cadastrar(Guid id, AdicionarAlunoRequest request)
     {
-        var command = new AdicionarAlunoCommand(id, request.Nome, request.Email);
+        try
+        {
+            var command = new AdicionarAlunoCommand(id, request.Nome, request.Email);
 
-        var resultado = await _mediatorHandler.EnviarComando(command);
+            var resultado = await _mediatorHandler.EnviarComando(command);
 
-        if (!resultado)
+            if (!resultado)
+                return CustomResponse();
+
+            return NoContent();
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
             return CustomResponse();
-
-        return NoContent();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -141,17 +221,30 @@ IAspNetUser user) : MainController(notifications, user)
     [Route("{id}")]
     public async Task<IActionResult> AtualizarAluno(Guid id, AtualizarAlunoRequest request)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
 
-        var command = new AlterarAlunoCommand(id, request.Nome, request.DataNascimento);
+            var command = new AlterarAlunoCommand(id, request.Nome, request.DataNascimento);
 
-        var resultado = await _mediatorHandler.EnviarComando(command);
+            var resultado = await _mediatorHandler.EnviarComando(command);
 
-        if (!resultado)
+            if (!resultado)
+                return CustomResponse();
+
+            return NoContent();
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
             return CustomResponse();
-
-        return NoContent();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -161,26 +254,39 @@ IAspNetUser user) : MainController(notifications, user)
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> MatricularAluno(Guid id, [FromBody] AdicionarMatriculaRequest request)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Forbid();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Forbid();
 
-        var command = new AdicionarMatriculaCommand(
-            _user.GetUserId(),
-            request.CursoId,
-            request.CursoNome,
-            request.Valor,
-            request.NomeCartao,
-            request.NumeroCartao,
-            request.ExpiracaoCartao,
-            request.CvvCartao,
-            request.TotalAulas);
+            var command = new AdicionarMatriculaCommand(
+                _user.GetUserId(),
+                request.CursoId,
+                request.CursoNome,
+                request.Valor,
+                request.NomeCartao,
+                request.NumeroCartao,
+                request.ExpiracaoCartao,
+                request.CvvCartao,
+                request.TotalAulas);
 
-        var resultado = await _mediatorHandler.EnviarComando(command);
+            var resultado = await _mediatorHandler.EnviarComando(command);
 
-        if (!resultado)
+            if (!resultado)
+                return CustomResponse();
+
+            return CreatedAtAction(nameof(ObterMatriculaPorId), new { id, matriculaId = command.AggregateId }, null);
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
             return CustomResponse();
-
-        return CreatedAtAction(nameof(ObterMatriculaPorId), new { id, matriculaId = command.AggregateId }, null);
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -191,17 +297,30 @@ IAspNetUser user) : MainController(notifications, user)
     [Route("{id}/matriculas/{matriculaId}/progresso/{aulaId}")]
     public async Task<IActionResult> AtualizarProgressoCurso(Guid id, Guid matriculaId, Guid aulaId)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
 
-        var command = new AtualizarHistoricoCommand(matriculaId, aulaId);
+            var command = new AtualizarHistoricoCommand(matriculaId, aulaId);
 
-        var resultado = await _mediatorHandler.EnviarComando(command);
+            var resultado = await _mediatorHandler.EnviarComando(command);
 
-        if (!resultado)
+            if (!resultado)
+                return CustomResponse();
+
+            return NoContent();
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
             return CustomResponse();
-
-        return NoContent();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 
     /// <summary>
@@ -212,16 +331,29 @@ IAspNetUser user) : MainController(notifications, user)
     [Route("{id}/matriculas/{matriculaId}/finalizar")]
     public async Task<IActionResult> FinalizarCurso(Guid id, Guid matriculaId)
     {
-        if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
-            return Unauthorized();
+        try
+        {
+            if (id != _user.GetUserId() && !_user.IsInRole("Administrador"))
+                return Unauthorized();
 
-        var command = new GerarCertificadoCommand(matriculaId);
+            var command = new GerarCertificadoCommand(matriculaId);
 
-        var resultado = await _mediatorHandler.EnviarComando(command);
+            var resultado = await _mediatorHandler.EnviarComando(command);
 
-        if (!resultado)
+            if (!resultado)
+                return CustomResponse();
+
+            return NoContent();
+        }
+        catch (DomainException ex)
+        {
+            NotificarErro(ex.Message);
             return CustomResponse();
-
-        return NoContent();
+        }
+        catch (Exception)
+        {
+            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            return CustomResponse();
+        }
     }
 }

@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eduonline
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - configmaps/observability-configmap.yaml
+  - secrets/observability-secret.yaml
+  - pv-pvc.yaml
+  - statefulsets/sqlserver-statefulset.yaml
+  - statefulsets/eventstore-statefulset.yaml
+  - statefulsets/rabbitmq-statefulset.yaml
+  - services/sqlserver-service.yaml
+  - services/eventstore-service.yaml
+  - services/rabbitmq-service.yaml
+  - deployments/auth-api-deployment.yaml
+  - deployments/conteudos-api-deployment.yaml
+  - deployments/alunos-api-deployment.yaml
+  - deployments/pagamentos-api-deployment.yaml
+  - deployments/bff-api-deployment.yaml
+  - services/auth-api-service.yaml
+  - services/conteudos-api-service.yaml
+  - services/alunos-api-service.yaml
+  - services/pagamentos-api-service.yaml
+  - services/bff-api-service.yaml
+  - networkpolicies/deny-all.yaml
+  - networkpolicies/allow-inter-service.yaml
+  - networkpolicies/allow-ingress.yaml
+  - ingress/ingress.yaml
+  - hpa/auth-api-hpa.yaml
+  - hpa/conteudos-api-hpa.yaml
+  - hpa/alunos-api-hpa.yaml
+  - hpa/pagamentos-api-hpa.yaml
+  - hpa/bff-api-hpa.yaml
+  - rbac/serviceaccount.yaml
+  - observability/otel-collector/configmap.yaml
+  - observability/otel-collector/deployment.yaml
+  - observability/otel-collector/service.yaml
+  - observability/jaeger/configmap.yaml
+  - observability/jaeger/deployment.yaml
+  - observability/jaeger/rbac.yaml
+  - observability/jaeger/service.yaml
+  - observability/alertmanager/configmap.yaml
+  - observability/alertmanager/deployment.yaml
+  - observability/alertmanager/rbac.yaml
+  - observability/alertmanager/service.yaml
+  - observability/elasticsearch/deployment.yaml
+  - observability/elasticsearch/kibana-configmap.yaml
+  - observability/elasticsearch/kibana-deployment.yaml
+  - observability/elasticsearch/kibana-rbac.yaml
+  - observability/elasticsearch/kibana-service.yaml
+  - observability/elasticsearch/rbac.yaml
+  - observability/elasticsearch/service.yaml
+  - observability/fluentd/configmap.yaml
+  - observability/fluentd/daemonset.yaml
+  - observability/fluentd/rbac.yaml
+  - security

@@ -1,0 +1,119 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: restricted
+  namespace: eduonline
+  labels:
+    component: security
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+
+  requiredDropCapabilities:
+  - ALL
+
+  volumes:
+  - 'configMap'
+  - 'emptyDir'
+  - 'projected'
+  - 'secret'
+  - 'downwardAPI'
+  - 'persistentVolumeClaim'
+
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+
+  runAsGroup:
+    rule: 'MustRunAs'
+    ranges:
+    - min: 1000
+      max: 65535
+
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+    - min: 1000
+      max: 65535
+
+  readOnlyRootFilesystem: false
+
+  seLinux:
+    rule: 'MustRunAs'
+    seLinuxOptions:
+      level: "s0:c123,c456"
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: baseline
+  namespace: eduonline
+  labels:
+    component: security
+spec:
+  privileged: false
+  allowPrivilegeEscalation: true
+
+  volumes:
+  - '*'
+
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+
+  runAsUser:
+    rule: 'RunAsAny'
+
+  runAsGroup:
+    rule: 'RunAsAny'
+
+  fsGroup:
+    rule: 'RunAsAny'
+
+  readOnlyRootFilesystem: false
+
+  seLinux:
+    rule: 'RunAsAny'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: restricted-psp
+  labels:
+    component: security
+rules:
+- apiGroups: ['policy']
+  resources: ['podsecuritypolicies']
+  verbs: ['use']
+  resourceNames:
+  - restricted
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: restricted-psp
+  labels:
+    component: security
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: restricted-psp
+subjects:
+- kind: ServiceAccount
+  name: auth-api
+  namespace: eduonline
+- kind: ServiceAccount
+  name: alunos-api
+  namespace: eduonline
+- kind: ServiceAccount
+  name: conteudos-api
+  namespace: eduonline
+- kind: ServiceAccount
+  name: pagamentos-api
+  namespace: eduonline
+- kind: ServiceAccount
+  name: bff-api
+  namespace: eduonline

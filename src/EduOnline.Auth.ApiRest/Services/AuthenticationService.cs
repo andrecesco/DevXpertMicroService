@@ -153,6 +153,37 @@ public class AuthenticationService
         return refreshToken;
     }
 
+    public string GerarTokenServicoAdministrador()
+    {
+        if (string.IsNullOrWhiteSpace(_appTokenSettingsSettings.Segredo))
+            throw new InvalidOperationException("AppTokenSettings:Segredo não configurado.");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appTokenSettingsSettings.Segredo));
+        var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var identityClaims = new ClaimsIdentity(new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+            new(ClaimTypes.Role, "Administrador"),
+            new("role", "Administrador"),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64),
+            new(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64)
+        });
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
+        {
+            Issuer = _appTokenSettingsSettings.Issuer,
+            Audience = _appTokenSettingsSettings.Audience,
+            Subject = identityClaims,
+            Expires = DateTime.UtcNow.AddMinutes(5),
+            SigningCredentials = signingCredentials
+        });
+
+        return tokenHandler.WriteToken(token);
+    }
+
     public async Task<RefreshToken?> ObterRefreshToken(Guid refreshToken)
     {
         RefreshToken? token = await _context.RefreshTokens.AsNoTracking()

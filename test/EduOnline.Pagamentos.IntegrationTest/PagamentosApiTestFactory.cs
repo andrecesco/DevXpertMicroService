@@ -1,3 +1,5 @@
+using EduOnline.Core.Data.EventSourcing;
+using EduOnline.Core.Mensagens;
 using EduOnline.Pagamentos.Data;
 using EduOnline.Pagamentos.Domain;
 using Microsoft.AspNetCore.Hosting;
@@ -17,7 +19,7 @@ public class PagamentosApiTestFactory : WebApplicationFactory<Program>
 {
     private const string Issuer = "https://localhost:7020";
     private const string Audience = "EduOnline-Dev";
-    private const string Secret = "360a1429-8cdb-45ec-ab2d-fccf2eb3521e";
+    private const string Secret = "ChaveSuperSecretaParaJWT_2024_EduOnline_MinhaChaveDeve_TerMaisde32Caracteres!@#$%^&*";
 
     public Guid Aluno1Id { get; } = Guid.NewGuid();
     public Guid Aluno2Id { get; } = Guid.NewGuid();
@@ -46,6 +48,8 @@ public class PagamentosApiTestFactory : WebApplicationFactory<Program>
         {
             services.RemoveAll<IPagamentoCartaoCreditoFacade>();
             services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacadeFake>();
+            services.RemoveAll<IEventSourcingRepository>();
+            services.AddSingleton<IEventSourcingRepository, NoOpEventSourcingRepository>();
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<PagamentosContext>();
@@ -143,6 +147,15 @@ public class PagamentosApiTestFactory : WebApplicationFactory<Program>
                 StatusTransacaoId = StatusTransacao.Aprovado.Id
             };
         }
+    }
+
+    private sealed class NoOpEventSourcingRepository : IEventSourcingRepository
+    {
+        public Task SalvarEvento<TEvent>(TEvent evento) where TEvent : Event
+            => Task.CompletedTask;
+
+        public Task<IEnumerable<StoredEvent>> ObterEventos(Guid aggregateId)
+            => Task.FromResult<IEnumerable<StoredEvent>>([]);
     }
 
     public async Task<int> ContarPagamentosAsync()

@@ -30,4 +30,18 @@ public class HealthChecksIntegrationTest : IClassFixture<AuthApiTestFactory>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Headers.Contains(CorrelationIdMiddleware.HeaderName).Should().BeTrue();
     }
+
+    [Fact(DisplayName = "GET /metrics deve retornar métricas na Auth API")]
+    public async Task Metrics_DeveRetornar200()
+    {
+        var response = await _client.GetAsync("/metrics", TestContext.Current.CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.Contains(CorrelationIdMiddleware.HeaderName).Should().BeTrue();
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/plain");
+
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        content.Should().Contain("# HELP");
+        content.Should().Contain("# TYPE");
+    }
 }

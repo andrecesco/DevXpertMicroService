@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - vault/configmap.yaml
+  - vault/deployment.yaml
+  - vault/rbac.yaml
+  - vault/service.yaml
+  - vault/policy-configmap.yaml
+  - vault/secretstore.yaml
+  - vault/external-secret.yaml
+  - audit/configmap.yaml
+  - rbac/pod-security-policies.yaml
+  - network-policies/network-policies.yaml
+  - tls/clusterissuer.yaml
+  - tls/certificates.yaml
+  - tls/ingress-tls.yaml

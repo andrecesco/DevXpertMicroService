@@ -9,12 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.AddStructuredLogging()
+    .AddApplicationObservability()
     .AddApiConfig()
     .AddJwtConfiguration()
     .AddDatabaseSelector()
     .ValidateRabbitMqWhenEnabled()
     .RegisterServices()
-    .AddApiHealthChecks<AlunosContext>(includeRabbitMqWhenEnabled: true)
+    .AddApiHealthChecks<AlunosContext>(includeRabbitMqWhenEnabled: false)
     .AddSwaggerConfig();
 
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
@@ -39,6 +40,7 @@ app.UseCors("Total");
 
 app.UseRouting();
 
+app.UseObservability();
 app.UseCorrelationId();
 
 app.UseAuthConfiguration();

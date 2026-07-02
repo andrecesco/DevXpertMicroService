@@ -153,7 +153,18 @@ public class AlunoController(IAlunoService alunoService, IConteudoService conteu
         if (id != user.GetUserId() && !user.IsInRole("Administrador"))
             return Forbid();
 
-        var response = await alunoService.AtualizarProgressoCurso(id, matriculaId, aulaId);
+        var matriculaResponse = await alunoService.ObterMatriculaPorId(id, matriculaId);
+        if (!matriculaResponse.Success)
+            return RespostaErro(matriculaResponse);
+
+        if (matriculaResponse.Data is not JsonElement matriculaElement ||
+            !matriculaElement.TryGetProperty("cursoId", out var cursoIdElement) ||
+            !cursoIdElement.TryGetGuid(out var cursoId))
+        {
+            return BadRequest("Não foi possível identificar o curso da matrícula para registrar o consumo da aula.");
+        }
+
+        var response = await conteudoService.RegistrarConsumoAula(cursoId, aulaId, id, matriculaId);
         return response.Success ? NoContent() : RespostaErro(response);
     }
 

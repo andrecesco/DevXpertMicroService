@@ -1,0 +1,71 @@
+{
+  "dashboard": {
+    "title": "Kubernetes Dashboard",
+    "tags": ["kubernetes", "cluster"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Node Status",
+        "targets": [
+          {
+            "expr": "kube_node_status_condition{condition=\"Ready\"}"
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "id": 2,
+        "title": "Pod Restarts",
+        "targets": [
+          {
+            "expr": "rate(kube_pod_container_status_restarts_total[15m])"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 3,
+        "title": "CPU Usage by Pod",
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (pod_name)"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 4,
+        "title": "Memory Usage by Pod",
+        "targets": [
+          {
+            "expr": "sum(container_memory_usage_bytes) by (pod_name)"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 5,
+        "title": "Persistent Volume Usage",
+        "targets": [
+          {
+            "expr": "(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) * 100"
+          }
+        ],
+        "type": "gauge"
+      },
+      {
+        "id": 6,
+        "title": "Network I/O",
+        "targets": [
+          {
+            "expr": "rate(container_network_transmit_bytes_total[5m])"
+          }
+        ],
+        "type": "graph"
+      }
+    ],
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

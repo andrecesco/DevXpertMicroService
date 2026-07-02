@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.AddStructuredLogging()
+    .AddApplicationObservability()
     .AddApiConfig()
     .AddJwtConfiguration()
     .RegisterServices()
@@ -36,6 +37,7 @@ app.UseCors("Total");
 
 app.UseRouting();
 
+app.UseObservability();
 app.UseCorrelationId();
 
 app.UseAuthConfiguration();

@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'apis'
+    static_configs:
+      - targets: ['auth-api:5000','conteudos-api:5001','alunos-api:5002','pagamentos-api:5003','bff-api:5004']
+
+  - job_name: 'sqlserver'
+    static_configs:
+      - targets: ['sqlserver:1433']
+
+  - job_name: 'eventstore'
+    static_configs:
+      - targets: ['eventstore:2113']

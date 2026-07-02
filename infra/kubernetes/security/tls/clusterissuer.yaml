@@ -1,0 +1,32 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: eduonline-ca
+  namespace: eduonline
+spec:
+  isCA: true
+  commonName: eduonline-ca
+  secretName: eduonline-ca
+  duration: 8760h
+  renewBefore: 720h
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  privateKey:
+    algorithm: RSA
+    size: 4096
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: eduonline-ca-issuer
+spec:
+  ca:
+    secretName: eduonline-ca

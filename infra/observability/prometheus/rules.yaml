@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: eduonline
+data:
+  alerts.yml: |
+    groups:
+      - name: Application
+        interval: 30s
+        rules:
+          # API Health Checks
+          - alert: APIDown
+            expr: up{job=~".*-api"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              component: api
+            annotations:
+              summary: "{{ $labels.job }} is DOWN"
+              description: "{{ $labels.job }} has been unreachable for more than 2 minutes."
+
+          # High Error Rate
+          - alert: HighErrorRate
+            expr: (rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])) > 0.05
+            for: 5m
+            labels:
+              severity: warning
+              component: api
+            annotations:
+              summary: "High error rate detected in {{ $labels.job }}"
+              description: "Error rate: {{ $value | humanizePercentage }}"
+
+          # High Response Time
+          - alert: HighResponseTime
+            expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+            for: 5m
+            labels:
+              severity: warning
+              component: api
+            annotations:
+              summary: "High response time in {{ $labels.job }}"
+              description: "P95 latency: {{ $value }}s"
+
+          # High CPU Usage
+          - alert: HighCPUUsage
+            expr: rate(container_cpu_usage_seconds_total[5m]) * 100 > 80
+            for: 5m
+            labels:
+              severity: warning
+              component: container
+            annotations:
+              summary: "High CPU usage in {{ $labels.pod_name }}"
+              description: "CPU usage: {{ $value }}%"
+
+          # High Memory Usage
+          - alert: HighMemoryUsage
+            expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 80
+            for: 5m
+            labels:
+              severity: warning
+              component: container
+            annotations:
+              summary: "High memory usage in {{ $labels.pod_name }}"
+              description: "Memory usage: {{ $value }}%"
+
+      - name: Database
+        interval: 30s
+        rules:
+          # Database Connection Pool Exhaustion
+          - alert: DBConnectionPoolNearExhaustion
+            expr: mssql_connections_active / mssql_connections_max_allowed > 0.8
+            for: 5m
+            labels:
+              severity: warning
+              component: database
+            annotations:
+              summary: "Database connection pool near exhaustion"
+              description: "Active connections: {{ $value | humanizePercentage }}"
+
+          # Database Replication Lag
+          - alert: DBReplicationLag
+            expr: mssql_replication_lag_seconds > 30
+            for: 2m
+            labels:
+              severity: critical
+              component: database
+            annotations:
+              summary: "Database replication lag detected"
+              description: "Lag: {{ $value }}s"
+
+      - name: Kubernetes
+        interval: 30s
+        rules:
+          # Pod Restart
+          - alert: PodRestart
+            expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+            for: 5m
+            labels:
+              severity: warning
+              component: kubernetes
+            annotations:
+              summary: "Pod {{ $labels.pod }} restarted"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted."
+
+          # Node NotReady
+          - alert: KubernetesNodeNotReady
+            expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+            for: 5m
+            labels:
+              severity: critical
+              component: kubernetes
+            annotations:
+              summary: "Kubernetes node {{ $labels.node }} not ready"
+              description: "Node {{ $labels.node }} has been in not ready state for more than 5 minutes."
+
+          # PVC Space Low
+          - alert: PersistentVolumeSpaceLow
+            expr: (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) * 100 > 80
+            for: 5m
+            labels:
+              severity: warning
+              component: kubernetes
+            annotations:
+              summary: "Persistent volume {{ $labels.persistentvolumeclaim }} space low"
+              description: "Usage: {{ $value }}%"

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conteudos-api
+  namespace: eduonline
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: conteudos-api
+  template:
+    metadata:
+      labels:
+        app: conteudos-api
+        app.kubernetes.io/name: conteudos-api
+        app.kubernetes.io/part-of: eduonline-platform
+    spec:
+      serviceAccountName: eduonline-api
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 64198
+        runAsGroup: 64198
+        fsGroup: 64198
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: conteudos-api
+          image: eduonline/conteudos-api:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 5001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: eduonline-config
+            - configMapRef:
+                name: eduonline-observability
+            - secretRef:
+                name: eduonline-secrets
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: ASPNETCORE_URLS
+              value: http://+:5001
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "5001"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://jaeger:4317"
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: eduonline-secrets
+                  key: conteudos-connection-string
+            - name: ConnectionStrings__DefaultConnectionLite
+              value: Data Source=/tmp/EduOnlineConteudos.db
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 180
+            periodSeconds: 20

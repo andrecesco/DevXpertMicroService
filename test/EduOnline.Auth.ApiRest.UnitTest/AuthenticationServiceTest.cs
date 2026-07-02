@@ -127,7 +127,7 @@ public class AuthenticationServiceTest
         };
 
         context.RefreshTokens.Add(token);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var service = new AuthenticationService(signInManager.Object, userManager.Object, options, context, aspNetUser.Object);
 
@@ -153,7 +153,7 @@ public class AuthenticationServiceTest
         };
 
         context.RefreshTokens.Add(token);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var service = new AuthenticationService(signInManager.Object, userManager.Object, options, context, aspNetUser.Object);
 

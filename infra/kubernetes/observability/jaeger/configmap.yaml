@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-config
+  namespace: eduonline
+  labels:
+    app: jaeger
+    component: observability
+data:
+  sampling.json: |
+    {
+      "default_strategy": {
+        "type": "probabilistic",
+        "param": 0.1
+      },
+      "service_strategies": [
+        {
+          "service": "auth-api",
+          "type": "probabilistic",
+          "param": 0.5
+        },
+        {
+          "service": "alunos-api",
+          "type": "probabilistic",
+          "param": 0.5
+        },
+        {
+          "service": "conteudos-api",
+          "type": "probabilistic",
+          "param": 0.5
+        },
+        {
+          "service": "pagamentos-api",
+          "type": "probabilistic",
+          "param": 0.5
+        },
+        {
+          "service": "bff-api",
+          "type": "probabilistic",
+          "param": 0.5
+        }
+      ]
+    }

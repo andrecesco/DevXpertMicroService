@@ -26,13 +26,9 @@ public static class DbMigrationsHelpers
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var context = scope.ServiceProvider.GetRequiredService<AlunosContext>();
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.IsEnvironment("Testing"))
         {
-            var enableMigrations = ObterBoolean(configuration, "SeedSettings:EnableMigrations", true);
-            if (enableMigrations)
-            {
-                await context.Database.MigrateAsync();
-            }
+            await context.Database.EnsureCreatedAsync();
 
             var enableSeedData = ObterBoolean(configuration, "SeedSettings:EnableSeedData", true);
             if (enableSeedData)

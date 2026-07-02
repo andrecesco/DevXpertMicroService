@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eduonline-observability
+  namespace: eduonline
+data:
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+  OTEL_SERVICE_NAME: "eduonline-platform"
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=dev,service.version=1.0.0"
+  PROMETHEUS_SCRAPE_PATH: "/metrics"
+  PROMETHEUS_SCRAPE_PORT_HTTP: "5000"
+  # Add additional observability-related non-sensitive settings here

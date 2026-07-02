@@ -24,13 +24,13 @@ public static class DbMigrationsHelpers
 
         if (env.IsDevelopment())
         {
-            var enableMigrations = ObterBoolean(configuration, "SeedSettings:EnableMigrations", true);
+            var enableMigrations = ObterBoolean(configuration, "SeedSettings:EnableMigrations", false);
             if (enableMigrations)
             {
                 await context.Database.MigrateAsync();
             }
 
-            var enableSeedData = ObterBoolean(configuration, "SeedSettings:EnableSeedData", true);
+            var enableSeedData = ObterBoolean(configuration, "SeedSettings:EnableSeedData", false);
             if (enableSeedData)
             {
                 await ConteudoSeedHelper.SeedAsync(context);

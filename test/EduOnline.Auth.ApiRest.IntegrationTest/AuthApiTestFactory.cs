@@ -1,10 +1,13 @@
 using EduOnline.Auth.ApiRest.Data;
+using EduOnline.Auth.ApiRest.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Net;
 
 namespace EduOnline.Auth.ApiRest.IntegrationTest;
 
@@ -32,6 +35,12 @@ public class AuthApiTestFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
+            services.RemoveAll<AlunoProvisioningService>();
+            services.AddSingleton(new AlunoProvisioningService(new HttpClient(new SuccessHttpMessageHandler())
+            {
+                BaseAddress = new Uri("https://localhost:7254/api/alunos/")
+            }));
+
             using var scope = services.BuildServiceProvider().CreateScope();
             var provider = scope.ServiceProvider;
 
@@ -111,5 +120,11 @@ public class AuthApiTestFactory : WebApplicationFactory<Program>
 
             await userManager.AddToRoleAsync(aluno, "Aluno");
         }
+    }
+
+    private sealed class SuccessHttpMessageHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            => Task.FromResult(new HttpResponseMessage(HttpStatusCode.NoContent));
     }
 }

@@ -13,4 +13,5 @@ public interface IConteudoService
     Task<ResponseResult> InativarCurso(Guid id);
     Task<ResponseResult> AdicionarAula(Guid id, AulaRequest request);
     Task<ResponseResult> AtualizarAula(Guid id, Guid aulaId, AulaRequest request);
+    Task<ResponseResult> RegistrarConsumoAula(Guid cursoId, Guid aulaId, Guid alunoId, Guid matriculaId);
 }

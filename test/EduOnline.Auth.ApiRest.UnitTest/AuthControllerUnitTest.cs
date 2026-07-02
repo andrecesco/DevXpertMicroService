@@ -39,7 +39,7 @@ public class AuthControllerUnitTest
         var appUser = Mock.Of<IAspNetUser>(x => x.IsAuthenticated() == false);
         var logger = new Mock<ILogger<AuthController>>();
 
-        var controller = new AuthController(notificador, service, appUser, roleManager.Object, logger.Object);
+        var controller = new AuthController(notificador, service, appUser, roleManager.Object, CreateAlunoProvisioningService(), logger.Object);
         controller.ModelState.AddModelError("Email", "Email é obrigatório");
 
         var result = await controller.Registrar(new UsuarioRegistroModel
@@ -93,7 +93,7 @@ public class AuthControllerUnitTest
         var appUser = Mock.Of<IAspNetUser>(x => x.IsAuthenticated() == false);
         var logger = new Mock<ILogger<AuthController>>();
 
-        var controller = new AuthController(notificador, service, appUser, roleManager.Object, logger.Object);
+        var controller = new AuthController(notificador, service, appUser, roleManager.Object, CreateAlunoProvisioningService(), logger.Object);
 
         var result = await controller.Login(new UsuarioLoginModel { Email = email, Senha = "Teste@123" });
 
@@ -127,7 +127,7 @@ public class AuthControllerUnitTest
         var appUser = Mock.Of<IAspNetUser>(x => x.IsAuthenticated() == true);
         var logger = new Mock<ILogger<AuthController>>();
 
-        var controller = new AuthController(notificador, service, appUser, roleManager.Object, logger.Object);
+        var controller = new AuthController(notificador, service, appUser, roleManager.Object, CreateAlunoProvisioningService(), logger.Object);
 
         var result = await controller.Excluir(Guid.NewGuid());
 
@@ -168,7 +168,7 @@ public class AuthControllerUnitTest
         var appUser = Mock.Of<IAspNetUser>(x => x.IsAuthenticated() == true);
         var logger = new Mock<ILogger<AuthController>>();
 
-        var controller = new AuthController(notificador, service, appUser, roleManager.Object, logger.Object);
+        var controller = new AuthController(notificador, service, appUser, roleManager.Object, CreateAlunoProvisioningService(), logger.Object);
 
         var result = await controller.Excluir(Guid.Parse(id));
 
@@ -249,4 +249,7 @@ public class AuthControllerUnitTest
             new IdentityErrorDescriber(),
             new Mock<ILogger<RoleManager<IdentityRole>>>().Object);
     }
+
+    private static AlunoProvisioningService CreateAlunoProvisioningService()
+        => new(new HttpClient { BaseAddress = new Uri("https://localhost:7254/api/alunos/") });
 }

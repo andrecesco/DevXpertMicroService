@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+  namespace: eduonline
+  labels:
+    app: fluentd
+    component: observability
+data:
+  fluent.conf: |
+    <source>
+      @type tail
+      path /var/log/containers/*_eduonline_*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      tag kubernetes.*
+      read_from_head true
+      <parse>
+        @type json
+        time_format %Y-%m-%dT%H:%M:%S.%NZ
+      </parse>
+    </source>
+
+    # Kubernetes metadata enrichment
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+    </filter>
+
+    # Remove unnecessary fields
+    <filter kubernetes.**>
+      @type record_modifier
+      <replace>
+        key log
+        expression /^{.*}$/
+        replace 
+      </replace>
+    </filter>
+
+    # Rename fields for Elasticsearch
+    <filter kubernetes.**>
+      @type record_transformer
+      <record>
+        host "#{Socket.gethostname}"
+        cluster_name "eduonline-dev"
+        environment "kubernetes"
+      </record>
+    </filter>
+
+    # Send to Elasticsearch
+    <match **>
+      @type elasticsearch
+      @id output_elasticsearch
+      @log_level info
+      include_tag_key true
+      tag_key @log_name
+      host elasticsearch
+      port 9200
+      path _bulk
+      <buffer tag,time>
+        @type file
+        path /var/log/fluentd-buffers/kubernetes.system.buffer
+        flush_mode interval
+        flush_interval 5s
+        flush_at_shutdown true
+        retry_type exponential_backoff
+        retry_forever
+        retry_max_interval 30
+        retry_timeout 72h
+        chunk_limit_size "#{ENV['FLUENT_ELASTICSEARCH_BUFFER_CHUNK_LIMIT_SIZE'] || '8M'}"
+        queue_limit_length "#{ENV['FLUENT_ELASTICSEARCH_BUFFER_QUEUE_LIMIT_LENGTH'] || '32'}"
+        overflow_action drop_oldest_chunk
+      </buffer>
+      <format>
+        @type json
+      </format>
+      logstash_format true
+      logstash_prefix kubernetes-logs
+      logstash_dateformat %Y.%m.%d
+      include_retry_key true
+      suppress_type_name "true"
+    </match>

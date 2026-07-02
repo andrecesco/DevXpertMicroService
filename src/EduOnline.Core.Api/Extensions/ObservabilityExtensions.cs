@@ -2,8 +2,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Prometheus;
 using System.Net.Sockets;
+using System.Reflection;
 
 namespace EduOnline.Core.Api.Extensions;
 
@@ -12,6 +19,14 @@ public static class ObservabilityExtensions
     public static WebApplicationBuilder AddStructuredLogging(this WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
+        builder.Logging.Configure(options =>
+        {
+            options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId |
+                                              ActivityTrackingOptions.SpanId |
+                                              ActivityTrackingOptions.ParentId |
+                                              ActivityTrackingOptions.Baggage;
+        });
+
         builder.Logging.AddJsonConsole(options =>
         {
             options.IncludeScopes = true;
@@ -21,10 +36,62 @@ public static class ObservabilityExtensions
         return builder;
     }
 
+    public static WebApplicationBuilder AddApplicationObservability(this WebApplicationBuilder builder)
+    {
+        var serviceName = builder.Environment.ApplicationName;
+        var serviceVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString()
+            ?? typeof(ObservabilityExtensions).Assembly.GetName().Version?.ToString()
+            ?? "unknown";
+
+        builder.Services.UseHttpClientMetrics();
+
+        builder.Services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(serviceName, serviceVersion: serviceVersion))
+            .WithTracing(tracing =>
+            {
+                tracing.AddAspNetCoreInstrumentation(options =>
+                {
+                    options.RecordException = true;
+                });
+
+                tracing.AddHttpClientInstrumentation();
+                tracing.AddSource(serviceName);
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    tracing.AddConsoleExporter();
+                }
+
+                if (TryGetOtlpEndpoint(builder.Configuration, out var endpoint))
+                {
+                    tracing.AddOtlpExporter(options => options.Endpoint = endpoint);
+                }
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics.AddAspNetCoreInstrumentation();
+                metrics.AddHttpClientInstrumentation();
+                metrics.AddRuntimeInstrumentation();
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    metrics.AddConsoleExporter();
+                }
+
+                if (TryGetOtlpEndpoint(builder.Configuration, out var endpoint))
+                {
+                    metrics.AddOtlpExporter(options => options.Endpoint = endpoint);
+                }
+            });
+
+        return builder;
+    }
+
     public static WebApplicationBuilder AddApiHealthChecks(this WebApplicationBuilder builder)
     {
         builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"));
+            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"))
+            .ForwardToPrometheus();
 
         return builder;
     }
@@ -41,7 +108,17 @@ public static class ObservabilityExtensions
             healthChecks.AddCheck<RabbitMqTcpHealthCheck>("rabbitmq", tags: ["messaging"]);
         }
 
+        healthChecks.ForwardToPrometheus();
+
         return builder;
+    }
+
+    public static WebApplication UseObservability(this WebApplication app)
+    {
+        app.UseHttpMetrics();
+        app.MapMetrics();
+
+        return app;
     }
 
     public static WebApplication UseApiHealthChecks(this WebApplication app)
@@ -53,6 +130,20 @@ public static class ObservabilityExtensions
         });
 
         return app;
+    }
+
+    private static bool TryGetOtlpEndpoint(IConfiguration configuration, out Uri endpoint)
+    {
+        var endpointValue = configuration["Observability:OtlpEndpoint"]
+            ?? configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+
+        if (!string.IsNullOrWhiteSpace(endpointValue) && Uri.TryCreate(endpointValue, UriKind.Absolute, out endpoint))
+        {
+            return true;
+        }
+
+        endpoint = null!;
+        return false;
     }
 
     private sealed class DbContextConnectivityHealthCheck<TDbContext>(IServiceScopeFactory scopeFactory) : IHealthCheck

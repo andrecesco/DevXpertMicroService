@@ -48,4 +48,13 @@
     <Project Path="test/EduOnline.Pagamentos.IntegrationTest/EduOnline.Pagamentos.IntegrationTest.csproj" />
     <Project Path="test/EduOnline.Pagamentos.UnitTest/EduOnline.Pagamentos.UnitTest.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="CI-CD-TESTING-GUIDE.md" />
+    <File Path="DOCKER-README.md" />
+    <File Path="FEEDBACK.md" />
+    <File Path="FeedbackFinal-Module4.md" />
+    <File Path="ProjetoMod05.md" />
+    <File Path="README.md" />
+    <File Path="SECURITY-COMPLIANCE-MATRIX.md" />
+  </Folder>
 </Solution>

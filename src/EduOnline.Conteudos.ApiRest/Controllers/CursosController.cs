@@ -1,4 +1,5 @@
 using EduOnline.Conteudos.ApiRest.Models;
+using EduOnline.Conteudos.ApiRest.Services;
 using EduOnline.Conteudos.Domain;
 using EduOnline.Conteudos.Domain.Services;
 using EduOnline.Core.Api.Controllers;
@@ -20,7 +21,7 @@ namespace EduOnline.Conteudos.ApiRest.Controllers;
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 [Authorize(Roles = "Aluno,Administrador")]
 [Route("api/conteudos/cursos")]
-public class CursosController(ICursoRepository cursoRepository, ICursoService cursoService, INotificador notificador, IAspNetUser user)
+public class CursosController(ICursoRepository cursoRepository, ICursoService cursoService, IAlunoProgressIntegrationService alunoProgressIntegrationService, INotificador notificador, IAspNetUser user)
     : MainController(notificador, user)
 {
     /// <summary>
@@ -199,6 +200,36 @@ public class CursosController(ICursoRepository cursoRepository, ICursoService cu
 
         if (!OperacaoValida())
             return CustomResponse();
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Registra o consumo de uma aula e atualiza o progresso da matrícula no serviço de alunos.
+    /// </summary>
+    [HttpPatch("{id:guid}/aulas/{aulaId:guid}/consumo/alunos/{alunoId:guid}/matriculas/{matriculaId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RegistrarConsumoAula(Guid id, Guid aulaId, Guid alunoId, Guid matriculaId)
+    {
+        if (alunoId != user.GetUserId() && !user.IsInRole("Administrador"))
+            return Forbid();
+
+        var curso = await cursoRepository.ObterPorIdAsync(id);
+        if (curso is null)
+            return NotFound();
+
+        var aula = await cursoRepository.ObterAulaPorIdAsync(aulaId);
+        if (aula is null || aula.CursoId != id)
+            return NotFound();
+
+        var sucesso = await alunoProgressIntegrationService.AtualizarProgressoAsync(alunoId, matriculaId, aulaId, HttpContext.RequestAborted);
+        if (!sucesso)
+        {
+            NotificarErro("Não foi possível atualizar o progresso do aluno na API de Alunos.");
+            return CustomResponse();
+        }
 
         return NoContent();
     }

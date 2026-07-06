@@ -1,0 +1,47 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Copy only the API project and its dependencies
+COPY ["src/EduOnline.Pagamentos.ApiRest/", "src/EduOnline.Pagamentos.ApiRest/"]
+COPY ["src/EduOnline.Pagamentos.AntiCorruption/", "src/EduOnline.Pagamentos.AntiCorruption/"]
+COPY ["src/EduOnline.Pagamentos.Business/", "src/EduOnline.Pagamentos.Business/"]
+COPY ["src/EduOnline.Pagamentos.Data/", "src/EduOnline.Pagamentos.Data/"]
+COPY ["src/EduOnline.Pagamentos.Domain/", "src/EduOnline.Pagamentos.Domain/"]
+COPY ["src/EduOnline.Core.Api/", "src/EduOnline.Core.Api/"]
+COPY ["src/EduOnline.Core/", "src/EduOnline.Core/"]
+COPY ["src/EventSourcing/", "src/EventSourcing/"]
+
+# Restore dependencies for the Pagamentos API project
+RUN dotnet restore "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj"
+
+# Build the Pagamentos project
+RUN dotnet build "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" -c Release -o /app/build
+
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Run application
+ENTRYPOINT ["dotnet", "EduOnline.Pagamentos.ApiRest.dll"]

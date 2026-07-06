@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  # SQLite shared database files
+  sqlite:
+    image: alpine:latest
+    container_name: eduonline_sqlite
+    command: sh -c "mkdir -p /data && while true; do sleep 10; done"
+    volumes:
+      - sqlite_data:/data
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -d /data"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eduonline_network
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: eduonline_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"      # AMQP port
+      - "15672:15672"    # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eduonline_network
+
+  # # Alunos Microservice
+  # alunos-api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.Alunos
+  #   container_name: eduonline_alunos_api
+  #   depends_on:
+  #     sqlserver:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Production
+  #     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunos;User Id=sa;Password=Password@123;TrustServerCertificate=True;"
+  #     RabbitMq__Enabled: "true"
+  #     RabbitMq__HostName: "rabbitmq"
+  #     RabbitMq__UserName: "guest"
+  #     RabbitMq__Password: "guest"
+  #   ports:
+  #     - "8001:8080"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   networks:
+  #     - eduonline_network
+
+  # Auth Microservice
+  auth-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.Auth
+    container_name: eduonline_auth_api
+    depends_on:
+      sqlite:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Data Source=/data/eduonline-auth.db"
+    volumes:
+      - sqlite_data:/data
+    ports:
+      - "8002:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - eduonline_network
+
+  # # Conteudos Microservice
+  # conteudos-api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.Conteudos
+  #   container_name: eduonline_conteudos_api
+  #   depends_on:
+  #     sqlite:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Production
+  #     ConnectionStrings__DefaultConnection: "Data Source=/data/eduonline-conteudos.db"
+  #     RabbitMq__Enabled: "true"
+  #     RabbitMq__HostName: "rabbitmq"
+  #     RabbitMq__UserName: "guest"
+  #     RabbitMq__Password: "guest"
+  #   ports:
+  #     - "8003:8080"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   networks:
+  #     - eduonline_network
+
+  # # Pagamentos Microservice
+  # pagamentos-api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.Pagamentos
+  #   container_name: eduonline_pagamentos_api
+  #   depends_on:
+  #     sqlite:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Production
+  #     ConnectionStrings__DefaultConnection: "Data Source=/data/eduonline-pagamentos.db"
+  #     RabbitMq__Enabled: "true"
+  #     RabbitMq__HostName: "rabbitmq"
+  #     RabbitMq__UserName: "guest"
+  #     RabbitMq__Password: "guest"
+  #   ports:
+  #     - "8004:8080"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   networks:
+  #     - eduonline_network
+
+  # # Bff Microservice
+  # webapps-api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.Bff
+  #   container_name: eduonline_webapps_api
+  #   depends_on:
+  #     sqlite:
+  #       condition: service_healthy
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Production
+  #     ConnectionStrings__DefaultConnection: "Data Source=/data/eduonline-webapps.db"
+  #   ports:
+  #     - "8005:8080"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   networks:
+  #     - eduonline_network
+
+volumes:
+  sqlite_data:
+  rabbitmq_data:
+
+networks:
+  eduonline_network:
+    driver: bridge

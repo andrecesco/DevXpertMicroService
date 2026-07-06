@@ -1,0 +1,42 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Copy only the BFF API project and its dependencies
+COPY ["src/EduOnline.WebApps.ApiRest/", "src/EduOnline.WebApps.ApiRest/"]
+COPY ["src/EduOnline.Core.Api/", "src/EduOnline.Core.Api/"]
+COPY ["src/EduOnline.Core/", "src/EduOnline.Core/"]
+
+# Restore dependencies for the BFF API project
+RUN dotnet restore "src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj"
+
+# Build the BFF project
+RUN dotnet build "src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" -c Release -o /app/build
+
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Run application
+ENTRYPOINT ["dotnet", "EduOnline.Bff.ApiRest.dll"]

@@ -9,7 +9,7 @@ public static class DatabaseSelectExtension
 {
     public static WebApplicationBuilder AddDatabaseSelector(this WebApplicationBuilder builder)
     {
-        if (!builder.Environment.IsDevelopment())
+        if (builder.Environment.IsDevelopment())
         {
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionLite") ?? throw new InvalidOperationException("Connection string 'DefaultConnectionLite' not found.");
             builder.Services.AddDbContext<PagamentosContext>(options =>

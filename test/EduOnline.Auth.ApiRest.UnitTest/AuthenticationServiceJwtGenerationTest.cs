@@ -122,7 +122,7 @@ public class AuthenticationServiceJwtGenerationTest
         resultado.RefreshToken.Should().NotBe(Guid.Empty);
 
         // Validar que refresh token foi persistido
-        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == resultado.RefreshToken);
+        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == resultado.RefreshToken, TestContext.Current.CancellationToken);
         refreshToken.Should().NotBeNull();
         refreshToken!.Username.Should().Be(email);
         refreshToken.ExpirationDate.Should().BeAfter(DateTime.UtcNow);
@@ -151,7 +151,7 @@ public class AuthenticationServiceJwtGenerationTest
             ExpirationDate = DateTime.UtcNow.AddMinutes(30)
         };
         context.RefreshTokens.Add(tokenAntigo);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         userManager.Setup(x => x.FindByEmailAsync(email)).ReturnsAsync(user);
         userManager.Setup(x => x.GetClaimsAsync(user)).ReturnsAsync(new List<System.Security.Claims.Claim>());

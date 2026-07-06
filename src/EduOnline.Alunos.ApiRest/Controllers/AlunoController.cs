@@ -182,7 +182,7 @@ IAspNetUser user) : MainController(notifications, user)
     /// <summary>
     /// Cadastra um aluno vinculado a um usuário já criado na autenticação.
     /// </summary>
-    [AllowAnonymous]
+    [Authorize(Roles = "Administrador")]
     [HttpPost("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Cadastrar(Guid id, AdicionarAlunoRequest request)

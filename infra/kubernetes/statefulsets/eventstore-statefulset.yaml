@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eventstore
+  namespace: eduonline
+spec:
+  serviceName: eventstore
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eventstore
+  template:
+    metadata:
+      labels:
+        app: eventstore
+        app.kubernetes.io/name: eventstore
+        app.kubernetes.io/part-of: eduonline-platform
+    spec:
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: eventstore
+          image: eventstore/eventstore:24.10.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2113
+              name: http
+            - containerPort: 1113
+              name: tcp
+          env:
+            - name: EVENTSTORE_INSECURE
+              value: "true"
+            - name: EVENTSTORE_RUN_PROJECTIONS
+              value: All
+            - name: EVENTSTORE_START_STANDARD_PROJECTIONS
+              value: "true"
+            - name: EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP
+              value: "true"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 2113
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 2113
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          volumeMounts:
+            - name: eventstore-storage
+              mountPath: /var/lib/eventstore
+      volumes:
+        - name: eventstore-storage
+          emptyDir: {}

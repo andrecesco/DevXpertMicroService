@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: eduonline
+  labels:
+    app: elasticsearch
+    component: observability
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 9200
+    targetPort: http
+    protocol: TCP
+  - name: node
+    port: 9300
+    targetPort: node
+    protocol: TCP
+  selector:
+    app: elasticsearch
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-headless
+  namespace: eduonline
+  labels:
+    app: elasticsearch
+    component: observability
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: http
+    port: 9200
+    targetPort: http
+    protocol: TCP
+  - name: node
+    port: 9300
+    targetPort: node
+    protocol: TCP
+  selector:
+    app: elasticsearch

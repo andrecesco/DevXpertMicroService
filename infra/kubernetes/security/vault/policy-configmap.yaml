@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-policy-samples
+  namespace: eduonline
+data:
+  auth-api.hcl: |
+    path "secret/data/eduonline/auth-api/*" {
+      capabilities = ["read", "list"]
+    }
+  alunos-api.hcl: |
+    path "secret/data/eduonline/alunos-api/*" {
+      capabilities = ["read", "list"]
+    }
+  conteudos-api.hcl: |
+    path "secret/data/eduonline/conteudos-api/*" {
+      capabilities = ["read", "list"]
+    }
+  pagamentos-api.hcl: |
+    path "secret/data/eduonline/pagamentos-api/*" {
+      capabilities = ["read", "list"]
+    }
+  bff-api.hcl: |
+    path "secret/data/eduonline/bff-api/*" {
+      capabilities = ["read", "list"]
+    }

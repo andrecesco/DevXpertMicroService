@@ -1,0 +1,102 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ingress-tls
+  namespace: eduonline
+spec:
+  secretName: ingress-tls
+  issuerRef:
+    name: eduonline-ca-issuer
+    kind: ClusterIssuer
+  commonName: api.eduonline.local
+  dnsNames:
+    - api.eduonline.local
+    - auth.eduonline.local
+    - alunos.eduonline.local
+    - conteudos.eduonline.local
+    - pagamentos.eduonline.local
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: auth-api-mtls
+  namespace: eduonline
+spec:
+  secretName: auth-api-mtls
+  issuerRef:
+    name: eduonline-ca-issuer
+    kind: ClusterIssuer
+  commonName: auth-api.eduonline.svc.cluster.local
+  dnsNames:
+    - auth-api
+    - auth-api.eduonline
+    - auth-api.eduonline.svc
+    - auth-api.eduonline.svc.cluster.local
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: alunos-api-mtls
+  namespace: eduonline
+spec:
+  secretName: alunos-api-mtls
+  issuerRef:
+    name: eduonline-ca-issuer
+    kind: ClusterIssuer
+  commonName: alunos-api.eduonline.svc.cluster.local
+  dnsNames:
+    - alunos-api
+    - alunos-api.eduonline
+    - alunos-api.eduonline.svc
+    - alunos-api.eduonline.svc.cluster.local
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: conteudos-api-mtls
+  namespace: eduonline
+spec:
+  secretName: conteudos-api-mtls
+  issuerRef:
+    name: eduonline-ca-issuer
+    kind: ClusterIssuer
+  commonName: conteudos-api.eduonline.svc.cluster.local
+  dnsNames:
+    - conteudos-api
+    - conteudos-api.eduonline
+    - conteudos-api.eduonline.svc
+    - conteudos-api.eduonline.svc.cluster.local
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pagamentos-api-mtls
+  namespace: eduonline
+spec:
+  secretName: pagamentos-api-mtls
+  issuerRef:
+    name: eduonline-ca-issuer
+    kind: ClusterIssuer
+  commonName: pagamentos-api.eduonline.svc.cluster.local
+  dnsNames:
+    - pagamentos-api
+    - pagamentos-api.eduonline
+    - pagamentos-api.eduonline.svc
+    - pagamentos-api.eduonline.svc.cluster.local
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bff-api-mtls
+  namespace: eduonline
+spec:
+  secretName: bff-api-mtls
+  issuerRef:
+    name: eduonline-ca-issuer
+    kind: ClusterIssuer
+  commonName: bff-api.eduonline.svc.cluster.local
+  dnsNames:
+    - bff-api
+    - bff-api.eduonline
+    - bff-api.eduonline.svc
+    - bff-api.eduonline.svc.cluster.local

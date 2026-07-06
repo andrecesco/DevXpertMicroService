@@ -1,0 +1,73 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eduonline-ingress-tls
+  namespace: eduonline
+  labels:
+    app: ingress
+    component: security
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: eduonline-ca-issuer
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.eduonline.local
+    - auth.eduonline.local
+    - alunos.eduonline.local
+    - conteudos.eduonline.local
+    - pagamentos.eduonline.local
+    secretName: ingress-tls
+  rules:
+  - host: api.eduonline.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bff-api
+            port:
+              number: 5004
+  - host: auth.eduonline.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-api
+            port:
+              number: 5000
+  - host: alunos.eduonline.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: alunos-api
+            port:
+              number: 5002
+  - host: conteudos.eduonline.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: conteudos-api
+            port:
+              number: 5001
+  - host: pagamentos.eduonline.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pagamentos-api
+            port:
+              number: 5003

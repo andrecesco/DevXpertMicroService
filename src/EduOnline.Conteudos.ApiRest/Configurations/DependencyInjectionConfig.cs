@@ -1,7 +1,9 @@
+using EduOnline.Conteudos.ApiRest.Services;
 using EduOnline.Conteudos.Data.Context;
 using EduOnline.Conteudos.Data.Repository;
 using EduOnline.Conteudos.Domain;
 using EduOnline.Conteudos.Domain.Services;
+using EduOnline.Core.Api.Extensions;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Data.EventSourcing;
@@ -48,6 +50,7 @@ public static class DependencyInjectionConfig
     private static void AddServices(WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ICursoService, CursoService>();
+        builder.Services.AddHttpClientService<IAlunoProgressIntegrationService, AlunoProgressIntegrationService>();
         builder.Services.AddSingleton<IEventStoreService, EventStoreService>();
         builder.Services.AddSingleton<IEventSourcingRepository, EventSourcingRepository>();
     }

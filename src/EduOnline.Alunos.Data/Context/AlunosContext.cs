@@ -9,10 +9,10 @@ public class AlunosContext : EduOnlineContext
 {
     public AlunosContext() { }
 
-    public AlunosContext(DbContextOptions options)
+    public AlunosContext(DbContextOptions<AlunosContext> options)
         : base(options) { }
 
-    public AlunosContext(DbContextOptions options, IMediatorHandler mediatorHandler) : base(options, mediatorHandler)
+    public AlunosContext(DbContextOptions<AlunosContext> options, IMediatorHandler mediatorHandler) : base(options, mediatorHandler)
     {
     }
 

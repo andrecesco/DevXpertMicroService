@@ -24,6 +24,7 @@ public class AuthController(INotificador notificador,
                       AuthenticationService authenticationService,
                       IAspNetUser user,
                       RoleManager<IdentityRole> roleManager,
+                      AlunoProvisioningService alunoProvisioningService,
                       ILogger<AuthController> logger) : MainController(notificador, user)
 {
     private readonly ILogger _logger = logger;
@@ -103,6 +104,31 @@ public class AuthController(INotificador notificador,
             }
 
             return CustomResponse();
+        }
+
+        if (perfil == "Aluno")
+        {
+            if (!Guid.TryParse(usuario.Id, out var usuarioId))
+            {
+                await authenticationService.UserManager.DeleteAsync(usuario);
+                NotificarErro("Não foi possível provisionar o aluno porque o identificador do usuário não é um GUID válido.");
+                return CustomResponse();
+            }
+
+            var tokenServico = authenticationService.GerarTokenServicoAdministrador();
+            var alunoProvisionado = await alunoProvisioningService.CadastrarAlunoAsync(
+                usuarioId,
+                usarioRegistro.Nome,
+                usarioRegistro.Email,
+                tokenServico,
+                HttpContext.RequestAborted);
+
+            if (!alunoProvisionado)
+            {
+                await authenticationService.UserManager.DeleteAsync(usuario);
+                NotificarErro("Não foi possível provisionar o cadastro do aluno na API de Alunos.");
+                return CustomResponse();
+            }
         }
 
         return CreatedAtAction(actionName: nameof(ObterPorId), routeValues: new { id = usuario.Id }, null);

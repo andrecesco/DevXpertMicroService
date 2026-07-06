@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sqlserver
+  namespace: eduonline
+spec:
+  serviceName: sqlserver
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver
+  template:
+    metadata:
+      labels:
+        app: sqlserver
+        app.kubernetes.io/name: sqlserver
+        app.kubernetes.io/part-of: eduonline-platform
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: sqlserver
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1433
+              name: sql
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_PID
+              value: Developer
+            - name: MSSQL_COLLATION
+              value: Latin1_General_CI_AS
+            - name: SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eduonline-secrets
+                  key: SA_PASSWORD
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 3Gi
+          readinessProbe:
+            tcpSocket:
+              port: 1433
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 1433
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          volumeMounts:
+            - name: sqlserver-storage
+              mountPath: /var/opt/mssql
+      volumes:
+        - name: sqlserver-storage
+          persistentVolumeClaim:
+            claimName: sqlserver-pvc

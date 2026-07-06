@@ -1,0 +1,61 @@
+{
+  "dashboard": {
+    "title": "Database Dashboard",
+    "tags": ["database", "sqlserver"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Connections",
+        "targets": [
+          {
+            "expr": "mssql_connections_active"
+          }
+        ],
+        "type": "gauge"
+      },
+      {
+        "id": 2,
+        "title": "Query Execution Time (ms)",
+        "targets": [
+          {
+            "expr": "mssql_query_execution_time_ms"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 3,
+        "title": "Lock Wait Time",
+        "targets": [
+          {
+            "expr": "mssql_lock_wait_time_ms"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 4,
+        "title": "Database Size",
+        "targets": [
+          {
+            "expr": "mssql_database_size_bytes"
+          }
+        ],
+        "type": "stat"
+      },
+      {
+        "id": 5,
+        "title": "Transactions Per Second",
+        "targets": [
+          {
+            "expr": "rate(mssql_transactions_total[1m])"
+          }
+        ],
+        "type": "graph"
+      }
+    ],
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

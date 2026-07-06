@@ -5,19 +5,32 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="coverlet.collector" Version="6.0.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="coverlet.collector" Version="10.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\EduOnline.Alunos.ApiRest\EduOnline.Alunos.ApiRest.csproj" />
+    <ProjectReference Include="..\..\src\EduOnline.Alunos.ApiRest\EduOnline.Alunos.ApiRest.csproj">
+      <Aliases>global,alunosApi</Aliases>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\EduOnline.Auth.ApiRest\EduOnline.Auth.ApiRest.csproj" />
+    <ProjectReference Include="..\..\src\EduOnline.Conteudos.Domain\EduOnline.Conteudos.Domain.csproj" />
     <ProjectReference Include="..\..\src\EduOnline.IntegrationTest\EduOnline.IntegrationTest.csproj" />
   </ItemGroup>
 

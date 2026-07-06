@@ -7,7 +7,7 @@ public class WebApiTestFactory<TStartup> : WebApplicationFactory<TStartup> where
 {
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment("Testing");
         return base.CreateHost(builder);
     }
 }

@@ -10,9 +10,6 @@ namespace EduOnline.Core.Api.Identidade;
 
 public static class JwtConfig
 {
-    private const string SegredoPadraoDesenvolvimento = "360a1429-8cdb-45ec-ab2d-fccf2eb3521e";
-    private const string SegredoPadraoAplicacao = "ChaveSuperSecretaParaJWT_2024_EduOnline_MinhaChaveDeve_TerMaisde32Caracteres!@#$%^&*";
-
     public static WebApplicationBuilder AddJwtConfiguration(this WebApplicationBuilder builder)
     {
         var appTokenSettings = builder.Configuration.GetSection("AppTokenSettings").Get<AppTokenSettings>();
@@ -30,9 +27,7 @@ public static class JwtConfig
         var segredos = new[]
         {
             appTokenSettings?.Segredo,
-            legacyTokenSettings?.Segredo,
-            SegredoPadraoDesenvolvimento,
-            SegredoPadraoAplicacao
+            legacyTokenSettings?.Segredo
         }
         .Where(segredo => !string.IsNullOrWhiteSpace(segredo))
         .Distinct(StringComparer.Ordinal)
@@ -46,12 +41,12 @@ public static class JwtConfig
             .Cast<SecurityKey>()
             .ToArray();
 
-        var validIssuers = new[] { appTokenSettings?.Issuer, legacyTokenSettings?.Issuer, "https://localhost:7020" }
+        var validIssuers = new[] { appTokenSettings?.Issuer, legacyTokenSettings?.Issuer }
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
 
-        var validAudiences = new[] { appTokenSettings?.Audience, legacyTokenSettings?.Audience, "EduOnline-Dev" }
+        var validAudiences = new[] { appTokenSettings?.Audience, legacyTokenSettings?.Audience }
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();

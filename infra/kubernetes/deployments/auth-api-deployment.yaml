@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-api
+  namespace: eduonline
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth-api
+  template:
+    metadata:
+      labels:
+        app: auth-api
+        app.kubernetes.io/name: auth-api
+        app.kubernetes.io/part-of: eduonline-platform
+    spec:
+      serviceAccountName: eduonline-api
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 64198
+        runAsGroup: 64198
+        fsGroup: 64198
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: auth-api
+          image: eduonline/auth-api:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 5000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: eduonline-config
+            - configMapRef:
+                name: eduonline-observability
+            - secretRef:
+                name: eduonline-secrets
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:5000
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "5000"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://jaeger:4317"
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: eduonline-secrets
+                  key: auth-connection-string
+            - name: ConnectionStrings__DefaultConnectionLite
+              value: Data Source=/tmp/EduOnlineAuth.db
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 20

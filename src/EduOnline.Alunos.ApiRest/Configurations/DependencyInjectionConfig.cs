@@ -59,9 +59,13 @@ public static class DependencyInjectionConfig
         builder.Services.AddSingleton<IEventStoreService, EventStoreService>();
         builder.Services.AddSingleton<IEventSourcingRepository, EventSourcingRepository>();
 
-        builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMq"));
-        builder.Services.AddSingleton<IRabbitMqEventBus, RabbitMqEventBus>();
-        builder.Services.AddHostedService<PagamentoIntegrationEventsConsumerHostedService>();
+        var rabbitMqEnabled = builder.Configuration.GetValue<bool?>("RabbitMq:Enabled") ?? false;
+        if (rabbitMqEnabled)
+        {
+            builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMq"));
+            builder.Services.AddSingleton<IRabbitMqEventBus, RabbitMqEventBus>();
+            builder.Services.AddHostedService<PagamentoIntegrationEventsConsumerHostedService>();
+        }
     }
 
     private static void AddRequestHandlers(WebApplicationBuilder builder)

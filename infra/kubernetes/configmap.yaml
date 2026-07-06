@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eduonline-config
+  namespace: eduonline
+data:
+  AllowedHosts: "*"
+  AppTokenSettings__Issuer: https://eduonline.local
+  AppTokenSettings__Audience: EduOnline-Cluster
+  AppSettings__Issuer: https://eduonline.local
+  AppSettings__Audience: EduOnline-Cluster
+  AuthUrl: http://auth-api:5000/api/auth/
+  AlunoUrl: http://alunos-api:5002/api/alunos/
+  ConteudoUrl: http://conteudos-api:5001/api/conteudos/
+  PagamentoUrl: http://pagamentos-api:5003/api/pagamentos/
+  ConnectionStrings__EventStoreConnection: esdb://eventstore:2113?tls=false
+  RabbitMq__Enabled: "true"
+  RabbitMq__HostName: rabbitmq
+  RabbitMq__Port: "5672"
+  RabbitMq__UserName: eduonline
+  RabbitMq__ExchangeName: eduonline.events
+  ASPNETCORE_AllowedHosts: "*"

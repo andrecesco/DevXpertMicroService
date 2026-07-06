@@ -20,7 +20,7 @@ namespace EduOnline.Bff.ApiRest.Controllers;
 [ProducesResponseType(StatusCodes.Status403Forbidden)]
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 [Route("api/bff/auth")]
-public class AuthController(IAuthService authService, IAlunoService alunoService, INotificador notificador, IAspNetUser user) : MainController(notificador, user)
+public class AuthController(IAuthService authService, INotificador notificador, IAspNetUser user) : MainController(notificador, user)
 {
     /// <summary>
     /// Cria um novo usuário e seu respectivo aluno no ecossistema.
@@ -33,20 +33,6 @@ public class AuthController(IAuthService authService, IAlunoService alunoService
         var responseAuth = await authService.CriarUsuarioIdentity(request) ?? throw new Exception("Ocorreu um erro ao se comunicar com a api de autenticação");
 
         if (!responseAuth.Success) return BadRequest(responseAuth);
-
-        var responseAluno = await alunoService.CriarAluno(authService.AggregateId, new CriarAlunoRequest { Email = request.Email, Nome = request.Nome }) ?? throw new Exception("Ocorreu um erro ao se comunicar com a api de Aluno");
-
-        if (!responseAluno.Success)
-        {
-            var responseAuthDelete = await authService.RemoverUsuarioIdentity(authService.AggregateId) ?? throw new Exception("Ocorreu um erro ao se comunicar com a api de autenticação");
-
-            if (!responseAuthDelete.Success)
-            {
-                return BadRequest(responseAuthDelete);
-            }
-
-            return BadRequest(responseAluno);
-        }
 
         return Created();
     }

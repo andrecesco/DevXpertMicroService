@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-secrets
+  namespace: eduonline
+  labels:
+    app: alertmanager
+    component: observability
+type: Opaque
+stringData:
+  slack-webhook-url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+  pagerduty-service-key: "YOUR_PAGERDUTY_SERVICE_KEY"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alertmanager
+  namespace: eduonline
+  labels:
+    app: alertmanager
+    component: observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+    component: observability
+rules:
+- apiGroups: [""]
+  resources:
+  - services
+  - endpoints
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+    component: observability
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: alertmanager
+subjects:
+- kind: ServiceAccount
+  name: alertmanager
+  namespace: eduonline

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff-api
+  namespace: eduonline
+spec:
+  type: ClusterIP
+  selector:
+    app: bff-api
+  ports:
+    - name: http
+      port: 5004
+      targetPort: 5004

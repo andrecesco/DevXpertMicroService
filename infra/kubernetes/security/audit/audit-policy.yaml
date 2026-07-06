@@ -1,0 +1,54 @@
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  # Log all requests at Metadata level
+  - level: Metadata
+    omitStages:
+    - RequestReceived
+
+  # Log pod exec at RequestResponse level
+  - level: RequestResponse
+    verbs: ["create"]
+    resources:
+    - group: ""
+      resources: ["pods/exec", "pods/portforward"]
+
+  # Log secret access at RequestResponse level
+  - level: RequestResponse
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+    resources:
+    - group: ""
+      resources: ["secrets"]
+
+  # Log configmap changes
+  - level: RequestResponse
+    verbs: ["create", "update", "patch", "delete"]
+    resources:
+    - group: ""
+      resources: ["configmaps"]
+
+  # Log RBAC changes
+  - level: RequestResponse
+    verbs: ["create", "update", "patch", "delete"]
+    resources:
+    - group: rbac.authorization.k8s.io
+      resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+
+  # Log authentication failures
+  - level: Metadata
+    userGroups: ["system:unauthenticated"]
+
+  # Log failed requests
+  - level: Metadata
+    omitStages:
+    - RequestReceived
+    userGroups:
+    - system:nodes
+
+  # Log all other requests at Metadata level
+  - level: Metadata
+    omitStages:
+    - RequestReceived
+
+  # A catch-all rule to log all requests at Metadata level
+  - level: Metadata

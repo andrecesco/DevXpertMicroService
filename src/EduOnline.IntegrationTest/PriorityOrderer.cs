@@ -69,6 +69,6 @@ public class PriorityOrderer : ITestCaseOrderer
 
     public IReadOnlyCollection<TTestCase> OrderTestCases<TTestCase>(IReadOnlyCollection<TTestCase> testCases) where TTestCase : notnull, Xunit.Sdk.ITestCase
     {
-        throw new NotImplementedException();
+        return OrderTestCases(testCases.AsEnumerable()).ToArray();
     }
 }

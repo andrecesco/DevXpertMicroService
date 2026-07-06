@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff-api
+  namespace: eduonline
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bff-api
+  template:
+    metadata:
+      labels:
+        app: bff-api
+        app.kubernetes.io/name: bff-api
+        app.kubernetes.io/part-of: eduonline-platform
+    spec:
+      serviceAccountName: eduonline-api
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 64198
+        runAsGroup: 64198
+        fsGroup: 64198
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bff-api
+          image: eduonline/bff-api:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 5004
+              name: http
+          envFrom:
+            - configMapRef:
+                name: eduonline-config
+            - configMapRef:
+                name: eduonline-observability
+            - secretRef:
+                name: eduonline-secrets
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:5004
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "5004"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://jaeger:4317"
+          resources:
+            requests:
+              cpu: 75m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            initialDelaySeconds: 30
+            periodSeconds: 20

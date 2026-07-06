@@ -38,4 +38,9 @@ public class ConteudoService : BaseService, IConteudoService
 
     public async Task<ResponseResult> AtualizarAula(Guid id, Guid aulaId, AulaRequest request)
         => await ProcessarResposta(await _httpClient.PutAsync($"cursos/{id}/aulas/{aulaId}", ObterConteudo(request)), "Aula não encontrada");
+
+    public async Task<ResponseResult> RegistrarConsumoAula(Guid cursoId, Guid aulaId, Guid alunoId, Guid matriculaId)
+        => await ProcessarResposta(
+            await _httpClient.PatchAsync($"cursos/{cursoId}/aulas/{aulaId}/consumo/alunos/{alunoId}/matriculas/{matriculaId}", null),
+            "Não foi possível registrar o consumo da aula");
 }

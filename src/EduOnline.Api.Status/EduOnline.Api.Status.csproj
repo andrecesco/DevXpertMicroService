@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>d13952d9-7b36-4757-91f1-9616bb9a3df1</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+	  <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0"/>
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0"/>
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.MySql.Storage" Version="9.0.0"/>
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.PostgreSQL.Storage" Version="9.0.0"/>
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.SQLite.Storage" Version="9.0.0"/>
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="9.0.0"/>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+  </ItemGroup>
+
+</Project>

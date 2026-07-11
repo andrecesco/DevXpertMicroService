@@ -41,9 +41,9 @@ app.UseObservability();
 app.UseCorrelationId();
 
 app.UseAuthConfiguration();
+app.UseApiHealthChecks();
 
 app.MapControllers();
-app.UseApiHealthChecks();
 
 app.Run();
 

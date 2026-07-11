@@ -1,3 +1,4 @@
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -123,10 +124,10 @@ public static class ObservabilityExtensions
 
     public static WebApplication UseApiHealthChecks(this WebApplication app)
     {
-        app.MapHealthChecks("/health");
-        app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = check => check.Tags.Contains("db") || check.Tags.Contains("messaging")
+            Predicate = r => r.Tags.Contains("api"),
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 
         return app;

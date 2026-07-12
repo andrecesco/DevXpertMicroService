@@ -1,4 +1,4 @@
-name: eduonline-local-compose
+version: '3.9'
 
 services:
   # ============================================================================
@@ -96,30 +96,32 @@ services:
       - ./infra/observability/prometheus/prometheus-local.yml:/etc/prometheus/prometheus.yml:ro
     networks:
       - eduonline-network
-    restart: on-failure   
+    restart: on-failure
 
   # ============================================================================
   # AUTH API - Autenticação e Autorização
   # ============================================================================
   auth-api:
+    build:
+      context: .
+      dockerfile: src/EduOnline.Auth.ApiRest/Dockerfile
     image: eduonline/auth-api:latest
     container_name: eduonline-auth-api
-    build:
-      context: ./
-      dockerfile: src/EduOnline.Auth.ApiRest/Dockerfile
     ports:
       - "5000:5000"
-    restart: always
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://+:5000"
       ASPNETCORE_HTTP_PORTS: "5000"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineDB;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ASPNETCORE_AllowedHosts: "*"
+      JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
+      JWT__Issuer: "EduOnline.Auth"
+      JWT__Audience: "EduOnline.Client"
+      JWT__ExpirationMinutes: "60"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -133,34 +135,35 @@ services:
       start_period: 15s
     networks:
       - eduonline-network
+    restart: on-failure
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-  
+
   # ============================================================================
   # CONTEUDOS API - Cursos e Aulas
   # ============================================================================
   conteudos-api:
     build:
-      context: ./
+      context: .
       dockerfile: src/EduOnline.Conteudos.ApiRest/Dockerfile
     image: eduonline/conteudos-api:latest
     container_name: eduonline-conteudos-api
     ports:
       - "5001:5001"
-    restart: always
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://+:5001"
       ASPNETCORE_HTTP_PORTS: "5001"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineDB;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ASPNETCORE_AllowedHosts: "*"
+      ServiceUrls__AuthApi: "http://auth-api:5000"
+      JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -176,34 +179,36 @@ services:
       start_period: 15s
     networks:
       - eduonline-network
+    restart: on-failure
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-  
-  # # ============================================================================
-  # # ALUNOS API - Gestão de Alunos e Matrículas
-  # # ============================================================================
+
+  # ============================================================================
+  # ALUNOS API - Gestão de Alunos e Matrículas
+  # ============================================================================
   alunos-api:
     build:
-      context: ./
+      context: .
       dockerfile: src/EduOnline.Alunos.ApiRest/Dockerfile
     image: eduonline/alunos-api:latest
     container_name: eduonline-alunos-api
     ports:
       - "5002:5002"
-    restart: always
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://+:5002"
       ASPNETCORE_HTTP_PORTS: "5002"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineDB;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ASPNETCORE_AllowedHosts: "*"
+      ServiceUrls__AuthApi: "http://auth-api:5000"
+      ServiceUrls__ConteudosApi: "http://conteudos-api:5001"
+      JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -221,34 +226,36 @@ services:
       start_period: 15s
     networks:
       - eduonline-network
+    restart: on-failure
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
 
-  # # ============================================================================
-  # # PAGAMENTOS API - Processamento de Pagamentos
-  # # ============================================================================
+  # ============================================================================
+  # PAGAMENTOS API - Processamento de Pagamentos
+  # ============================================================================
   pagamentos-api:
     build:
-      context: ./
+      context: .
       dockerfile: src/EduOnline.Pagamentos.ApiRest/Dockerfile
     image: eduonline/pagamentos-api:latest
     container_name: eduonline-pagamentos-api
     ports:
       - "5003:5003"
-    restart: always
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://+:5003"
       ASPNETCORE_HTTP_PORTS: "5003"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineDB;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ASPNETCORE_AllowedHosts: "*"
+      ServiceUrls__AuthApi: "http://auth-api:5000"
+      ServiceUrls__AlunosApi: "http://alunos-api:5002"
+      JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -266,35 +273,36 @@ services:
       start_period: 15s
     networks:
       - eduonline-network
+    restart: on-failure
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
 
-  # # ============================================================================
-  # # BFF API - Backend for Frontend
-  # # ============================================================================
+  # ============================================================================
+  # BFF API - Backend for Frontend
+  # ============================================================================
   bff-api:
     build:
-      context: ./
+      context: .
       dockerfile: src/EduOnline.WebApps.ApiRest/Dockerfile
     image: eduonline/bff-api:latest
     container_name: eduonline-bff-api
     ports:
       - "5004:5004"
-    restart: always
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://+:5004"
       ASPNETCORE_HTTP_PORTS: "5004"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineBffDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineDB;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      AuthUrl: "http://auth-api:5000"
-      ConteudoUrl: "http://conteudos-api:5001"
-      AlunoUrl: "http://alunos-api:5002"
-      PagamentoUrl: "http://pagamentos-api:5003"
+      ServiceUrls__AuthApi: "http://auth-api:5000"
+      ServiceUrls__ConteudosApi: "http://conteudos-api:5001"
+      ServiceUrls__AlunosApi: "http://alunos-api:5002"
+      ServiceUrls__PagamentosApi: "http://pagamentos-api:5003"
+      JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
       sqlserver:
@@ -317,48 +325,7 @@ services:
       start_period: 15s
     networks:
       - eduonline-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ============================================================================
-  # STATUS API
-  # ============================================================================
-  status-api:
-    image: eduonline/status:latest
-    container_name: eduonline-status-api
-    build:
-      context: ./
-      dockerfile: ./src/EduOnline.Api.Status/Dockerfile
-    ports:
-      - "5005:5005"
-    restart: always
-    environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
-      ASPNETCORE_URLS: "http://+:5005"
-      ASPNETCORE_HTTP_PORTS: "5005"
-      ASPNETCORE_AllowedHosts: "*"
-    depends_on:
-      auth-api:
-        condition: service_healthy
-      conteudos-api:
-        condition: service_healthy
-      alunos-api:
-        condition: service_healthy
-      pagamentos-api:
-        condition: service_healthy
-      bff-api:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5005/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    networks:
-      - eduonline-network
+    restart: on-failure
     logging:
       driver: "json-file"
       options:

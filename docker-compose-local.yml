@@ -119,10 +119,6 @@ services:
       SeedSettings__EnableSeedData: "true"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      # JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
-      # JWT__Issuer: "EduOnline.Auth"
-      # JWT__Audience: "EduOnline.Client"
-      # JWT__ExpirationMinutes: "60"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
       sqlserver:
@@ -164,8 +160,6 @@ services:
       SeedSettings__EnableSeedData: "true"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ServiceUrls__AuthApi: "http://auth-api:5000"
-      #JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
       sqlserver:
@@ -209,9 +203,6 @@ services:
       SeedSettings__EnableSeedData: "true"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ServiceUrls__AuthApi: "http://auth-api:5000"
-      ServiceUrls__ConteudosApi: "http://conteudos-api:5001"
-      #JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
       sqlserver:
@@ -257,9 +248,6 @@ services:
       SeedSettings__EnableSeedData: "true"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ServiceUrls__AuthApi: "http://auth-api:5000"
-      ServiceUrls__AlunosApi: "http://alunos-api:5002"
-      #JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
       sqlserver:
@@ -303,11 +291,10 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineBffDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
-      ServiceUrls__AuthApi: "http://auth-api:5000"
-      ServiceUrls__ConteudosApi: "http://conteudos-api:5001"
-      ServiceUrls__AlunosApi: "http://alunos-api:5002"
-      ServiceUrls__PagamentosApi: "http://pagamentos-api:5003"
-      #JWT__Secret: "${JWT_SECRET:-SuperSecretKeyForJWT_Change_This_In_Production_2024}"
+      AuthUrl: "http://auth-api:5000"
+      ConteudoUrl: "http://conteudos-api:5001"
+      AlunoUrl: "http://alunos-api:5002"
+      PagamentoUrl: "http://pagamentos-api:5003"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
       sqlserver:

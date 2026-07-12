@@ -3,7 +3,6 @@ using System;
 using EduOnline.Conteudos.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -16,29 +15,25 @@ namespace EduOnline.Conteudos.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
             modelBuilder.Entity("EduOnline.Conteudos.Domain.Aula", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("CursoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Descricao")
                         .HasColumnType("varchar(100)");
 
                     b.Property<int>("DuracaoEmMinutos")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("LinkMaterial")
                         .IsRequired()
@@ -59,27 +54,27 @@ namespace EduOnline.Conteudos.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Autor")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateOnly>("Validade")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Valor")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -102,14 +97,14 @@ namespace EduOnline.Conteudos.Data.Migrations
                     b.OwnsOne("EduOnline.Conteudos.Domain.ConteudoProgramatico", "ConteudoProgramatico", b1 =>
                         {
                             b1.Property<Guid>("CursoId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("CargaHoraria")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("CargaHoraria");
 
                             b1.Property<int>("NivelId")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("NivelId");
 
                             b1.Property<string>("Tema")

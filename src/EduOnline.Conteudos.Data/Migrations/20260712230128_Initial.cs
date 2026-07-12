@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,16 +15,16 @@ namespace EduOnline.Conteudos.Data.Migrations
                 name: "Cursos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Nome = table.Column<string>(type: "varchar(100)", nullable: false),
                     Autor = table.Column<string>(type: "varchar(100)", nullable: false),
-                    Validade = table.Column<DateOnly>(type: "date", nullable: false),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    Valor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Validade = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Valor = table.Column<decimal>(type: "TEXT", nullable: false),
                     Tema = table.Column<string>(type: "varchar(2048)", nullable: false),
-                    NivelId = table.Column<int>(type: "int", nullable: false),
-                    CargaHoraria = table.Column<int>(type: "int", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    NivelId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CargaHoraria = table.Column<int>(type: "INTEGER", nullable: false),
+                    DataCriacao = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,13 +35,13 @@ namespace EduOnline.Conteudos.Data.Migrations
                 name: "Aulas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CursoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CursoId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Titulo = table.Column<string>(type: "varchar(100)", nullable: false),
                     Descricao = table.Column<string>(type: "varchar(100)", nullable: true),
                     LinkMaterial = table.Column<string>(type: "varchar(2048)", nullable: false),
-                    DuracaoEmMinutos = table.Column<int>(type: "int", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DuracaoEmMinutos = table.Column<int>(type: "INTEGER", nullable: false),
+                    DataCriacao = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

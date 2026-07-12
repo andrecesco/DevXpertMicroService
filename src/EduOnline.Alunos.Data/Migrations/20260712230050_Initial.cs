@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,12 +15,12 @@ namespace EduOnline.Alunos.Data.Migrations
                 name: "Alunos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Nome = table.Column<string>(type: "varchar(100)", nullable: false),
                     Email = table.Column<string>(type: "varchar(100)", nullable: false),
-                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: true),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DataNascimento = table.Column<DateOnly>(type: "TEXT", nullable: true),
+                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
+                    DataCriacao = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,17 +31,17 @@ namespace EduOnline.Alunos.Data.Migrations
                 name: "Matriculas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AlunoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CursoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AlunoId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CursoId = table.Column<Guid>(type: "TEXT", nullable: false),
                     CursoNome = table.Column<string>(type: "varchar(100)", nullable: false),
-                    Validade = table.Column<DateOnly>(type: "date", nullable: false),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
-                    PagamentoStatusId = table.Column<int>(type: "int", nullable: false),
-                    TotalAulas = table.Column<int>(type: "int", nullable: true),
-                    AulasConcluidas = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Validade = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    StatusId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PagamentoStatusId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TotalAulas = table.Column<int>(type: "INTEGER", nullable: true),
+                    AulasConcluidas = table.Column<string>(type: "TEXT", nullable: true),
+                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
+                    DataCriacao = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,10 +58,10 @@ namespace EduOnline.Alunos.Data.Migrations
                 name: "Certificados",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MatriculaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    MatriculaId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Link = table.Column<string>(type: "varchar(100)", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DataCriacao = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

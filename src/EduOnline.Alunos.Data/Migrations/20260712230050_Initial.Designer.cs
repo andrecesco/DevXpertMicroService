@@ -3,7 +3,6 @@ using System;
 using EduOnline.Alunos.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,33 +11,29 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduOnline.Alunos.Data.Migrations
 {
     [DbContext(typeof(AlunosContext))]
-    [Migration("20260712013743_Initial")]
+    [Migration("20260712230050_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
             modelBuilder.Entity("EduOnline.Alunos.Domain.Models.Aluno", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateOnly?>("DataNascimento")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -57,17 +52,17 @@ namespace EduOnline.Alunos.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
                     b.Property<Guid>("MatriculaId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -81,32 +76,32 @@ namespace EduOnline.Alunos.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("AlunoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("CursoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("CursoNome")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("PagamentoStatusId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateOnly>("Validade")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -137,15 +132,15 @@ namespace EduOnline.Alunos.Data.Migrations
                     b.OwnsOne("EduOnline.Alunos.Domain.ValueObjects.HistoricoAprendizagem", "HistoricoAprendizagem", b1 =>
                         {
                             b1.Property<Guid>("MatriculaId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("TEXT");
 
                             b1.PrimitiveCollection<string>("AulasConcluidas")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("AulasConcluidas");
 
                             b1.Property<int>("TotalAulas")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("TotalAulas");
 
                             b1.HasKey("MatriculaId");

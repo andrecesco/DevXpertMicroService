@@ -102,7 +102,7 @@ services:
   # AUTH API - Autenticação e Autorização
   # ============================================================================
   auth-api:
-    image: eduonline/auth-api:latest
+    image: andrecesco/eduonline-auth-api:latest
     container_name: eduonline-auth-api
     build:
       context: ./
@@ -143,11 +143,11 @@ services:
   # CONTEUDOS API - Cursos e Aulas
   # ============================================================================
   conteudos-api:
+    image: andrecesco/eduonline-conteudos-api:latest
+    container_name: eduonline-conteudos-api
     build:
       context: ./
       dockerfile: src/EduOnline.Conteudos.ApiRest/Dockerfile
-    image: eduonline/conteudos-api:latest
-    container_name: eduonline-conteudos-api
     ports:
       - "5001:5001"
     restart: always
@@ -182,15 +182,15 @@ services:
         max-size: "10m"
         max-file: "3"
   
-  # # ============================================================================
-  # # ALUNOS API - Gestão de Alunos e Matrículas
-  # # ============================================================================
+  # ============================================================================
+  # ALUNOS API - Gestão de Alunos e Matrículas
+  # ============================================================================
   alunos-api:
+    image: andrecesco/eduonline-alunos-api:latest
+    container_name: eduonline-alunos-api
     build:
       context: ./
       dockerfile: src/EduOnline.Alunos.ApiRest/Dockerfile
-    image: eduonline/alunos-api:latest
-    container_name: eduonline-alunos-api
     ports:
       - "5002:5002"
     restart: always
@@ -209,10 +209,10 @@ services:
         condition: service_healthy
       eventstore:
         condition: service_started
-      auth-api:
-        condition: service_healthy
-      conteudos-api:
-        condition: service_healthy
+      # auth-api:
+      #   condition: service_healthy
+      # conteudos-api:
+      #   condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5002/health"]
       interval: 30s
@@ -231,11 +231,11 @@ services:
   # # PAGAMENTOS API - Processamento de Pagamentos
   # # ============================================================================
   pagamentos-api:
+    image: andrecesco/eduonline-pagamentos-api:latest
+    container_name: eduonline-pagamentos-api
     build:
       context: ./
       dockerfile: src/EduOnline.Pagamentos.ApiRest/Dockerfile
-    image: eduonline/pagamentos-api:latest
-    container_name: eduonline-pagamentos-api
     ports:
       - "5003:5003"
     restart: always
@@ -276,11 +276,11 @@ services:
   # # BFF API - Backend for Frontend
   # # ============================================================================
   bff-api:
+    image: andrecesco/eduonline-bff:latest
+    container_name: eduonline-bff-api
     build:
       context: ./
       dockerfile: src/EduOnline.WebApps.ApiRest/Dockerfile
-    image: eduonline/bff-api:latest
-    container_name: eduonline-bff-api
     ports:
       - "5004:5004"
     restart: always
@@ -327,7 +327,7 @@ services:
   # STATUS API
   # ============================================================================
   status-api:
-    image: eduonline/status:latest
+    image: andrecesco/eduonline-status:latest
     container_name: eduonline-status-api
     build:
       context: ./

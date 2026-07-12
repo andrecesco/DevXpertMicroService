@@ -25,28 +25,6 @@ var healthCheckBuilder = builder.Services.AddHealthChecksUI(setup =>
 });
 
 healthCheckBuilder.AddInMemoryStorage();
-//var (database, connString) = DetectDatabase(builder.Configuration);
-
-//switch (database)
-//{
-//    case DatabaseType.None:
-//        break;
-//    case DatabaseType.SqlServer:
-//        healthCheckBuilder.AddSqlServerStorage(connString);
-//        break;
-//    case DatabaseType.MySql:
-//        healthCheckBuilder.AddMySqlStorage(connString);
-//        break;
-//    case DatabaseType.Postgre:
-//        healthCheckBuilder.AddPostgreSqlStorage(connString);
-//        break;
-//    case DatabaseType.Sqlite:
-//        healthCheckBuilder.AddSqliteStorage(connString);
-//        break;
-//    default:
-//        healthCheckBuilder.AddInMemoryStorage();
-//        break;
-//}
 
 var app = builder.Build();
 
@@ -81,34 +59,3 @@ app.MapHealthChecksUI(setup =>
     setup.PageTitle = "EduOnline - Status";
 });
 app.Run();
-
-
-//var builder = WebApplication.CreateBuilder(args);
-
-// 1. ADICIONE ESTA LINHA para registrar os serviços necessários
-//builder.Services.AddHealthChecks();
-
-// Se estiver usando a interface gráfica do Health Checks, adicione também:
-//builder.Services.AddHealthChecksUI(setupSettings =>
-//{
-//     Monitorar a própria API local
-//    setupSettings.AddHealthCheckEndpoint("BFF", "https://localhost:7098/health");
-
-//     Você pode adicionar outras APIs ou Microserviços aqui:
-//     setupSettings.AddHealthCheckEndpoint("API de Vendas", "https://api-vendas/health");
-//})
-//    .AddInMemoryStorage();
-
-//var app = builder.Build();
-
-// 2. Mapeie o endpoint utilizando o formatador JSON do UI
-//app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-//{
-//    Predicate = _ => true,
-//    ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
-//});
-
-// Opcional: Mapeia a interface visual (/healthchecks-ui)
-//app.MapHealthChecksUI();
-
-//app.Run();

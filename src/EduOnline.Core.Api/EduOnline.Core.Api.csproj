@@ -17,15 +17,11 @@
 		<PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
 		<PackageReference Include="prometheus-net.AspNetCore.HealthChecks" Version="8.2.1" />
 		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0"/>
+		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\EduOnline.Core\EduOnline.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="DatabaseFlavor\" />
 	</ItemGroup>
 
 </Project>

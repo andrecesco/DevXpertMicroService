@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Configuration;
-
 namespace EduOnline.Conteudos.ApiRest.Services;
 
 public class AlunoProgressIntegrationService(HttpClient httpClient, IConfiguration configuration) : IAlunoProgressIntegrationService

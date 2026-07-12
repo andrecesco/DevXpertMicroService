@@ -1,5 +1,4 @@
 ﻿using EduOnline.Alunos.Data.Context;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Alunos.ApiRest.Extensions;

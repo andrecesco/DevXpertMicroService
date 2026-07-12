@@ -1,0 +1,7 @@
+﻿:root {
+    --primaryColor: #525AF2;
+    --secondaryColor: #F2F2F2;
+    --bgMenuActive: #797FF2;
+    --bgButton: #A2A6F2;
+    --bgAside: var(--primaryColor);
+}

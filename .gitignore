@@ -9,6 +9,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.Db
+*.Db-shm
+*.Db-wal
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -361,3 +364,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/src/EduOnline.Alunos.ApiRest/EduOnlineAlunos.Db
+/src/EduOnline.Auth.ApiRest/EduOnlineAuth.Db

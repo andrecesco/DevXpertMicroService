@@ -1,5 +1,4 @@
 ﻿using EduOnline.Alunos.Data.Context;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EduOnline.Alunos.ApiRest.Extensions;
@@ -26,7 +25,7 @@ public static class DbMigrationsHelpers
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var context = scope.ServiceProvider.GetRequiredService<AlunosContext>();
 
-        if (env.IsDevelopment() || env.IsEnvironment("Testing"))
+        if (env.IsDevelopment() || env.IsEnvironment("Testing") || env.IsEnvironment("Docker"))
         {
             await context.Database.EnsureCreatedAsync();
 

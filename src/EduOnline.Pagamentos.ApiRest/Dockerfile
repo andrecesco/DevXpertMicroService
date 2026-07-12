@@ -35,14 +35,9 @@ RUN dotnet publish "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRes
 # Stage 3: Runtime - Imagem final leve
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 WORKDIR /app
-RUN apk add --no-cache icu-libs
 
-# Variáveis de ambiente padrão
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
-	ASPNETCORE_ENVIRONMENT=Production \
-	ASPNETCORE_URLS=http://+:5003 \
-	ASPNETCORE_HTTP_PORTS=5003 \
-	OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+RUN apk add --no-cache icu-libs
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copiar arquivos publicados
 COPY --from=build /app/publish .

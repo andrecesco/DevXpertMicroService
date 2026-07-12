@@ -27,6 +27,7 @@ public class CursosController(ICursoRepository cursoRepository, ICursoService cu
     /// <summary>
     /// Lista todos os cursos disponíveis.
     /// </summary>
+    [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(typeof(ResponseResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> ObterTodos()

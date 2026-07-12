@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Bff/">
+    <Project Path="src/EduOnline.Api.Status/EduOnline.Api.Status.csproj" Id="9f5d938a-b3d4-4cff-a10e-223d9f8b8544" />
     <Project Path="src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" />
   </Folder>
   <Folder Name="/BuildingBlocks/">

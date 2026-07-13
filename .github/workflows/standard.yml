@@ -1,0 +1,35 @@
+name: Build .NET e Rodar Docker Compose
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-e-executar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
+
+    - name: Configurar o SDK do .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x' # Altere para a versão do seu projeto
+
+    - name: Restaurar dependências e Build da Solução
+      run: dotnet build EduOnline.slnx --configuration Release
+
+    # - name: Fazer Login no Docker Hub (Opcional)
+      # if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      # uses: docker/login-action@v3
+      # with:
+        # username: ${{ secrets.DOCKER_USERNAME }}
+        # password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Buildar e Subir o Docker Compose
+      run: |
+        docker compose build
+        docker compose up -d

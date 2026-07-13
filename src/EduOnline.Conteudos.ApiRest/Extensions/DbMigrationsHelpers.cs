@@ -22,7 +22,7 @@ public static class DbMigrationsHelpers
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var context = scope.ServiceProvider.GetRequiredService<ConteudosContext>();
 
-        if (env.IsDevelopment() || env.IsEnvironment("Docker"))
+        if (env.IsDevelopment())
         {
             var enableMigrations = ObterBoolean(configuration, "SeedSettings:EnableMigrations", false);
             if (enableMigrations)

@@ -25,7 +25,7 @@ public static class DbMigrationsHelpers
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var context = scope.ServiceProvider.GetRequiredService<AlunosContext>();
 
-        if (env.IsDevelopment() || env.IsEnvironment("Testing") || env.IsEnvironment("Docker"))
+        if (env.IsDevelopment() || env.IsEnvironment("Testing"))
         {
             await context.Database.EnsureCreatedAsync();
 

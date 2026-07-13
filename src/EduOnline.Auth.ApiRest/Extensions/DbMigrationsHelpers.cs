@@ -27,7 +27,7 @@ public static class DbMigrationsHelpers
         var context = services.GetRequiredService<ApplicationDbContext>();
         var configuration = services.GetRequiredService<IConfiguration>();
 
-        if (env.IsDevelopment() || env.IsEnvironment("Docker"))
+        if (env.IsDevelopment())
         {
             var enableMigrations = ObterBoolean(configuration, "SeedSettings:EnableMigrations", true);
             if (enableMigrations)

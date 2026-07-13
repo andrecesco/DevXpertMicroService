@@ -54,7 +54,7 @@ if (app.Configuration["USE_HTTPS_REDIRECTION"] == "true")
 
 app.MapHealthChecksUI(setup =>
 {
-    setup.AddCustomStylesheet("devstore.css");
+    setup.AddCustomStylesheet("eduonline.css");
     setup.UIPath = "/";
     setup.PageTitle = "EduOnline - Status";
 });

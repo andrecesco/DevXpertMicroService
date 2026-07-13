@@ -1,4 +1,4 @@
-name: eduonline-local-compose
+name: eduonline-compose
 
 services:
   # ============================================================================
@@ -115,8 +115,8 @@ services:
       ASPNETCORE_URLS: "http://+:5000"
       ASPNETCORE_HTTP_PORTS: "5000"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
@@ -156,8 +156,8 @@ services:
       ASPNETCORE_URLS: "http://+:5001"
       ASPNETCORE_HTTP_PORTS: "5001"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
@@ -199,8 +199,8 @@ services:
       ASPNETCORE_URLS: "http://+:5002"
       ASPNETCORE_HTTP_PORTS: "5002"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
@@ -244,8 +244,8 @@ services:
       ASPNETCORE_URLS: "http://+:5003"
       ASPNETCORE_HTTP_PORTS: "5003"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      SeedSettings__EnableMigrations: "true"
-      SeedSettings__EnableSeedData: "true"
+      SeedSettings__EnableMigrations: "false"
+      SeedSettings__EnableSeedData: "false"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"

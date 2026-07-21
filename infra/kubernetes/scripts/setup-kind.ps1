@@ -5,6 +5,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..'))
+$composeServices = @('auth-api', 'conteudos-api', 'alunos-api', 'pagamentos-api', 'bff-api')
+
 # ---------------------------------------------------------------------------
 # 1. Criar o cluster Kind (se ainda não existir)
 # ---------------------------------------------------------------------------
@@ -17,21 +20,20 @@ if (-not $clusterExists) {
 kubectl config use-context "kind-$ClusterName" | Out-Null
 
 # ---------------------------------------------------------------------------
-# 2. Build das imagens via docker compose (a partir da raiz do repositório)
+# 2. Build das imagens dos microsserviços via docker compose
 # ---------------------------------------------------------------------------
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..'))
-Write-Host "Executando 'docker compose build' em '$repoRoot'..." -ForegroundColor Cyan
-docker compose --project-directory $repoRoot build
+Write-Host "Executando 'docker compose build' para os microsserviços em '$repoRoot'..." -ForegroundColor Cyan
+docker compose --project-directory $repoRoot build @composeServices
 
 # ---------------------------------------------------------------------------
-# 3. Mapeamento: imagem gerada pelo compose → nome usado nos deployments K8s
+# 3. Mapeamento: imagem gerada pelo compose -> nome usado nos deployments K8s
 # ---------------------------------------------------------------------------
 $images = @(
-	@{ Compose = 'andrecesco/eduonline-auth-api:latest';      K8s = 'eduonline/auth-api:latest'      },
-	@{ Compose = 'andrecesco/eduonline-conteudos-api:latest'; K8s = 'eduonline/conteudos-api:latest' },
-	@{ Compose = 'andrecesco/eduonline-alunos-api:latest';    K8s = 'eduonline/alunos-api:latest'    },
-	@{ Compose = 'andrecesco/eduonline-pagamentos-api:latest';K8s = 'eduonline/pagamentos-api:latest'},
-	@{ Compose = 'andrecesco/eduonline-bff:latest';           K8s = 'eduonline/bff-api:latest'       }
+	@{ Compose = 'andrecesco/eduonline-auth-api:latest';       K8s = 'eduonline/auth-api:latest' },
+	@{ Compose = 'andrecesco/eduonline-conteudos-api:latest';  K8s = 'eduonline/conteudos-api:latest' },
+	@{ Compose = 'andrecesco/eduonline-alunos-api:latest';     K8s = 'eduonline/alunos-api:latest' },
+	@{ Compose = 'andrecesco/eduonline-pagamentos-api:latest'; K8s = 'eduonline/pagamentos-api:latest' },
+	@{ Compose = 'andrecesco/eduonline-bff:latest';            K8s = 'eduonline/bff-api:latest' }
 )
 
 # ---------------------------------------------------------------------------

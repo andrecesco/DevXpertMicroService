@@ -18,6 +18,9 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Verificar formatação do código
+      run: dotnet format EduOnline.slnx --verify-no-changes --no-restore
+
     - name: Configurar o JDK (necessário para o Sonar Scanner)
       uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
       with:

@@ -13,6 +13,11 @@ jobs:
     - name: Checkout do código
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+    - name: Configurar line endings (CRLF)
+      run: |
+        git config --global core.autocrlf true
+        git config --global core.safecrlf false
+
     - name: Configurar o SDK do .NET
       uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
       with:

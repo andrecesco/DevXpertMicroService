@@ -40,6 +40,10 @@ jobs:
         /o:"$SONAR_ORGANIZATION"
         /d:sonar.token="$SONAR_TOKEN"
         /d:sonar.host.url="https://sonarcloud.io"
+        /d:sonar.sourceEncoding="UTF-8"
+        /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,.git/**"
+        /d:sonar.coverage.exclusions="**/*Tests*,**/*IntegrationTest*,**/bin/**,**/obj/**"
+        /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
     - name: Executar Testes de Unidade
       run: >

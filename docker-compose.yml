@@ -39,8 +39,7 @@ services:
           memory: 2G
 
   # ============================================================================
-  # SQL SERVER INIT - Executa o InitDB.sql (a imagem oficial do SQL Server não
-  # roda scripts de /docker-entrypoint-initdb.d automaticamente como Postgres/MySQL)
+  # SQL SERVER INIT - Executa o InitDB.sql
   # ============================================================================
   sqlserver-init:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -240,10 +239,10 @@ services:
         condition: service_completed_successfully
       eventstore:
         condition: service_started
-      # auth-api:
-      #   condition: service_healthy
-      # conteudos-api:
-      #   condition: service_healthy
+      auth-api:
+        condition: service_healthy
+      conteudos-api:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5002/health"]
       interval: 30s
@@ -288,6 +287,8 @@ services:
       eventstore:
         condition: service_started
       auth-api:
+        condition: service_healthy
+      conteudos-api:
         condition: service_healthy
       alunos-api:
         condition: service_healthy

@@ -25,14 +25,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 WORKDIR /app
 RUN apk add --no-cache icu-libs
 
-# Criar usuário não-root para executar a aplicação
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
 # Copiar arquivos publicados
 COPY --from=build /app/publish .
-RUN chown -R appuser:appgroup /app
-
-USER appuser
 
 # Expor porta
 EXPOSE 5005

@@ -34,14 +34,8 @@ WORKDIR /app
 RUN apk add --no-cache icu-libs
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-# Criar usuário não-root para executar a aplicação
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
 # Copiar arquivos publicados
 COPY --from=build /app/publish .
-RUN chown -R appuser:appgroup /app
-
-USER appuser
 
 # Expor porta
 EXPOSE 5003

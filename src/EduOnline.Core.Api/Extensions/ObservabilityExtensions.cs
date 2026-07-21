@@ -129,6 +129,12 @@ public static class ObservabilityExtensions
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 
+        app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = r => r.Tags.Contains("api"),
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+
         return app;
     }
 

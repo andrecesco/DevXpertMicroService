@@ -40,13 +40,65 @@ jobs:
         /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         /d:sonar.host.url="https://sonarcloud.io"
 
-    - name: Executar Testes (Unidade e Integração)
+    - name: Executar Testes de Unidade
       run: >
         dotnet test EduOnline.slnx --configuration Release --no-build
+        --filter "FullyQualifiedName!~IntegrationTest"
         /p:CollectCoverage=true
         /p:CoverletOutputFormat=opencover
         /p:CoverletOutput="../../coverage/"
         /p:MergeWith="../../coverage/coverage.opencover.xml"
+
+    - name: Subir RabbitMQ para os testes de integração
+      run: |
+        docker run -d --name rabbitmq-test \
+          -p 5672:5672 \
+          rabbitmq:3-management-alpine
+
+    - name: Subir EventStore para os testes de integração
+      run: |
+        docker run -d --name eventstore-test \
+          -e "EVENTSTORE_INSECURE=true" \
+          -e "EVENTSTORE_RUN_PROJECTIONS=All" \
+          -e "EVENTSTORE_START_STANDARD_PROJECTIONS=true" \
+          -e "EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true" \
+          -p 2113:2113 \
+          eventstore/eventstore:24.10.0
+
+    - name: Aguardar RabbitMQ e EventStore ficarem disponíveis
+      run: |
+        for i in $(seq 1 30); do
+          if docker exec rabbitmq-test rabbitmq-diagnostics -q ping > /dev/null 2>&1; then
+            echo "RabbitMQ disponível"
+            break
+          fi
+          echo "Aguardando RabbitMQ... ($i/30)"
+          sleep 5
+        done
+
+        for i in $(seq 1 30); do
+          if curl -sf http://localhost:2113/health/live > /dev/null 2>&1; then
+            echo "EventStore disponível"
+            break
+          fi
+          echo "Aguardando EventStore... ($i/30)"
+          sleep 5
+        done
+
+    - name: Executar Testes de Integração
+      run: >
+        dotnet test EduOnline.slnx --configuration Release --no-build
+        --filter "FullyQualifiedName~IntegrationTest"
+        /p:CollectCoverage=true
+        /p:CoverletOutputFormat=opencover
+        /p:CoverletOutput="../../coverage/"
+        /p:MergeWith="../../coverage/coverage.opencover.xml"
+
+    - name: Remover RabbitMQ e EventStore de testes
+      if: always()
+      run: |
+        docker rm -f rabbitmq-test eventstore-test
+        docker rmi rabbitmq:3-management-alpine eventstore/eventstore:24.10.0
 
     - name: Finalizar análise do SonarCloud
       env:

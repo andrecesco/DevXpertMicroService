@@ -15,6 +15,10 @@ COPY ["src/EventSourcing/EventSourcing.csproj", "src/EventSourcing/"]
 # Restaurar dependências
 RUN dotnet restore "src/EduOnline.Alunos.ApiRest/EduOnline.Alunos.ApiRest.csproj"
 
+
+FROM restore AS build
+WORKDIR /src
+
 # Copiar código fonte completo
 COPY . .
 

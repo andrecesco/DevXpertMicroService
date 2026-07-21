@@ -33,11 +33,12 @@ jobs:
     - name: Iniciar análise do SonarCloud
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
       run: >
         dotnet sonarscanner begin
         /k:"eduonline-platform"
-        /o:"${{ secrets.SONAR_ORGANIZATION }}"
-        /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        /o:"$SONAR_ORGANIZATION"
+        /d:sonar.token="$SONAR_TOKEN"
         /d:sonar.host.url="https://sonarcloud.io"
 
     - name: Executar Testes de Unidade
@@ -57,6 +58,11 @@ jobs:
         /p:CoverletOutputFormat=opencover
         /p:CoverletOutput="../../coverage/"
         /p:MergeWith="../../coverage/coverage.opencover.xml"
+
+    - name: Finalizar análise do SonarCloud
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
   build-push-images:
     needs: build

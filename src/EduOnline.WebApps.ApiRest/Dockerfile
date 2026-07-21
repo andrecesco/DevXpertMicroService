@@ -36,8 +36,14 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 	ASPNETCORE_HTTP_PORTS=5004 \
 	OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
 
+# Criar usuário não-root para executar a aplicação
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 # Copiar arquivos publicados
 COPY --from=build /app/publish .
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 # Expor porta
 EXPOSE 5004

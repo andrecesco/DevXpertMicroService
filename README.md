@@ -198,9 +198,13 @@ Após o container estiver rodando é possível acessar através do link http://l
 
 - `src/` - APIs, domínios, dados, aplicação, core e BFF
 - `test/` - testes unitários e de integração
-- `docs/` - documentação de CI/CD e configuração dos workflows
+- `docs/` - documentação complementar:
+  - `docs/docker.md` - guia detalhado do ambiente Docker e Docker Compose
+  - `docs/ci-cd-testing-guide.md` - validação e testes dos workflows de CI/CD
+  - `docs/CI-CD-PIPELINE.md` - documentação completa do pipeline
+  - `docs/GITHUB-ACTIONS-SETUP.md` - configuração de secrets e workflows
+  - `docs/projeto-mod05.md` - brief de requisitos e critérios de avaliação do módulo
 - `infra/kubernetes/` - manifests e guias da infraestrutura local em Kubernetes
 - `infra/kubernetes/README.md` - guia complementar com foco nos manifests Kubernetes
-- `DOCKER-README.md` - guia detalhado do ambiente Docker
-- `CI-CD-TESTING-GUIDE.md` - validação dos workflows de CI/CD
 - `SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado de segurança e compliance
+- `FEEDBACK.md` - histórico de feedbacks e correções aplicadas

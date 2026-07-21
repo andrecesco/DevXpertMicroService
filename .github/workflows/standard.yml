@@ -60,7 +60,7 @@ jobs:
 
   build-push-images:
     needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    #if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -103,7 +103,7 @@ jobs:
 
   docker-compose:
     needs: build-push-images
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    #if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
 
     steps:

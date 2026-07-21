@@ -24,28 +24,21 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
+    - name: Restaurar dependências e Build da Solução
+      run: dotnet build EduOnline.slnx --configuration Release
+
     - name: Instalar o Sonar Scanner para .NET
       run: dotnet tool install --global dotnet-sonarscanner
 
     - name: Iniciar análise do SonarCloud
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      # Demais configurações (exclusions, coverage, encoding, etc.) vêm do sonar-project.properties na raiz do repo
       run: >
         dotnet sonarscanner begin
         /k:"eduonline-platform"
         /o:"${{ secrets.SONAR_ORGANIZATION }}"
         /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         /d:sonar.host.url="https://sonarcloud.io"
-
-    - name: Restaurar dependências e Build da Solução
-      run: dotnet build EduOnline.slnx --configuration Release
-
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout do código
-      uses: actions/checkout@v4
 
     - name: Finalizar análise do SonarCloud
       env:

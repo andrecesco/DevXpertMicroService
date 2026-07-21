@@ -90,7 +90,7 @@ public static class ObservabilityExtensions
     public static WebApplicationBuilder AddApiHealthChecks(this WebApplicationBuilder builder)
     {
         builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"))
+            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"), tags: ["live", "ready"])
             .ForwardToPrometheus();
 
         return builder;
@@ -100,12 +100,12 @@ public static class ObservabilityExtensions
         where TDbContext : class
     {
         var healthChecks = builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"))
-            .AddCheck<DbContextConnectivityHealthCheck<TDbContext>>("database", tags: ["db"]);
+            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"), tags: ["live", "ready"])
+            .AddCheck<DbContextConnectivityHealthCheck<TDbContext>>("database", tags: ["ready", "db"]);
 
         if (includeRabbitMqWhenEnabled)
         {
-            healthChecks.AddCheck<RabbitMqTcpHealthCheck>("rabbitmq", tags: ["messaging"]);
+            healthChecks.AddCheck<RabbitMqTcpHealthCheck>("rabbitmq", tags: ["ready", "messaging"]);
         }
 
         healthChecks.ForwardToPrometheus();
@@ -123,21 +123,24 @@ public static class ObservabilityExtensions
 
     public static WebApplication UseApiHealthChecks(this WebApplication app)
     {
+        // Agregado: todos os checks, útil para dashboards/diagnóstico manual - não usar em probes do Kubernetes.
         app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = r => r.Tags.Contains("api"),
+            Predicate = _ => true,
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 
+        // Readiness: inclui dependências externas (banco, RabbitMQ) - falha remove o pod do Service sem reiniciá-lo.
         app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = r => r.Tags.Contains("api"),
+            Predicate = r => r.Tags.Contains("ready"),
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 
+        // Liveness: só confirma que o processo está respondendo - não deve depender de recursos externos.
         app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = r => r.Tags.Contains("api"),
+            Predicate = r => r.Tags.Contains("live"),
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 

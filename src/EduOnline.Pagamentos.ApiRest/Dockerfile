@@ -15,19 +15,14 @@ COPY ["src/EventSourcing/EventSourcing.csproj", "src/EventSourcing/"]
 # Restaurar dependências
 RUN dotnet restore "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj"
 
-# Stage 2: Build - Compila a aplicação
+# Stage 2: Publish - Compila e publica a aplicação
 FROM restore AS build
 WORKDIR /src
 
 # Copiar código fonte completo
 COPY . .
 
-# Build da aplicação
-RUN dotnet build "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" \
-	-c Release \
-	-o /app/build
-
-# Publish da aplicação
+# Publish da aplicação (já compila internamente, dispensando um "dotnet build" separado)
 RUN dotnet publish "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" \
 	-c Release \
 	-o /app/publish
@@ -39,8 +34,14 @@ WORKDIR /app
 RUN apk add --no-cache icu-libs
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
+# Criar usuário não-root para executar a aplicação
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 # Copiar arquivos publicados
 COPY --from=build /app/publish .
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 # Expor porta
 EXPOSE 5003

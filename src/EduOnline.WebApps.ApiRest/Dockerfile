@@ -12,19 +12,14 @@ COPY ["src/EventSourcing/EventSourcing.csproj", "src/EventSourcing/"]
 # Restaurar dependências
 RUN dotnet restore "src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj"
 
-# Stage 2: Build - Compila a aplicação
+# Stage 2: Publish - Compila e publica a aplicação
 FROM restore AS build
 WORKDIR /src
 
 # Copiar código fonte completo
 COPY . .
 
-# Build da aplicação
-RUN dotnet build "src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" \
-	-c Release \
-	-o /app/build
-
-# Publish da aplicação
+# Publish da aplicação (já compila internamente, dispensando um "dotnet build" separado)
 RUN dotnet publish "src/EduOnline.WebApps.ApiRest/EduOnline.Bff.ApiRest.csproj" \
 	-c Release \
 	-o /app/publish
@@ -41,8 +36,14 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 	ASPNETCORE_HTTP_PORTS=5004 \
 	OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
 
+# Criar usuário não-root para executar a aplicação
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 # Copiar arquivos publicados
 COPY --from=build /app/publish .
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 # Expor porta
 EXPOSE 5004

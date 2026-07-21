@@ -18,10 +18,11 @@ public class AlunosApiTestFactory : WebApplicationFactory<alunosApi::Program>
     public const string AdminEmail = "admin@eduonline.com";
     public const string AlunoEmail = "aluno@eduonline.com";
     public const string Password = "Teste@123";
+    private static readonly Guid _testRunId = Guid.NewGuid();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var authDbFile = Path.Combine(Path.GetTempPath(), $"alunos-auth-it-{Guid.NewGuid():N}.db");
+        var authDbFile = Path.Combine(Path.GetTempPath(), $"alunos-auth-it-{_testRunId:N}.db");
 
         builder.UseEnvironment("Testing");
 

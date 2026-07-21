@@ -20,6 +20,7 @@ public class PagamentosApiTestFactory : WebApplicationFactory<Program>
     private const string Issuer = "https://localhost:7020";
     private const string Audience = "EduOnline-Dev";
     private const string Secret = "ChaveSuperSecretaParaJWT_2024_EduOnline_MinhaChaveDeve_TerMaisde32Caracteres!@#$%^&*";
+    private static readonly Guid _testRunId = Guid.NewGuid();
 
     public Guid Aluno1Id { get; } = Guid.NewGuid();
     public Guid Aluno2Id { get; } = Guid.NewGuid();
@@ -28,15 +29,14 @@ public class PagamentosApiTestFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var dbFile = Path.Combine(Path.GetTempPath(), $"pagamentos-it-{Guid.NewGuid():N}.db");
-
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment("Testing");
 
         builder.ConfigureAppConfiguration((_, config) =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:DefaultConnectionLite"] = $"Data Source={dbFile}",
+                ["ConnectionStrings:DefaultConnectionLite"] = "Data Source=:memory:",
+                ["SeedSettings:EnableMigrations"] = "false",
                 ["AppTokenSettings:Issuer"] = Issuer,
                 ["AppTokenSettings:Audience"] = Audience,
                 ["AppTokenSettings:Segredo"] = Secret,

@@ -48,6 +48,9 @@ app.UseAuthConfiguration();
 app.MapControllers();
 app.UseApiHealthChecks();
 
-app.UseDbMigrationHelper();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDbMigrationHelper();
+}
 
 app.Run();

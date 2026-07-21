@@ -9,6 +9,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          MSSQL_SA_PASSWORD: "P@ssw0rd2024!"
+          MSSQL_PID: Developer
+          ACCEPT_EULA: "Y"
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P P@ssw0rd2024! -Q 'SELECT 1'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 1433:1433
     steps:
     - name: Checkout do código
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -38,13 +52,16 @@ jobs:
         /p:MergeWith="../../coverage/coverage.opencover.xml"
 
     - name: Executar Testes de Integração
-      # Validação pontual: rodando apenas o projeto Auth.IntegrationTest, não foi possível rodar todos os testes de integração. Porém todos os testes estão passando ao rodar pelo Visual Studio.
       run: >
-        dotnet test test/EduOnline.Auth.ApiRest.IntegrationTest/EduOnline.Auth.ApiRest.IntegrationTest.csproj
+        dotnet test EduOnline.slnx
+        --configuration Release
+        --no-build
+        --filter "FullyQualifiedName~IntegrationTest"
         /p:CollectCoverage=true
         /p:CoverletOutputFormat=opencover
         /p:CoverletOutput="../../coverage/"
         /p:MergeWith="../../coverage/coverage.opencover.xml"
+        --logger "trx;LogFileName=integration-tests.trx"
 
   build-push-images:
     needs: build

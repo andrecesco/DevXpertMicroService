@@ -1,34 +1,31 @@
 -- ============================================================================
 -- Script de Seed para SQL Server - EduOnline Platform
 -- ============================================================================
--- Este script cria a estrutura inicial de schemas e dados para desenvolvimento/teste
+-- Cada API possui seu próprio banco de dados (Database per Service), refletindo
+-- o isolamento real usado pelas connection strings do docker-compose.yml.
+-- Não são usados schemas para "separar" domínios dentro de um único banco.
 -- Execução: Docker entrypoint para SQL Server
+-- ============================================================================
 
+-- ============================================================================
+-- BANCO: EduOnlineAuthDb - Autenticação e Usuários
+-- ============================================================================
 USE [master];
 GO
 
--- Verificar se o banco de dados existe, caso contrário criar
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'EduOnlineDB')
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'EduOnlineAuthDb')
 BEGIN
-	CREATE DATABASE [EduOnlineDB];
-	ALTER DATABASE [EduOnlineDB] SET RECOVERY SIMPLE;
+	CREATE DATABASE [EduOnlineAuthDb];
+	ALTER DATABASE [EduOnlineAuthDb] SET RECOVERY SIMPLE;
 END;
 GO
 
-USE [EduOnlineDB];
+USE [EduOnlineAuthDb];
 GO
 
--- ============================================================================
--- SCHEMA: AUTH - Autenticação e Usuários
--- ============================================================================
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'Auth')
-	EXEC sp_executesql N'CREATE SCHEMA Auth';
-GO
-
--- Tabela de Usuários
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Auth].[Users]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Auth].[Users] (
+	CREATE TABLE [dbo].[Users] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[Email] [nvarchar](256) NOT NULL UNIQUE,
 		[NormalizedEmail] [nvarchar](256) NOT NULL UNIQUE,
@@ -49,15 +46,14 @@ BEGIN
 		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
 		[IsActive] [bit] NOT NULL DEFAULT 1
 	);
-	CREATE NONCLUSTERED INDEX [IX_Users_Email] ON [Auth].[Users]([Email]);
-	CREATE NONCLUSTERED INDEX [IX_Users_NormalizedUserName] ON [Auth].[Users]([NormalizedUserName]);
+	CREATE NONCLUSTERED INDEX [IX_Users_Email] ON [dbo].[Users]([Email]);
+	CREATE NONCLUSTERED INDEX [IX_Users_NormalizedUserName] ON [dbo].[Users]([NormalizedUserName]);
 END;
 GO
 
--- Tabela de Roles (Papéis)
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Auth].[Roles]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Roles]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Auth].[Roles] (
+	CREATE TABLE [dbo].[Roles] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[Name] [nvarchar](256) NOT NULL UNIQUE,
 		[NormalizedName] [nvarchar](256) NOT NULL UNIQUE,
@@ -68,38 +64,70 @@ BEGIN
 END;
 GO
 
--- Tabela de User Roles (Mapeamento User-Role)
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Auth].[UserRoles]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Auth].[UserRoles] (
+	CREATE TABLE [dbo].[UserRoles] (
 		[UserId] [uniqueidentifier] NOT NULL,
 		[RoleId] [uniqueidentifier] NOT NULL,
 		PRIMARY KEY ([UserId], [RoleId]),
-		FOREIGN KEY ([UserId]) REFERENCES [Auth].[Users]([Id]) ON DELETE CASCADE,
-		FOREIGN KEY ([RoleId]) REFERENCES [Auth].[Roles]([Id]) ON DELETE CASCADE
+		FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([Id]) ON DELETE CASCADE,
+		FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE CASCADE
 	);
 END;
 GO
 
--- Dados iniciais: Roles
-IF NOT EXISTS (SELECT 1 FROM [Auth].[Roles] WHERE [Name] = 'Administrador')
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE [Name] = 'Administrador')
 BEGIN
-	INSERT INTO [Auth].[Roles] ([Id], [Name], [NormalizedName], [Description]) VALUES (NEWID(), 'Administrador', 'ADMINISTRADOR', 'Administrador do sistema');
-	INSERT INTO [Auth].[Roles] ([Id], [Name], [NormalizedName], [Description]) VALUES (NEWID(), 'Aluno', 'ALUNO', 'Estudante da plataforma');
+	INSERT INTO [dbo].[Roles] ([Id], [Name], [NormalizedName], [Description]) VALUES (NEWID(), 'Administrador', 'ADMINISTRADOR', 'Administrador do sistema');
+	INSERT INTO [dbo].[Roles] ([Id], [Name], [NormalizedName], [Description]) VALUES (NEWID(), 'Aluno', 'ALUNO', 'Estudante da plataforma');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [Email] = 'admin@eduonline.com')
+BEGIN
+	DECLARE @AdminId UNIQUEIDENTIFIER = NEWID();
+	DECLARE @AdminRoleId UNIQUEIDENTIFIER;
+
+	INSERT INTO [dbo].[Users] ([Id], [Email], [NormalizedEmail], [UserName], [NormalizedUserName], [FullName])
+	VALUES (@AdminId, 'admin@eduonline.com', 'ADMIN@EDUONLINE.COM', 'admin', 'ADMIN', 'Administrador do Sistema');
+
+	SELECT @AdminRoleId = [Id] FROM [dbo].[Roles] WHERE [Name] = 'Administrador';
+	INSERT INTO [dbo].[UserRoles] ([UserId], [RoleId]) VALUES (@AdminId, @AdminRoleId);
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [Email] = 'aluno@eduonline.com')
+BEGIN
+	DECLARE @AlunoUserId UNIQUEIDENTIFIER = NEWID();
+	DECLARE @AlunoRoleId UNIQUEIDENTIFIER;
+
+	INSERT INTO [dbo].[Users] ([Id], [Email], [NormalizedEmail], [UserName], [NormalizedUserName], [FullName])
+	VALUES (@AlunoUserId, 'aluno@eduonline.com', 'ALUNO@EDUONLINE.COM', 'aluno', 'ALUNO', 'João da Silva');
+
+	SELECT @AlunoRoleId = [Id] FROM [dbo].[Roles] WHERE [Name] = 'Aluno';
+	INSERT INTO [dbo].[UserRoles] ([UserId], [RoleId]) VALUES (@AlunoUserId, @AlunoRoleId);
 END;
 GO
 
 -- ============================================================================
--- SCHEMA: CONTEUDOS - Cursos e Aulas
+-- BANCO: EduOnlineConteudosDb - Cursos e Aulas
 -- ============================================================================
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'Conteudos')
-	EXEC sp_executesql N'CREATE SCHEMA Conteudos';
+USE [master];
 GO
 
--- Tabela de Cursos
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Conteudos].[Cursos]') AND type in (N'U'))
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'EduOnlineConteudosDb')
 BEGIN
-	CREATE TABLE [Conteudos].[Cursos] (
+	CREATE DATABASE [EduOnlineConteudosDb];
+	ALTER DATABASE [EduOnlineConteudosDb] SET RECOVERY SIMPLE;
+END;
+GO
+
+USE [EduOnlineConteudosDb];
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Cursos]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[Cursos] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[Nome] [nvarchar](256) NOT NULL,
 		[Descricao] [nvarchar](max) NOT NULL,
@@ -110,15 +138,14 @@ BEGIN
 		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
 		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
 	);
-	CREATE NONCLUSTERED INDEX [IX_Cursos_Nome] ON [Conteudos].[Cursos]([Nome]);
-	CREATE NONCLUSTERED INDEX [IX_Cursos_Ativo] ON [Conteudos].[Cursos]([Ativo]);
+	CREATE NONCLUSTERED INDEX [IX_Cursos_Nome] ON [dbo].[Cursos]([Nome]);
+	CREATE NONCLUSTERED INDEX [IX_Cursos_Ativo] ON [dbo].[Cursos]([Ativo]);
 END;
 GO
 
--- Tabela de Aulas
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Conteudos].[Aulas]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Aulas]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Conteudos].[Aulas] (
+	CREATE TABLE [dbo].[Aulas] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[CursoId] [uniqueidentifier] NOT NULL,
 		[Titulo] [nvarchar](256) NOT NULL,
@@ -129,33 +156,44 @@ BEGIN
 		[Ativo] [bit] NOT NULL DEFAULT 1,
 		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
 		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([CursoId]) REFERENCES [Conteudos].[Cursos]([Id]) ON DELETE CASCADE
+		FOREIGN KEY ([CursoId]) REFERENCES [dbo].[Cursos]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_Aulas_CursoId] ON [Conteudos].[Aulas]([CursoId]);
-	CREATE NONCLUSTERED INDEX [IX_Aulas_Ordem] ON [Conteudos].[Aulas]([CursoId], [Ordem]);
+	CREATE NONCLUSTERED INDEX [IX_Aulas_CursoId] ON [dbo].[Aulas]([CursoId]);
+	CREATE NONCLUSTERED INDEX [IX_Aulas_Ordem] ON [dbo].[Aulas]([CursoId], [Ordem]);
 END;
 GO
 
--- Dados iniciais: Cursos
-IF NOT EXISTS (SELECT 1 FROM [Conteudos].[Cursos])
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Cursos])
 BEGIN
-	INSERT INTO [Conteudos].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'Introdução a C#', 'Aprenda os fundamentos da linguagem C# e programação orientada a objetos', 'Prof. João Silva', 40, 149.99);
-	INSERT INTO [Conteudos].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'ASP.NET Core Avançado', 'Desenvolvimento de aplicações web profissionais com ASP.NET Core', 'Prof. Maria Santos', 60, 199.99);
-	INSERT INTO [Conteudos].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'Banco de Dados SQL', 'Modelagem e manipulação de dados com SQL Server', 'Prof. Carlos Oliveira', 50, 179.99);
+	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'Introdução a C#', 'Aprenda os fundamentos da linguagem C# e programação orientada a objetos', 'Prof. João Silva', 40, 149.99);
+	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'ASP.NET Core Avançado', 'Desenvolvimento de aplicações web profissionais com ASP.NET Core', 'Prof. Maria Santos', 60, 199.99);
+	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'Banco de Dados SQL', 'Modelagem e manipulação de dados com SQL Server', 'Prof. Carlos Oliveira', 50, 179.99);
 END;
 GO
 
 -- ============================================================================
--- SCHEMA: ALUNOS - Alunos e Matrículas
+-- BANCO: EduOnlineAlunosDb - Alunos e Matrículas
 -- ============================================================================
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'Alunos')
-	EXEC sp_executesql N'CREATE SCHEMA Alunos';
+-- Observação: [UserId] e [CursoId] referenciam registros em EduOnlineAuthDb e
+-- EduOnlineConteudosDb, respectivamente. Como bancos separados não suportam
+-- FOREIGN KEY entre si, a integridade referencial passa a ser responsabilidade
+-- da aplicação (nada diferente do que já acontece entre microsserviços).
+USE [master];
 GO
 
--- Tabela de Alunos (estendida do Auth.Users)
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Alunos].[AlunosPerfil]') AND type in (N'U'))
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'EduOnlineAlunosDb')
 BEGIN
-	CREATE TABLE [Alunos].[AlunosPerfil] (
+	CREATE DATABASE [EduOnlineAlunosDb];
+	ALTER DATABASE [EduOnlineAlunosDb] SET RECOVERY SIMPLE;
+END;
+GO
+
+USE [EduOnlineAlunosDb];
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AlunosPerfil]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[AlunosPerfil] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 		[UserId] [uniqueidentifier] NOT NULL UNIQUE,
 		[Matricula] [nvarchar](50) NOT NULL UNIQUE,
@@ -167,18 +205,16 @@ BEGIN
 		[Estado] [nvarchar](2) NULL,
 		[Cep] [nvarchar](10) NULL,
 		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([UserId]) REFERENCES [Auth].[Users]([Id]) ON DELETE CASCADE
+		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
 	);
-	CREATE NONCLUSTERED INDEX [IX_AlunosPerfil_UserId] ON [Alunos].[AlunosPerfil]([UserId]);
-	CREATE NONCLUSTERED INDEX [IX_AlunosPerfil_Matricula] ON [Alunos].[AlunosPerfil]([Matricula]);
+	CREATE NONCLUSTERED INDEX [IX_AlunosPerfil_UserId] ON [dbo].[AlunosPerfil]([UserId]);
+	CREATE NONCLUSTERED INDEX [IX_AlunosPerfil_Matricula] ON [dbo].[AlunosPerfil]([Matricula]);
 END;
 GO
 
--- Tabela de Matrículas
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Alunos].[Matriculas]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Matriculas]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Alunos].[Matriculas] (
+	CREATE TABLE [dbo].[Matriculas] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[AlunoId] [uniqueidentifier] NOT NULL,
 		[CursoId] [uniqueidentifier] NOT NULL,
@@ -187,19 +223,17 @@ BEGIN
 		[Status] [nvarchar](50) NOT NULL DEFAULT 'Ativa',
 		[ProgressoPercentual] [decimal](5, 2) NOT NULL DEFAULT 0,
 		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([AlunoId]) REFERENCES [Alunos].[AlunosPerfil]([Id]) ON DELETE CASCADE,
-		FOREIGN KEY ([CursoId]) REFERENCES [Conteudos].[Cursos]([Id]) ON DELETE CASCADE
+		FOREIGN KEY ([AlunoId]) REFERENCES [dbo].[AlunosPerfil]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_Matriculas_AlunoId] ON [Alunos].[Matriculas]([AlunoId]);
-	CREATE NONCLUSTERED INDEX [IX_Matriculas_CursoId] ON [Alunos].[Matriculas]([CursoId]);
-	CREATE NONCLUSTERED INDEX [IX_Matriculas_Status] ON [Alunos].[Matriculas]([Status]);
+	CREATE NONCLUSTERED INDEX [IX_Matriculas_AlunoId] ON [dbo].[Matriculas]([AlunoId]);
+	CREATE NONCLUSTERED INDEX [IX_Matriculas_CursoId] ON [dbo].[Matriculas]([CursoId]);
+	CREATE NONCLUSTERED INDEX [IX_Matriculas_Status] ON [dbo].[Matriculas]([Status]);
 END;
 GO
 
--- Tabela de Progresso de Aulas
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Alunos].[ProgressoAulas]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ProgressoAulas]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Alunos].[ProgressoAulas] (
+	CREATE TABLE [dbo].[ProgressoAulas] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[MatriculaId] [uniqueidentifier] NOT NULL,
 		[AulaId] [uniqueidentifier] NOT NULL,
@@ -207,40 +241,70 @@ BEGIN
 		[TempoAssistidoSegundos] [int] NOT NULL DEFAULT 0,
 		[Concluida] [bit] NOT NULL DEFAULT 0,
 		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([MatriculaId]) REFERENCES [Alunos].[Matriculas]([Id]) ON DELETE CASCADE,
-		FOREIGN KEY ([AulaId]) REFERENCES [Conteudos].[Aulas]([Id]) ON DELETE NO ACTION
+		FOREIGN KEY ([MatriculaId]) REFERENCES [dbo].[Matriculas]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_ProgressoAulas_MatriculaId] ON [Alunos].[ProgressoAulas]([MatriculaId]);
+	CREATE NONCLUSTERED INDEX [IX_ProgressoAulas_MatriculaId] ON [dbo].[ProgressoAulas]([MatriculaId]);
 END;
 GO
 
--- Tabela de Certificados
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Alunos].[Certificados]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Certificados]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Alunos].[Certificados] (
+	CREATE TABLE [dbo].[Certificados] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[MatriculaId] [uniqueidentifier] NOT NULL UNIQUE,
 		[NumeroCertificado] [nvarchar](100) NOT NULL UNIQUE,
 		[DataEmissao] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
 		[DataValidade] [datetime2] NULL,
 		[Ativo] [bit] NOT NULL DEFAULT 1,
-		FOREIGN KEY ([MatriculaId]) REFERENCES [Alunos].[Matriculas]([Id]) ON DELETE CASCADE
+		FOREIGN KEY ([MatriculaId]) REFERENCES [dbo].[Matriculas]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_Certificados_MatriculaId] ON [Alunos].[Certificados]([MatriculaId]);
+	CREATE NONCLUSTERED INDEX [IX_Certificados_MatriculaId] ON [dbo].[Certificados]([MatriculaId]);
+END;
+GO
+
+-- Seed: perfil e matrícula do aluno de teste, lendo Id's de EduOnlineAuthDb e EduOnlineConteudosDb
+-- (consulta entre bancos no mesmo servidor via nome de três partes, sem FK entre eles)
+IF NOT EXISTS (SELECT 1 FROM [dbo].[AlunosPerfil] WHERE [Matricula] = 'ALUNO001')
+BEGIN
+	DECLARE @AlunoUserId UNIQUEIDENTIFIER;
+	DECLARE @AlunoPerfilId UNIQUEIDENTIFIER = NEWID();
+	DECLARE @CursoId UNIQUEIDENTIFIER;
+
+	SELECT @AlunoUserId = [Id] FROM [EduOnlineAuthDb].[dbo].[Users] WHERE [Email] = 'aluno@eduonline.com';
+	SELECT TOP 1 @CursoId = [Id] FROM [EduOnlineConteudosDb].[dbo].[Cursos];
+
+	IF @AlunoUserId IS NOT NULL AND @CursoId IS NOT NULL
+	BEGIN
+		INSERT INTO [dbo].[AlunosPerfil] ([Id], [UserId], [Matricula], [DataNascimento], [Cpf], [Telefone])
+		VALUES (@AlunoPerfilId, @AlunoUserId, 'ALUNO001', DATEFROMPARTS(2000, 5, 15), '123.456.789-00', '(11) 98765-4321');
+
+		INSERT INTO [dbo].[Matriculas] ([AlunoId], [CursoId], [Status])
+		VALUES (@AlunoPerfilId, @CursoId, 'Ativa');
+	END;
 END;
 GO
 
 -- ============================================================================
--- SCHEMA: PAGAMENTOS - Transações e Histórico
+-- BANCO: EduOnlinePagamentosDb - Transações e Histórico
 -- ============================================================================
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'Pagamentos')
-	EXEC sp_executesql N'CREATE SCHEMA Pagamentos';
+-- Observação: [MatriculaId] e [AlunoId] referenciam EduOnlineAlunosDb; sem FK
+-- entre bancos pelo mesmo motivo descrito acima.
+USE [master];
 GO
 
--- Tabela de Pagamentos
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Pagamentos].[Pagamentos]') AND type in (N'U'))
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'EduOnlinePagamentosDb')
 BEGIN
-	CREATE TABLE [Pagamentos].[Pagamentos] (
+	CREATE DATABASE [EduOnlinePagamentosDb];
+	ALTER DATABASE [EduOnlinePagamentosDb] SET RECOVERY SIMPLE;
+END;
+GO
+
+USE [EduOnlinePagamentosDb];
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Pagamentos]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[Pagamentos] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[MatriculaId] [uniqueidentifier] NOT NULL,
 		[AlunoId] [uniqueidentifier] NOT NULL,
@@ -251,92 +315,38 @@ BEGIN
 		[DataPagamento] [datetime2] NULL,
 		[DataVencimento] [datetime2] NOT NULL,
 		[DataCriacao] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([MatriculaId]) REFERENCES [Alunos].[Matriculas]([Id]) ON DELETE CASCADE,
-		FOREIGN KEY ([AlunoId]) REFERENCES [Alunos].[AlunosPerfil]([Id]) ON DELETE NO ACTION
+		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
 	);
-	CREATE NONCLUSTERED INDEX [IX_Pagamentos_AlunoId] ON [Pagamentos].[Pagamentos]([AlunoId]);
-	CREATE NONCLUSTERED INDEX [IX_Pagamentos_Status] ON [Pagamentos].[Pagamentos]([Status]);
-	CREATE NONCLUSTERED INDEX [IX_Pagamentos_DataVencimento] ON [Pagamentos].[Pagamentos]([DataVencimento]);
+	CREATE NONCLUSTERED INDEX [IX_Pagamentos_AlunoId] ON [dbo].[Pagamentos]([AlunoId]);
+	CREATE NONCLUSTERED INDEX [IX_Pagamentos_Status] ON [dbo].[Pagamentos]([Status]);
+	CREATE NONCLUSTERED INDEX [IX_Pagamentos_DataVencimento] ON [dbo].[Pagamentos]([DataVencimento]);
 END;
 GO
 
--- Tabela de Histórico de Transações
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Pagamentos].[HistoricoTransacoes]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[HistoricoTransacoes]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [Pagamentos].[HistoricoTransacoes] (
+	CREATE TABLE [dbo].[HistoricoTransacoes] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
 		[PagamentoId] [uniqueidentifier] NOT NULL,
 		[StatusAnterior] [nvarchar](50) NOT NULL,
 		[StatusNovo] [nvarchar](50) NOT NULL,
 		[Descricao] [nvarchar](500) NULL,
 		[DataTransacao] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([PagamentoId]) REFERENCES [Pagamentos].[Pagamentos]([Id]) ON DELETE CASCADE
+		FOREIGN KEY ([PagamentoId]) REFERENCES [dbo].[Pagamentos]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_HistoricoTransacoes_PagamentoId] ON [Pagamentos].[HistoricoTransacoes]([PagamentoId]);
-END;
-GO
-
--- ============================================================================
--- INSERIR DADOS INICIAIS
--- ============================================================================
-
--- Inserir Admin User
-IF NOT EXISTS (SELECT 1 FROM [Auth].[Users] WHERE [Email] = 'admin@eduonline.com')
-BEGIN
-	DECLARE @AdminId UNIQUEIDENTIFIER = NEWID();
-	DECLARE @AdminRoleId UNIQUEIDENTIFIER;
-
-	INSERT INTO [Auth].[Users] ([Id], [Email], [NormalizedEmail], [UserName], [NormalizedUserName], [FullName])
-	VALUES (@AdminId, 'admin@eduonline.com', 'ADMIN@EDUONLINE.COM', 'admin', 'ADMIN', 'Administrador do Sistema');
-
-	SELECT @AdminRoleId = [Id] FROM [Auth].[Roles] WHERE [Name] = 'Administrador';
-	INSERT INTO [Auth].[UserRoles] ([UserId], [RoleId]) VALUES (@AdminId, @AdminRoleId);
-END;
-GO
-
--- Inserir Aluno Teste
-IF NOT EXISTS (SELECT 1 FROM [Auth].[Users] WHERE [Email] = 'aluno@eduonline.com')
-BEGIN
-	DECLARE @AlunoUserId UNIQUEIDENTIFIER = NEWID();
-	DECLARE @AlunoId UNIQUEIDENTIFIER = NEWID();
-	DECLARE @AlunoRoleId UNIQUEIDENTIFIER;
-	DECLARE @CursoId UNIQUEIDENTIFIER;
-
-	-- Criar usuário
-	INSERT INTO [Auth].[Users] ([Id], [Email], [NormalizedEmail], [UserName], [NormalizedUserName], [FullName])
-	VALUES (@AlunoUserId, 'aluno@eduonline.com', 'ALUNO@EDUONLINE.COM', 'aluno', 'ALUNO', 'João da Silva');
-
-	-- Atribuir role Aluno
-	SELECT @AlunoRoleId = [Id] FROM [Auth].[Roles] WHERE [Name] = 'Aluno';
-	INSERT INTO [Auth].[UserRoles] ([UserId], [RoleId]) VALUES (@AlunoUserId, @AlunoRoleId);
-
-	-- Criar perfil do aluno
-	INSERT INTO [Alunos].[AlunosPerfil] ([Id], [UserId], [Matricula], [DataNascimento], [Cpf], [Telefone])
-	VALUES (@AlunoId, @AlunoUserId, 'ALUNO001', DATEFROMPARTS(2000, 5, 15), '123.456.789-00', '(11) 98765-4321');
-
-	-- Matricular no primeiro curso
-	SELECT TOP 1 @CursoId = [Id] FROM [Conteudos].[Cursos];
-	INSERT INTO [Alunos].[Matriculas] ([AlunoId], [CursoId], [Status])
-	VALUES (@AlunoId, @CursoId, 'Ativa');
+	CREATE NONCLUSTERED INDEX [IX_HistoricoTransacoes_PagamentoId] ON [dbo].[HistoricoTransacoes]([PagamentoId]);
 END;
 GO
 
 -- ============================================================================
 -- EXIBIR RESULTADO
 -- ============================================================================
+USE [master];
+GO
 PRINT '========================================';
 PRINT 'Script de Seed executado com sucesso!';
 PRINT '========================================';
 PRINT '';
-PRINT 'Schemas criados:';
-SELECT name FROM sys.schemas WHERE name IN ('Auth', 'Conteudos', 'Alunos', 'Pagamentos');
-PRINT '';
-PRINT 'Tabelas criadas:';
-SELECT COUNT(*) as TotalTabelas FROM sys.objects WHERE type = 'U';
-PRINT '';
-PRINT 'Dados iniciais inseridos:';
-PRINT 'Roles: ' + CONVERT(VARCHAR, (SELECT COUNT(*) FROM [Auth].[Roles]));
-PRINT 'Usuários: ' + CONVERT(VARCHAR, (SELECT COUNT(*) FROM [Auth].[Users]));
-PRINT 'Cursos: ' + CONVERT(VARCHAR, (SELECT COUNT(*) FROM [Conteudos].[Cursos]));
+PRINT 'Bancos criados:';
+SELECT name FROM sys.databases WHERE name IN ('EduOnlineAuthDb', 'EduOnlineConteudosDb', 'EduOnlineAlunosDb', 'EduOnlinePagamentosDb');
 GO

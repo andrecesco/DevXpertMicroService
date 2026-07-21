@@ -21,7 +21,7 @@ public class AuthApiTestFactory : WebApplicationFactory<Program>
     {
         var dbFile = Path.Combine(Path.GetTempPath(), $"auth-it-{Guid.NewGuid():N}.db");
 
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment("Testing");
 
         builder.ConfigureAppConfiguration((_, config) =>
         {

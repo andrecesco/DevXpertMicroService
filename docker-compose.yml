@@ -20,7 +20,6 @@ services:
       - sqlserver_data:/var/opt/mssql/data
       - sqlserver_log:/var/opt/mssql/log
       - sqlserver_backup:/var/opt/mssql/backup
-      - ./infra/database/InitDB.sql:/docker-entrypoint-initdb.d/InitDB.sql:ro
     healthcheck:
       test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD:-P@ssw0rd2024!}", "-Q", "SELECT 1"]
       interval: 10s
@@ -38,6 +37,31 @@ services:
         reservations:
           cpus: '1'
           memory: 2G
+
+  # ============================================================================
+  # SQL SERVER INIT - Executa o InitDB.sql
+  # ============================================================================
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: eduonline-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./infra/database/InitDB.sql:/InitDB.sql:ro
+    entrypoint:
+      - /opt/mssql-tools18/bin/sqlcmd
+      - -C
+      - -S
+      - sqlserver
+      - -U
+      - sa
+      - -P
+      - "${SA_PASSWORD:-P@ssw0rd2024!}"
+      - -i
+      - /InitDB.sql
+    networks:
+      - eduonline-network
 
   # ============================================================================
   # EVENTSTORE - Event Sourcing / KurrentDB compatível
@@ -123,6 +147,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       eventstore:
         condition: service_started
     healthcheck:
@@ -164,6 +190,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       eventstore:
         condition: service_started
       auth-api:
@@ -207,12 +235,14 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       eventstore:
         condition: service_started
-      # auth-api:
-      #   condition: service_healthy
-      # conteudos-api:
-      #   condition: service_healthy
+      auth-api:
+        condition: service_healthy
+      conteudos-api:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5002/health"]
       interval: 30s
@@ -252,9 +282,13 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       eventstore:
         condition: service_started
       auth-api:
+        condition: service_healthy
+      conteudos-api:
         condition: service_healthy
       alunos-api:
         condition: service_healthy
@@ -299,6 +333,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       eventstore:
         condition: service_started
       auth-api:

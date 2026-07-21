@@ -15,19 +15,14 @@ COPY ["src/EventSourcing/EventSourcing.csproj", "src/EventSourcing/"]
 # Restaurar dependências
 RUN dotnet restore "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj"
 
-# Stage 2: Build - Compila a aplicação
+# Stage 2: Publish - Compila e publica a aplicação
 FROM restore AS build
 WORKDIR /src
 
 # Copiar código fonte completo
 COPY . .
 
-# Build da aplicação
-RUN dotnet build "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" \
-	-c Release \
-	-o /app/build
-
-# Publish da aplicação
+# Publish da aplicação (já compila internamente, dispensando um "dotnet build" separado)
 RUN dotnet publish "src/EduOnline.Pagamentos.ApiRest/EduOnline.Pagamentos.ApiRest.csproj" \
 	-c Release \
 	-o /app/publish

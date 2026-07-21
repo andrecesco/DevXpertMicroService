@@ -161,6 +161,18 @@ Se for necessário executar manualmente o serviço, utilize a imagem configurada
 
 `http://localhost:2113`
 
+### **7.1. Docker do KurrentDb para event sourcing para teste locais**
+Basta rodar os comandos do docker abaixo, isso é importante para o correto funcionamento da aplicação.
+
+`docker pull docker.kurrent.io/kurrent-latest/kurrentdb:latest`
+
+`docker run --name kurrentdb-node -it -p 2113:2113 \
+    docker.kurrent.io/kurrent-latest/kurrentdb:latest --insecure --run-projections=All \
+    --enable-atom-pub-over-http`
+
+Após o container estiver rodando é possível acessar através do link http://localhost:2113
+
+
 ## **8. Troubleshooting e limpeza (Kubernetes)**
 
 - **Pods em `ImagePullBackOff`**:

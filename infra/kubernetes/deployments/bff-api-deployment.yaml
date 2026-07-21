@@ -61,13 +61,13 @@ spec:
               memory: 256Mi
           readinessProbe:
             httpGet:
-              path: /health
+              path: /health/ready
               port: 5004
             initialDelaySeconds: 15
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /health
+              path: /health/live
               port: 5004
             initialDelaySeconds: 30
             periodSeconds: 20

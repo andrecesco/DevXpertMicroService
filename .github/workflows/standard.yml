@@ -27,6 +27,9 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Corrigir formatação automáticamente
+      run: dotnet format EduOnline.slnx --no-restore
+
     - name: Verificar formatação do código
       run: dotnet format EduOnline.slnx --verify-no-changes --no-restore
 

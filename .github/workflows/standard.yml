@@ -17,6 +17,8 @@ jobs:
 
     - name: Normalizar line endings
       run: |
+        git config --local user.email "ci@github.com"
+        git config --local user.name "GitHub Actions"
         git config --local core.autocrlf false
         git add -A --renormalize || true
 

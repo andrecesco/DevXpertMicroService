@@ -18,6 +18,9 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Restaurar dependências e Build da Solução
+      run: dotnet build EduOnline.slnx --configuration Release
+
     - name: Configurar o JDK (necessário para o Sonar Scanner)
       uses: actions/setup-java@v4
       with:
@@ -30,16 +33,12 @@ jobs:
     - name: Iniciar análise do SonarCloud
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      # Demais configurações (exclusions, coverage, encoding, etc.) vêm do sonar-project.properties na raiz do repo
       run: >
         dotnet sonarscanner begin
         /k:"eduonline-platform"
         /o:"${{ secrets.SONAR_ORGANIZATION }}"
         /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         /d:sonar.host.url="https://sonarcloud.io"
-
-    - name: Restaurar dependências e Build da Solução
-      run: dotnet build EduOnline.slnx --configuration Release
 
     - name: Executar Testes (Unidade e Integração)
       run: >
@@ -54,7 +53,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
-    - name: Fazer Login no Docker Hub (Opcional)
+    - name: Fazer Login no Docker Hub
       if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:

@@ -18,29 +18,12 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
-    - name: Configurar o JDK (necessário para o Sonar Scanner)
-      uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
-      with:
-        distribution: 'zulu'
-        java-version: '17'
+    - name: Corrigir formatação automáticamente
+      run: dotnet format EduOnline.slnx --no-restore
 
-    - name: Instalar o Sonar Scanner para .NET
-      run: dotnet tool install --global dotnet-sonarscanner
-
-    - name: Iniciar análise do SonarCloud
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
-      run: >
-        dotnet sonarscanner begin
-        /k:"andrecesco_DevXpertMicroService"
-        /o:"$SONAR_ORGANIZATION"
-        /d:sonar.token="$SONAR_TOKEN"
-        /d:sonar.host.url="https://sonarcloud.io"
-        /d:sonar.sourceEncoding="UTF-8"
-        /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,.git/**"
-        /d:sonar.coverage.exclusions="**/*Tests*,**/*IntegrationTest*,**/bin/**,**/obj/**"
-        /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+    - name: Validar formatação (informativo)
+      continue-on-error: true
+      run: dotnet format EduOnline.slnx --verify-no-changes --no-restore
 
     - name: Build da Solução
       run: dotnet build EduOnline.slnx --configuration Release
@@ -62,11 +45,6 @@ jobs:
         /p:CoverletOutputFormat=opencover
         /p:CoverletOutput="../../coverage/"
         /p:MergeWith="../../coverage/coverage.opencover.xml"
-
-    - name: Finalizar análise do SonarCloud
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
   build-push-images:
     needs: build

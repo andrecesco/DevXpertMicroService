@@ -10,7 +10,6 @@ resources:
   - vault/secretstore.yaml
   - vault/external-secret.yaml
   - audit/configmap.yaml
-  - rbac/pod-security-policies.yaml
   - network-policies/network-policies.yaml
   - tls/clusterissuer.yaml
   - tls/certificates.yaml

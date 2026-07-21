@@ -18,9 +18,6 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
-    - name: Restaurar dependências e Build da Solução
-      run: dotnet build EduOnline.slnx --configuration Release
-
     - name: Configurar o JDK (necessário para o Sonar Scanner)
       uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
       with:
@@ -36,7 +33,7 @@ jobs:
         SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
       run: >
         dotnet sonarscanner begin
-        /k:"eduonline-platform"
+        /k:"andrecesco_DevXpertMicroService"
         /o:"$SONAR_ORGANIZATION"
         /d:sonar.token="$SONAR_TOKEN"
         /d:sonar.host.url="https://sonarcloud.io"
@@ -44,6 +41,9 @@ jobs:
         /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,.git/**"
         /d:sonar.coverage.exclusions="**/*Tests*,**/*IntegrationTest*,**/bin/**,**/obj/**"
         /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+
+    - name: Build da Solução
+      run: dotnet build EduOnline.slnx --configuration Release
 
     - name: Executar Testes de Unidade
       run: >

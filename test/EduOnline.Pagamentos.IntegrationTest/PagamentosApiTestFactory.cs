@@ -30,7 +30,7 @@ public class PagamentosApiTestFactory : WebApplicationFactory<Program>
     {
         var dbFile = Path.Combine(Path.GetTempPath(), $"pagamentos-it-{Guid.NewGuid():N}.db");
 
-        builder.UseEnvironment("Staging");
+        builder.UseEnvironment("Testing");
 
         builder.ConfigureAppConfiguration((_, config) =>
         {

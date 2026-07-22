@@ -6,13 +6,14 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..'))
-$composeServices = @('auth-api', 'conteudos-api', 'alunos-api', 'pagamentos-api', 'bff-api')
+$composeServices = @('auth-api', 'conteudos-api', 'alunos-api', 'pagamentos-api', 'bff-api', 'status-api')
 $images = @(
 	'andrecesco/eduonline-auth-api:latest',
 	'andrecesco/eduonline-conteudos-api:latest',
 	'andrecesco/eduonline-alunos-api:latest',
 	'andrecesco/eduonline-pagamentos-api:latest',
-	'andrecesco/eduonline-bff:latest'
+	'andrecesco/eduonline-bff:latest',
+	'andrecesco/eduonline-status:latest'
 )
 
 # ---------------------------------------------------------------------------

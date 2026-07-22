@@ -1,0 +1,46 @@
+name: Kubernetes Smoke Test
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "infra/kubernetes/**"
+      - "docker-compose.yml"
+      - "src/**/Dockerfile"
+      - ".github/workflows/kubernetes-smoke.yml"
+  push:
+    branches: [ "main" ]
+    paths:
+      - "infra/kubernetes/**"
+      - "docker-compose.yml"
+      - "src/**/Dockerfile"
+      - ".github/workflows/kubernetes-smoke.yml"
+
+jobs:
+  smoke-kind:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Provisionar cluster Kind
+        uses: helm/kind-action@v1.10.0
+        with:
+          cluster_name: eduonline
+          config: infra/kubernetes/kind-config.yaml
+
+      - name: Build, load e apply dos manifests
+        shell: pwsh
+        run: ./infra/kubernetes/scripts/setup-kind.ps1 -ClusterName eduonline
+
+      - name: Smoke test de deployments e endpoints
+        shell: pwsh
+        run: ./infra/kubernetes/scripts/smoke-test.ps1 -Namespace eduonline -TimeoutSeconds 900
+
+      - name: Logs de diagnóstico (sempre)
+        if: always()
+        run: |
+          kubectl get pods -n eduonline -o wide || true
+          kubectl get svc -n eduonline || true
+          kubectl get endpoints -n eduonline || true

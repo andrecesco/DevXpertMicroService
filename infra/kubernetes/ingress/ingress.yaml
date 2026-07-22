@@ -10,6 +10,13 @@ spec:
   rules:
     - http:
         paths:
+          - path: /status
+            pathType: Prefix
+            backend:
+              service:
+                name: status-api
+                port:
+                  number: 5005
           - path: /
             pathType: Prefix
             backend:

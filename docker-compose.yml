@@ -125,7 +125,7 @@ services:
   # AUTH API - Autenticação e Autorização
   # ============================================================================
   auth-api:
-    image: andrecesco/eduonline-auth-api:latest
+    image: andrecesco/eduonline-auth-api:${IMAGE_TAG:-latest}
     container_name: eduonline-auth-api
     build:
       context: ./
@@ -168,7 +168,7 @@ services:
   # CONTEUDOS API - Cursos e Aulas
   # ============================================================================
   conteudos-api:
-    image: andrecesco/eduonline-conteudos-api:latest
+    image: andrecesco/eduonline-conteudos-api:${IMAGE_TAG:-latest}
     container_name: eduonline-conteudos-api
     build:
       context: ./
@@ -213,7 +213,7 @@ services:
   # ALUNOS API - Gestão de Alunos e Matrículas
   # ============================================================================
   alunos-api:
-    image: andrecesco/eduonline-alunos-api:latest
+    image: andrecesco/eduonline-alunos-api:${IMAGE_TAG:-latest}
     container_name: eduonline-alunos-api
     build:
       context: ./
@@ -260,7 +260,7 @@ services:
   # # PAGAMENTOS API - Processamento de Pagamentos
   # # ============================================================================
   pagamentos-api:
-    image: andrecesco/eduonline-pagamentos-api:latest
+    image: andrecesco/eduonline-pagamentos-api:${IMAGE_TAG:-latest}
     container_name: eduonline-pagamentos-api
     build:
       context: ./
@@ -309,7 +309,7 @@ services:
   # # BFF API - Backend for Frontend
   # # ============================================================================
   bff-api:
-    image: andrecesco/eduonline-bff:latest
+    image: andrecesco/eduonline-bff:${IMAGE_TAG:-latest}
     container_name: eduonline-bff-api
     build:
       context: ./
@@ -362,7 +362,7 @@ services:
   # STATUS API
   # ============================================================================
   status-api:
-    image: andrecesco/eduonline-status:latest
+    image: andrecesco/eduonline-status:${IMAGE_TAG:-latest}
     container_name: eduonline-status-api
     build:
       context: ./

@@ -32,6 +32,7 @@ resources:
   - networkpolicies/allow-inter-service.yaml
   - networkpolicies/allow-ingress.yaml
   - ingress/ingress.yaml
+  - ingress/internal-health-ingress.yaml
   - hpa/auth-api-hpa.yaml
   - hpa/conteudos-api-hpa.yaml
   - hpa/alunos-api-hpa.yaml

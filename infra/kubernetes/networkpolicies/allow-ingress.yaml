@@ -20,7 +20,27 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-api-ingress-from-bff
+  name: allow-status-api-ingress
+  namespace: eduonline
+spec:
+  podSelector:
+    matchLabels:
+      app: status-api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 5005
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-ingress-from-bff-and-ingress
   namespace: eduonline
 spec:
   podSelector:
@@ -39,6 +59,9 @@ spec:
         - podSelector:
             matchLabels:
               app: bff-api
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
       ports:
         - protocol: TCP
           port: 5000

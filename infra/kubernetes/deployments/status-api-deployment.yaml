@@ -49,7 +49,7 @@ spec:
             - name: ASPNETCORE_HTTP_PORTS
               value: "5005"
             - name: ENDPOINTS
-              value: "Auth API|http://auth-api:5000/health;Conteudos API|http://conteudos-api:5001/health;Alunos API|http://alunos-api:5002/health;Pagamentos API|http://pagamentos-api:5003/health;BFF|http://bff-api:5004/health"
+              value: "Auth API|https://ingress-nginx-controller.ingress-nginx.svc.cluster.local/internal-health/auth;Conteudos API|https://ingress-nginx-controller.ingress-nginx.svc.cluster.local/internal-health/conteudos;Alunos API|https://ingress-nginx-controller.ingress-nginx.svc.cluster.local/internal-health/alunos;Pagamentos API|https://ingress-nginx-controller.ingress-nginx.svc.cluster.local/internal-health/pagamentos;BFF|https://ingress-nginx-controller.ingress-nginx.svc.cluster.local/internal-health/bff"
           resources:
             requests:
               cpu: 50m

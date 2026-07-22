@@ -2,6 +2,9 @@ extern alias alunosApi;
 
 using EduOnline.Auth.ApiRest.Data;
 using EduOnline.Auth.ApiRest.Services;
+using EduOnline.Core.Data.EventSourcing;
+using EduOnline.Core.DomainObjects;
+using EduOnline.Core.Mensagens;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -79,6 +82,10 @@ public class AlunosApiTestFactory : WebApplicationFactory<alunosApi::Program>
                     BaseAddress = new Uri("https://localhost:7254/api/alunos/")
                 }));
 
+            // Mock IEventSourcingRepository para evitar conexão ao EventStore
+            services.RemoveAll<IEventSourcingRepository>();
+            services.AddSingleton<IEventSourcingRepository, NoOpEventSourcingRepository>();
+
             // Adicionar controllers de Auth
             services.AddControllers()
                 .AddApplicationPart(typeof(EduOnline.Auth.ApiRest.Controllers.AuthController).Assembly);
@@ -144,5 +151,14 @@ public class AlunosApiTestFactory : WebApplicationFactory<alunosApi::Program>
         {
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
         }
+    }
+
+    private sealed class NoOpEventSourcingRepository : IEventSourcingRepository
+    {
+        public Task SalvarEvento<TEvent>(TEvent evento) where TEvent : Event
+            => Task.CompletedTask;
+
+        public Task<IEnumerable<StoredEvent>> ObterEventos(Guid aggregateId)
+            => Task.FromResult<IEnumerable<StoredEvent>>([]);
     }
 }

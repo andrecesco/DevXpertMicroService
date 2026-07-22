@@ -284,7 +284,7 @@ IAspNetUser user) : MainController(notifications, user)
         }
         catch (Exception)
         {
-            NotificarErro("Ocorreu um erro inesperado ao atualizar o progresso do curso.");
+            NotificarErro("Ocorreu um erro inesperado ao criar a matrícula.");
             return CustomResponse();
         }
     }

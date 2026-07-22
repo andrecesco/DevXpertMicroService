@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bff-api
-          image: eduonline/bff-api:latest
+          image: andrecesco/eduonline-bff:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false

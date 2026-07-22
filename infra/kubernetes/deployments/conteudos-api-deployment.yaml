@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: conteudos-api
-          image: eduonline/conteudos-api:latest
+          image: andrecesco/eduonline-conteudos-api:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false

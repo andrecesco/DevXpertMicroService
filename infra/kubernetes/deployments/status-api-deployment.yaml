@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: status-api
+  namespace: eduonline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: status-api
+  template:
+    metadata:
+      labels:
+        app: status-api
+        app.kubernetes.io/name: status-api
+        app.kubernetes.io/part-of: eduonline-platform
+    spec:
+      serviceAccountName: eduonline-api
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 64198
+        runAsGroup: 64198
+        fsGroup: 64198
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: status-api
+          image: andrecesco/eduonline-status:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 5005
+              name: http
+          envFrom:
+            - configMapRef:
+                name: eduonline-config
+            - configMapRef:
+                name: eduonline-observability
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:5005
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "5005"
+            - name: ENDPOINTS
+              value: "Auth API|http://auth-api:5000/health;Conteudos API|http://conteudos-api:5001/health;Alunos API|http://alunos-api:5002/health;Pagamentos API|http://pagamentos-api:5003/health;BFF|http://bff-api:5004/health"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 5005
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 5005
+            initialDelaySeconds: 30
+            periodSeconds: 20

@@ -21,11 +21,13 @@ resources:
   - deployments/alunos-api-deployment.yaml
   - deployments/pagamentos-api-deployment.yaml
   - deployments/bff-api-deployment.yaml
+  - deployments/status-api-deployment.yaml
   - services/auth-api-service.yaml
   - services/conteudos-api-service.yaml
   - services/alunos-api-service.yaml
   - services/pagamentos-api-service.yaml
   - services/bff-api-service.yaml
+  - services/status-api-service.yaml
   - networkpolicies/deny-all.yaml
   - networkpolicies/allow-inter-service.yaml
   - networkpolicies/allow-ingress.yaml

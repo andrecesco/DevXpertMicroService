@@ -7,6 +7,13 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..'))
 $composeServices = @('auth-api', 'conteudos-api', 'alunos-api', 'pagamentos-api', 'bff-api')
+$images = @(
+	'andrecesco/eduonline-auth-api:latest',
+	'andrecesco/eduonline-conteudos-api:latest',
+	'andrecesco/eduonline-alunos-api:latest',
+	'andrecesco/eduonline-pagamentos-api:latest',
+	'andrecesco/eduonline-bff:latest'
+)
 
 # ---------------------------------------------------------------------------
 # 1. Criar o cluster Kind (se ainda não existir)
@@ -26,29 +33,15 @@ Write-Host "Executando 'docker compose build' para os microsserviços em '$repoR
 docker compose --project-directory $repoRoot build @composeServices
 
 # ---------------------------------------------------------------------------
-# 3. Mapeamento: imagem gerada pelo compose -> nome usado nos deployments K8s
+# 3. Carregar no Kind as mesmas imagens referenciadas nos Deployments K8s
 # ---------------------------------------------------------------------------
-$images = @(
-	@{ Compose = 'andrecesco/eduonline-auth-api:latest';       K8s = 'eduonline/auth-api:latest' },
-	@{ Compose = 'andrecesco/eduonline-conteudos-api:latest';  K8s = 'eduonline/conteudos-api:latest' },
-	@{ Compose = 'andrecesco/eduonline-alunos-api:latest';     K8s = 'eduonline/alunos-api:latest' },
-	@{ Compose = 'andrecesco/eduonline-pagamentos-api:latest'; K8s = 'eduonline/pagamentos-api:latest' },
-	@{ Compose = 'andrecesco/eduonline-bff:latest';            K8s = 'eduonline/bff-api:latest' }
-)
-
-# ---------------------------------------------------------------------------
-# 4. Re-tagear e carregar cada imagem no cluster Kind
-# ---------------------------------------------------------------------------
-foreach ($img in $images) {
-	Write-Host "Tagueando '$($img.Compose)' -> '$($img.K8s)'..." -ForegroundColor Cyan
-	docker tag $img.Compose $img.K8s
-
-	Write-Host "Carregando '$($img.K8s)' no cluster Kind '$ClusterName'..." -ForegroundColor Cyan
-	kind load docker-image $img.K8s --name $ClusterName
+foreach ($image in $images) {
+	Write-Host "Carregando '$image' no cluster Kind '$ClusterName'..." -ForegroundColor Cyan
+	kind load docker-image $image --name $ClusterName
 }
 
 # ---------------------------------------------------------------------------
-# 5. Aplicar os manifestos Kubernetes
+# 4. Aplicar os manifestos Kubernetes
 # ---------------------------------------------------------------------------
 Write-Host "Aplicando manifestos Kubernetes..." -ForegroundColor Cyan
 kubectl apply -k (Join-Path $PSScriptRoot '..')

@@ -13,14 +13,13 @@ jobs:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          MSSQL_SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD }}
+          MSSQL_SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD || 'P@ssw0rd2024!' }}
           MSSQL_PID: Developer
           ACCEPT_EULA: "Y"
         options: >-
-          --health-cmd="echo SELECT 1 | /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $(echo $MSSQL_SA_PASSWORD) || exit 1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          --health-interval=15s
+          --health-timeout=10s
+          --health-retries=3
         ports:
           - 1433:1433
     steps:

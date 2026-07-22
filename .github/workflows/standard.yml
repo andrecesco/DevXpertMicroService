@@ -137,6 +137,8 @@ jobs:
     needs: build-push-images
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
     - name: Checkout do código

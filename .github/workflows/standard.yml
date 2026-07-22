@@ -61,7 +61,7 @@ jobs:
         /p:MergeWith="../../coverage/coverage.opencover.xml"
 
     - name: Executar Testes de Integração
-      continue-on-error: true
+      continue-on-error: ${{ github.event_name == 'pull_request' }}
       run: >
         dotnet test EduOnline.slnx
         --configuration Release

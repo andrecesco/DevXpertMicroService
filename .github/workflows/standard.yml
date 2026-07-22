@@ -73,6 +73,28 @@ jobs:
         /p:MergeWith="../../coverage/coverage.opencover.xml"
         --logger "trx;LogFileName=integration-tests.trx"
 
+    - name: Fazer Upload de Cobertura para SonarCloud
+      uses: CodeCoverageAction/github-action-codecoverage@5a71f24fb5b1e3b83c0cda3502bc67d2c3a91fb8 # v1
+      with:
+        files: ./coverage/coverage.opencover.xml
+        fail_ci_if_error: false
+
+    - name: Analisar com SonarCloud
+      uses: SonarSource/sonarcloud-github-action@7feeff976e526dd637af4a6c64c89f86ee0519df # v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=andrecesco_eduonline
+          -Dsonar.organization=andrecesco
+          -Dsonar.sources=src
+          -Dsonar.tests=test
+          -Dsonar.exclusions=**/Migrations/**,**/obj/**,**/bin/**
+          -Dsonar.test.inclusions=test/**/*Test.cs,test/**/*Tests.cs
+          -Dsonar.coverage.exclusions=**/Migrations/**,**/obj/**,**/bin/**,test/**
+          -Dsonar.dotnet.excludeGeneratedCode=true
+
   build-push-images:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

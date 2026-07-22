@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eduonline-internal-health-ingress
+  namespace: eduonline
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /health
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: ingress-tls
+  rules:
+    - http:
+        paths:
+          - path: /internal-health/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-api
+                port:
+                  number: 5000
+          - path: /internal-health/conteudos
+            pathType: Prefix
+            backend:
+              service:
+                name: conteudos-api
+                port:
+                  number: 5001
+          - path: /internal-health/alunos
+            pathType: Prefix
+            backend:
+              service:
+                name: alunos-api
+                port:
+                  number: 5002
+          - path: /internal-health/pagamentos
+            pathType: Prefix
+            backend:
+              service:
+                name: pagamentos-api
+                port:
+                  number: 5003
+          - path: /internal-health/bff
+            pathType: Prefix
+            backend:
+              service:
+                name: bff-api
+                port:
+                  number: 5004

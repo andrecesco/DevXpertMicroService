@@ -80,8 +80,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=andrecesco_eduonline
-          -Dsonar.organization=andrecesco
+          -Dsonar.projectKey=andrecesco_DevXpertMicroService
+          -Dsonar.organization=eduonline
           -Dsonar.sources=src
           -Dsonar.tests=test
           -Dsonar.exclusions=**/Migrations/**,**/obj/**,**/bin/**

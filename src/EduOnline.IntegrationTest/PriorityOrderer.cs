@@ -1,4 +1,4 @@
-﻿using Xunit.Abstractions;
+﻿using System.Reflection;
 using Xunit.v3;
 
 namespace EduOnline.IntegrationTest;
@@ -13,21 +13,11 @@ public class PriorityOrderer : ITestCaseOrderer
         {
             var priority = 0;
 
-            // Use reflection to access TestMethod property since it may not be on ITestCase interface
-            var testMethodProperty = testCase.GetType().GetProperty("TestMethod");
-            if (testMethodProperty != null)
+            if (testCase is IXunitTestCase xunitTestCase)
             {
-                var testMethod = testMethodProperty.GetValue(testCase);
-                var methodProperty = testMethod?.GetType().GetProperty("Method");
-                if (methodProperty != null)
-                {
-                    var method = methodProperty.GetValue(testMethod) as IMethodInfo;
-                    if (method != null)
-                    {
-                        foreach (var attr in method.GetCustomAttributes(typeof(TestPriorityAttribute).AssemblyQualifiedName))
-                            priority = attr.GetNamedArgument<int>("Priority");
-                    }
-                }
+                var attr = xunitTestCase.TestMethod.Method.GetCustomAttribute<TestPriorityAttribute>();
+                if (attr != null)
+                    priority = attr.Priority;
             }
 
             GetOrCreate(sortedMethods, priority).Add(testCase);
@@ -43,18 +33,7 @@ public class PriorityOrderer : ITestCaseOrderer
 
     private static string GetTestMethodName<TTestCase>(TTestCase testCase) where TTestCase : Xunit.Sdk.ITestCase
     {
-        var testMethodProperty = testCase.GetType().GetProperty("TestMethod");
-        if (testMethodProperty != null)
-        {
-            var testMethod = testMethodProperty.GetValue(testCase);
-            var methodProperty = testMethod?.GetType().GetProperty("Method");
-            if (methodProperty != null)
-            {
-                var method = methodProperty.GetValue(testMethod) as IMethodInfo;
-                return method?.Name ?? string.Empty;
-            }
-        }
-        return string.Empty;
+        return testCase is IXunitTestCase xunitTestCase ? xunitTestCase.TestMethod.Method.Name : string.Empty;
     }
 
     private static TValue GetOrCreate<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()

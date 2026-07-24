@@ -30,10 +30,19 @@ public static class PollyExtensions
         where TClient : class
         where TImplementation : class, TClient
     {
+        services.AddHttpClientService<TClient, TImplementation>((_, _) => { });
+    }
+
+    public static void AddHttpClientService<TClient, TImplementation>(
+        this IServiceCollection services,
+        Action<IServiceProvider, HttpClient> configureClient)
+        where TClient : class
+        where TImplementation : class, TClient
+    {
         services.AddHttpContextAccessor();
         services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
 
-        services.AddHttpClient<TClient, TImplementation>()
+        services.AddHttpClient<TClient, TImplementation>(configureClient)
             .AddPolicyHandler(GetRetryPolicy)
             .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
             .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();

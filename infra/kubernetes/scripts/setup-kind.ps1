@@ -51,9 +51,20 @@ Write-Host "Instalando CRDs do external-secrets-operator..." -ForegroundColor Cy
 kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/v0.9.13/deploy/crds/bundle.yaml
 
 # ---------------------------------------------------------------------------
-# 5. Aplicar os manifestos Kubernetes (overlay smoke-test: replicas=1)
+# 5. Aplicar os manifestos Kubernetes
 # ---------------------------------------------------------------------------
 Write-Host "Aplicando manifestos Kubernetes..." -ForegroundColor Cyan
-kubectl apply -k (Join-Path $PSScriptRoot '..\overlays\smoke-test')
+kubectl apply -k (Join-Path $PSScriptRoot '..')
+
+# ---------------------------------------------------------------------------
+# 6. Ajustar replicas para 1 e aumentar progressDeadlineSeconds no smoke-test
+#    (Kind nao tem infraestrutura real; 1 replica e suficiente para validar)
+# ---------------------------------------------------------------------------
+Write-Host "Ajustando replicas=1 e progressDeadlineSeconds=900 para smoke-test..." -ForegroundColor Cyan
+$apiDeployments = @('auth-api', 'conteudos-api', 'alunos-api', 'pagamentos-api', 'bff-api')
+foreach ($dep in $apiDeployments) {
+	kubectl scale deployment/$dep -n eduonline --replicas=1
+	kubectl patch deployment/$dep -n eduonline --type=merge --patch '{"spec":{"progressDeadlineSeconds":900}}'
+}
 
 Write-Host "Setup concluído." -ForegroundColor Green

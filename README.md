@@ -114,12 +114,13 @@ Como os `Service` das APIs estão como `ClusterIP`, use port-forward para testes
 - Pagamentos API: `kubectl port-forward svc/pagamentos-api 5003:5003 -n eduonline`
 - BFF API: `kubectl port-forward svc/bff-api 5004:5004 -n eduonline`
 
-Após o port-forward, valide:
+Após o port-forward, valide ao menos:
 - `http://localhost:5000/health`
-- `http://localhost:5001/health`
-- `http://localhost:5002/health`
-- `http://localhost:5003/health`
-- `http://localhost:5004/health`
+- `http://localhost:5000/health/ready`
+- `http://localhost:5000/health/live`
+- `http://localhost:5000/metrics`
+
+> Para checklist completo (incluindo CI e Kubernetes), consulte `docs/observability-validation-runbook.md`.
 
 ### **Execução apenas de uma API no modo desenvolvimento**
 
@@ -145,13 +146,14 @@ Cada API expõe Swagger/OpenAPI no ambiente local:
 - **Pagamentos API**: `http://localhost:5003/swagger`
 - **BFF API**: `http://localhost:5004/swagger`
 
-Endpoints de saúde:
+Endpoints de saúde e observabilidade (exemplos com Auth API):
 
 - `http://localhost:5000/health`
-- `http://localhost:5001/health`
-- `http://localhost:5002/health`
-- `http://localhost:5003/health`
-- `http://localhost:5004/health`
+- `http://localhost:5000/health/ready`
+- `http://localhost:5000/health/live`
+- `http://localhost:5000/metrics`
+
+Os mesmos endpoints estão disponíveis nas demais APIs, respeitando a porta de cada serviço.
 
 ## **7. Docker do EventStoreDB para event sourcing**
 
@@ -204,7 +206,8 @@ Após o container estiver rodando é possível acessar através do link http://l
   - `docs/CI-CD-PIPELINE.md` - documentação completa do pipeline
   - `docs/GITHUB-ACTIONS-SETUP.md` - configuração de secrets e workflows
   - `docs/projeto-mod05.md` - brief de requisitos e critérios de avaliação do módulo
-- `infra/kubernetes/` - manifests e guias da infraestrutura local em Kubernetes
+  - `docs/observability-validation-runbook.md` - checklist operacional de validação de resiliência e observabilidade
+  - `infra/kubernetes/` - manifests e guias da infraestrutura local em Kubernetes
 - `infra/kubernetes/README.md` - guia complementar com foco nos manifests Kubernetes
 - `SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado de segurança e compliance
 - `FEEDBACK.md` - histórico de feedbacks e correções aplicadas

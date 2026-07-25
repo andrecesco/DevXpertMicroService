@@ -653,19 +653,20 @@ Este projeto é parte do programa MBA DevXpert - Módulo 05.
 ## 📚 Documentação Completa
 
 ### Docker e execução local
-- 📖 `DOCKER-README.md` (este arquivo)
+- 📖 `docs/docker.md` (este arquivo)
 - 📖 `README.md` - visão geral atualizada
 - 📖 `infra/kubernetes/README.md` - base dos manifests e scripts de Kubernetes
 
 ### CI/CD e automação
 - 📖 `docs/CI-CD-PIPELINE.md` - pipeline overview
 - 📖 `docs/GITHUB-ACTIONS-SETUP.md` - setup de secrets
-- 📖 `CI-CD-TESTING-GUIDE.md` - guia de testes
+- 📖 `docs/ci-cd-testing-guide.md` - guia de testes
+
+### Observabilidade
+- 📖 `docs/observability-validation-runbook.md` - validação operacional de health/metrics e manifestos
 
 ### Segurança e compliance
 - 📖 `SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado atual
-- 📖 `infra/security/COMPLIANCE-CHECKLIST.md` - checklist técnico
-- 📖 `infra/observability/DEPLOYMENT.md` - implantação da stack de observabilidade
 
 ---
 

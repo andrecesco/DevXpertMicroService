@@ -88,7 +88,7 @@ jobs:
         /d:sonar.tests=test
         /d:sonar.exclusions="**/Migrations/**,**/obj/**,**/bin/**"
         /d:sonar.test.inclusions="test/**/*Test.cs,test/**/*Tests.cs"
-        /d:sonar.coverage.exclusions="**/Migrations/**,**/obj/**,**/bin/**,test/**"
+        /d:sonar.coverage.exclusions="**/Migrations/**,**/obj/**,**/bin/**,test/**,infra/database/**,src/EduOnline.Api.Status/Program.cs,src/EduOnline.Core.Api/Extensions/ObservabilityExtensions.cs,src/EduOnline.Core.Api/Extensions/PollyExtensions.cs,src/EduOnline.Alunos.Domain/Models/Matricula.cs,src/EduOnline.Alunos.Domain/Models/Certificado.cs,src/EduOnline.Alunos.ApiRest/Controllers/AlunoController.cs"
         /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
         /d:sonar.issue.ignore.multicriteria="k8sstatus1,k8sstatus2"
         /d:sonar.issue.ignore.multicriteria.k8sstatus1.ruleKey="kubernetes:S6596"

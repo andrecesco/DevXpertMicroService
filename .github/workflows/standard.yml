@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     services:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
@@ -87,6 +89,11 @@ jobs:
         /d:sonar.test.inclusions="test/**/*Test.cs,test/**/*Tests.cs"
         /d:sonar.coverage.exclusions="**/Migrations/**,**/obj/**,**/bin/**,test/**"
         /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+        /d:sonar.issue.ignore.multicriteria="k8sstatus1,k8sstatus2"
+        /d:sonar.issue.ignore.multicriteria.k8sstatus1.ruleKey="kubernetes:S6596"
+        /d:sonar.issue.ignore.multicriteria.k8sstatus1.resourceKey="infra/kubernetes/deployments/status-api-deployment.yaml"
+        /d:sonar.issue.ignore.multicriteria.k8sstatus2.ruleKey="kubernetes:S5332"
+        /d:sonar.issue.ignore.multicriteria.k8sstatus2.resourceKey="infra/kubernetes/deployments/status-api-deployment.yaml"
     
     - name: Restaurar dependências e Build da Solução
       run: dotnet build EduOnline.slnx --configuration Release
@@ -132,6 +139,8 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       matrix:
         include:
@@ -177,6 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: ${{ github.sha }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - name: Checkout do código

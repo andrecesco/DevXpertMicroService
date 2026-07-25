@@ -257,9 +257,9 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # # ============================================================================
-  # # PAGAMENTOS API - Processamento de Pagamentos
-  # # ============================================================================
+  # ============================================================================
+  # PAGAMENTOS API - Processamento de Pagamentos
+  # ============================================================================
   pagamentos-api:
     image: andrecesco/eduonline-pagamentos-api:${IMAGE_TAG:-latest}
     container_name: eduonline-pagamentos-api
@@ -306,9 +306,9 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # # ============================================================================
-  # # BFF API - Backend for Frontend
-  # # ============================================================================
+  # ============================================================================
+  # BFF API - Backend for Frontend
+  # ============================================================================
   bff-api:
     image: andrecesco/eduonline-bff:${IMAGE_TAG:-latest}
     container_name: eduonline-bff-api

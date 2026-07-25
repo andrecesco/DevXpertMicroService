@@ -9,17 +9,17 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: jaeger-agent-zipkin-thrift
+  - name: jgr-zipkin
     port: 6831
-    targetPort: jaeger-agent-zipkin-thrift
+    targetPort: jgr-zipkin
     protocol: UDP
-  - name: jaeger-agent-compact
+  - name: jgr-compact
     port: 6832
-    targetPort: jaeger-agent-compact
+    targetPort: jgr-compact
     protocol: UDP
-  - name: jaeger-agent-binary
+  - name: jgr-binary
     port: 6833
-    targetPort: jaeger-agent-binary
+    targetPort: jgr-binary
     protocol: UDP
   - name: jaeger-query
     port: 16686
@@ -48,17 +48,17 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-  - name: jaeger-agent-zipkin-thrift
+  - name: jgr-zipkin
     port: 6831
-    targetPort: jaeger-agent-zipkin-thrift
+    targetPort: jgr-zipkin
     protocol: UDP
-  - name: jaeger-agent-compact
+  - name: jgr-compact
     port: 6832
-    targetPort: jaeger-agent-compact
+    targetPort: jgr-compact
     protocol: UDP
-  - name: jaeger-agent-binary
+  - name: jgr-binary
     port: 6833
-    targetPort: jaeger-agent-binary
+    targetPort: jgr-binary
     protocol: UDP
   selector:
     app: jaeger

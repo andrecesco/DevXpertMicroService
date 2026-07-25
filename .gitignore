@@ -366,3 +366,8 @@ MigrationBackup/
 FodyWeavers.xsd
 /src/EduOnline.Alunos.ApiRest/EduOnlineAlunos.Db
 /src/EduOnline.Auth.ApiRest/EduOnlineAuth.Db
+
+# Environment files
+.env
+.env.*
+!.env.example

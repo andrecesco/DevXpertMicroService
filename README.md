@@ -45,13 +45,16 @@ O ecossistema está organizado em APIs independentes para **Autenticação**, **
 ### **Opção A - Execução local com Docker Compose (rápida)**
 
 1. **Clone o repositório**
-2. **Configure as variáveis do arquivo `.env`**, se necessário
-3. **Suba a stack principal**:
+2. **Crie seu `.env` local a partir do template**:
+   - `cp .env.example .env` (Linux/macOS)
+   - `Copy-Item .env.example .env` (PowerShell)
+3. **Configure as variáveis do arquivo `.env`**, se necessário
+4. **Suba a stack principal**:
    - `docker compose up -d --build`
    - ou `.\docker-init.ps1 -Action up`
-4. **Valide os containers**:
+5. **Valide os containers**:
    - `docker compose ps`
-5. **Acesse os serviços** conforme a tabela da seção de documentação da API
+6. **Acesse os serviços** conforme a tabela da seção de documentação da API
 
 ### **Opção B - Execução local com Kubernetes (fluxo para avaliação)**
 

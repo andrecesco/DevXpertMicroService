@@ -100,20 +100,29 @@ jobs:
       run: dotnet build EduOnline.slnx --configuration Release
 
     - name: Executar Testes de Unidade
-      run: >
-        dotnet test EduOnline.slnx --configuration Release --no-build
-        --filter "FullyQualifiedName!~IntegrationTest"
-        --collect:"XPlat Code Coverage;Format=opencover"
+      shell: bash
+      run: |
+        set -euo pipefail
+        shopt -s globstar nullglob
+        for project in test/**/*.csproj; do
+          if [[ "$project" == *UnitTest.csproj ]]; then
+            echo "Executando unit tests em $project"
+            dotnet test "$project" --configuration Release --no-build --collect:"XPlat Code Coverage;Format=opencover"
+          fi
+        done
 
     - name: Executar Testes de Integração
       continue-on-error: ${{ github.event_name == 'pull_request' }}
-      run: >
-        dotnet test EduOnline.slnx
-        --configuration Release
-        --no-build
-        --filter "FullyQualifiedName~IntegrationTest"
-        --collect:"XPlat Code Coverage;Format=opencover"
-        --logger "trx;LogFileName=integration-tests.trx"
+      shell: bash
+      run: |
+        set -euo pipefail
+        shopt -s globstar nullglob
+        for project in test/**/*.csproj; do
+          if [[ "$project" == *IntegrationTest.csproj ]]; then
+            echo "Executando integration tests em $project"
+            dotnet test "$project" --configuration Release --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx;LogFileName=integration-tests.trx"
+          fi
+        done
 
     - name: Smoke de Observabilidade (HealthChecks)
       run: >

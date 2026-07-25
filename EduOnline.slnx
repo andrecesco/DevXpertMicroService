@@ -58,4 +58,8 @@
     <File Path="README.md" />
     <File Path="SECURITY-COMPLIANCE-MATRIX.md" />
   </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/test/">
+    <Project Path="test/EduOnline.WebApps.UnitTest/EduOnline.WebApps.UnitTest.csproj" />
+  </Folder>
 </Solution>

@@ -143,12 +143,6 @@ public class CursoService(INotificador notificador, ICursoRepository repository)
     //    await PersistirDados(repository.UnitOfWork);
     //}
 
-    private async Task<bool> CursoExiste(Guid id)
-    {
-        var curso = await repository.ObterPorIdAsync(id);
-        return curso is not null;
-    }
-
     public void Dispose()
     {
         repository.Dispose();

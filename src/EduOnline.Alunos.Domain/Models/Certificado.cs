@@ -8,7 +8,7 @@ public class Certificado : Entity
     public string Link { get; private set; } = string.Empty;
 
     //EF Relations
-    public Matricula? Matricula { get; private set; }
+    public Matricula? Matricula { get; set; }
 
     private Certificado() { }
     public Certificado(Guid id, Guid matriculaId, string link)

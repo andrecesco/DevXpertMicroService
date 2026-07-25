@@ -1,3 +1,5 @@
+#nullable enable
+
 using EduOnline.Alunos.ApiRest.Controllers;
 using EduOnline.Alunos.ApiRest.Models;
 using EduOnline.Alunos.Application.Queries;

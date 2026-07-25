@@ -16,6 +16,9 @@ namespace EduOnline.Core.Api.Extensions;
 
 public static class ObservabilityExtensions
 {
+    private const string LiveTag = "live";
+    private const string ReadyTag = "ready";
+
     public static WebApplicationBuilder AddStructuredLogging(this WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
@@ -90,7 +93,7 @@ public static class ObservabilityExtensions
     public static WebApplicationBuilder AddApiHealthChecks(this WebApplicationBuilder builder)
     {
         builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"), tags: ["live", "ready"])
+            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"), tags: [LiveTag, ReadyTag])
             .ForwardToPrometheus();
 
         return builder;
@@ -100,12 +103,12 @@ public static class ObservabilityExtensions
         where TDbContext : class
     {
         var healthChecks = builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"), tags: ["live", "ready"])
-            .AddCheck<DbContextConnectivityHealthCheck<TDbContext>>("database", tags: ["ready", "db"]);
+            .AddCheck("self", () => HealthCheckResult.Healthy("API disponível"), tags: [LiveTag, ReadyTag])
+            .AddCheck<DbContextConnectivityHealthCheck<TDbContext>>("database", tags: [ReadyTag, "db"]);
 
         if (includeRabbitMqWhenEnabled)
         {
-            healthChecks.AddCheck<RabbitMqTcpHealthCheck>("rabbitmq", tags: ["ready", "messaging"]);
+            healthChecks.AddCheck<RabbitMqTcpHealthCheck>("rabbitmq", tags: [ReadyTag, "messaging"]);
         }
 
         healthChecks.ForwardToPrometheus();
@@ -133,14 +136,14 @@ public static class ObservabilityExtensions
         // Readiness: inclui dependências externas (banco, RabbitMQ) - falha remove o pod do Service sem reiniciá-lo.
         app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = r => r.Tags.Contains("ready"),
+            Predicate = r => r.Tags.Contains(ReadyTag),
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 
         // Liveness: só confirma que o processo está respondendo - não deve depender de recursos externos.
         app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = r => r.Tags.Contains("live"),
+            Predicate = r => r.Tags.Contains(LiveTag),
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
 

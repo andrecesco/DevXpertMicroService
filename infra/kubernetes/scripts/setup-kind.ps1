@@ -51,9 +51,9 @@ Write-Host "Instalando CRDs do external-secrets-operator..." -ForegroundColor Cy
 kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/v0.9.13/deploy/crds/bundle.yaml
 
 # ---------------------------------------------------------------------------
-# 5. Aplicar os manifestos Kubernetes
+# 5. Aplicar os manifestos Kubernetes (overlay smoke-test: replicas=1)
 # ---------------------------------------------------------------------------
 Write-Host "Aplicando manifestos Kubernetes..." -ForegroundColor Cyan
-kubectl apply -k (Join-Path $PSScriptRoot '..')
+kubectl apply -k (Join-Path $PSScriptRoot '..\overlays\smoke-test')
 
 Write-Host "Setup concluído." -ForegroundColor Green

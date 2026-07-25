@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Configurações de cobertura de código para uso com dotnet test -->
+<!-- Exclui código auto-gerado (Migrations, EF Core snapshots, source-generators, Program boilerplate) -->
+<RunSettings>
+  <DataCollectionRunSettings>
+	<DataCollectors>
+	  <DataCollector friendlyName="XPlat Code Coverage">
+		<Configuration>
+		  <Format>opencover,cobertura</Format>
+		  <ExcludeByFile>
+			**/Migrations/**/*.cs,
+			**/obj/**/*.cs,
+			**/bin/**/*.cs
+		  </ExcludeByFile>
+		  <ExcludeByAttribute>
+			ExcludeFromCodeCoverage,
+			GeneratedCodeAttribute,
+			CompilerGeneratedAttribute
+		  </ExcludeByAttribute>
+		  <Exclude>
+			[*.Migrations]*,
+			[*]*ModelSnapshot,
+			[*]*MigrationBase,
+			[*]*DesignTimeDbContextFactory
+		  </Exclude>
+		  <IncludeTestAssembly>false</IncludeTestAssembly>
+		</Configuration>
+	  </DataCollector>
+	</DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

@@ -81,6 +81,7 @@ jobs:
         ./.sonar/scanner/dotnet-sonarscanner begin
         /k:"$SONAR_PROJECT_KEY"
         /o:"$SONAR_ORGANIZATION"
+        /v:"${{ github.sha }}"
         /d:sonar.token="$SONAR_TOKEN"
         /d:sonar.host.url="https://sonarcloud.io"
         /d:sonar.sources=src

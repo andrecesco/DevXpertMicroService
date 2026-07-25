@@ -113,6 +113,15 @@ jobs:
         /p:MergeWith="../../coverage/coverage.opencover.xml"
         --logger "trx;LogFileName=integration-tests.trx"
 
+    - name: Smoke de Observabilidade (HealthChecks)
+      run: >
+        dotnet test EduOnline.slnx --configuration Release --no-build
+        --filter "FullyQualifiedName~HealthChecksIntegrationTest"
+
+    - name: Validar manifestos de observabilidade do Kubernetes
+      shell: pwsh
+      run: ./scripts/validate-observability.ps1
+
     - name: Finalizar a análise do SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

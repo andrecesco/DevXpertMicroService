@@ -31,8 +31,16 @@ public class CursoServiceTest
             .RuleFor(c => c.CargaHoraria, f => f.Random.Int(0, 1000));
 
         var cursoFaker = new Faker<Curso>("pt_BR")
-            .RuleFor(c => c.Nome, f => f.Company.CompanyName())
-            .RuleFor(c => c.Autor, f => f.Person.FullName)
+            .RuleFor(c => c.Nome, f =>
+            {
+                var nome = f.Company.CompanyName();
+                return nome.Length > 100 ? nome[..100] : nome;
+            })
+            .RuleFor(c => c.Autor, f =>
+            {
+                var autor = f.Person.FullName;
+                return autor.Length > 100 ? autor[..100] : autor;
+            })
             .RuleFor(c => c.Validade, f => f.Date.FutureDateOnly())
             .RuleFor(c => c.ConteudoProgramatico, f => conteudoProgramatico.Generate());
 

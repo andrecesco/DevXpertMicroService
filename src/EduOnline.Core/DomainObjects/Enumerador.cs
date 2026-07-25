@@ -2,7 +2,7 @@
 
 namespace EduOnline.Core.DomainObjects;
 
-public abstract class Enumerador(int id, string nome) : IComparable
+public abstract class Enumerador(int id, string nome) : IComparable, IComparable<Enumerador>, IEquatable<Enumerador>
 {
     #region Properties
     public string Nome { get; private set; } = nome;
@@ -45,7 +45,13 @@ public abstract class Enumerador(int id, string nome) : IComparable
         if (other is not Enumerador enumerador)
             throw new ArgumentException($"Objeto deve ser do tipo {nameof(Enumerador)}", nameof(other));
 
-        return Id.CompareTo(enumerador.Id);
+        return CompareTo(enumerador);
+    }
+
+    public int CompareTo(Enumerador? other)
+    {
+        if (other is null) return 1;
+        return Id.CompareTo(other.Id);
     }
 
     #region Static utils

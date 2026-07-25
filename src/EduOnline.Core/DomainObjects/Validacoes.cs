@@ -2,7 +2,7 @@
 
 namespace EduOnline.Core.DomainObjects;
 
-public class Validacoes
+public static class Validacoes
 {
     public static void ValidarSeIgual(object? object1, object object2, string mensagem)
     {

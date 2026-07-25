@@ -2,11 +2,11 @@
 
 | Requisito | Status | Implementação |
 | --- | --- | --- |
-| Secrets managed no Vault | Parcial | `infra/kubernetes/security/vault/secretstore.yaml` e `external-secret.yaml` conectam `eduonline-secrets` ao Vault; bootstrap/role validation still depends on cluster runtime. |
-| RBAC restritivo implementado | Concluído | Workloads use dedicated `ServiceAccount`s and the security base includes the RBAC policies. |
-| Network policies bloqueando tráfego não-autorizado | Concluído | `infra/kubernetes/security/network-policies/network-policies.yaml` plus the base deny/allow policies. |
+| Secrets managed no Vault | Não aplicado em runtime | Manifestos do Vault existem em `infra/kubernetes/security/vault/` e `infra/kubernetes/vault/`, porém **nenhum Deployment consome segredos via Vault atualmente** — as variáveis de ambiente vêm de `ConfigMap` e `Secret` padrão do Kubernetes. O Vault foi provisionado como infraestrutura futura; o ExternalSecretsOperator não está habilitado nos manifestos ativos. |
+| RBAC restritivo implementado | Concluído | Workloads utilizam `ServiceAccount`s dedicadas e as políticas RBAC estão definidas em `infra/kubernetes/security/rbac/`. |
+| Network policies bloqueando tráfego não-autorizado | Concluído | `infra/kubernetes/networkpolicies/` aplica abordagem `deny-all` com liberações explícitas por serviço. |
 | Segurança de pods aplicada | Concluído | `PodSecurityPolicy` removida (API extinta no K8s 1.25+). Substituída por **Pod Security Admission** nível `restricted` via labels no `infra/kubernetes/namespace.yaml` + `securityContext` restritivo em todos os Deployments (`runAsNonRoot`, `drop: ALL`, `allowPrivilegeEscalation: false`, `seccompProfile`). |
-| Audit logging habilitado | Parcial | `infra/kubernetes/security/audit/configmap.yaml` and `kind-config.yaml` provide the policy and bootstrap settings; cluster control-plane enablement is still required. |
-| TLS/mTLS certificates | Parcial | `infra/kubernetes/security/tls/clusterissuer.yaml`, `certificates.yaml`, and `ingress-tls.yaml` provide the CA and cert resources; workload rollout/validation remains. |
-| Container image scanning | Concluído | `.github/workflows/security.yml` runs Trivy image scanning and uploads SARIF results. |
-| Compliance matrix coverage | Concluído | This document now reflects the current security posture and remaining runtime validations. |
+| Audit logging habilitado | Parcial | `infra/kubernetes/security/audit/configmap.yaml` e `kind-config.yaml` fornecem a política e as configurações de bootstrap; a habilitação no control-plane do cluster ainda requer configuração em runtime. |
+| TLS/mTLS certificates | Parcial | `infra/kubernetes/security/tls/clusterissuer.yaml`, `certificates.yaml` e `ingress-tls.yaml` fornecem os recursos de CA e certificados; a validação em ambiente real ainda depende de um cluster com cert-manager instalado. |
+| Container image scanning | Concluído | `.github/workflows/security.yml` executa Trivy image scanning e publica resultados SARIF no GitHub Security. |
+| Compliance matrix coverage | Concluído | Este documento reflete a postura real de segurança implementada, distinguindo o que está operante do que é infraestrutura planejada. |

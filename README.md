@@ -63,12 +63,12 @@ Antes de aplicar os manifests, gere as imagens usadas pelos Deployments:
 
 - `docker compose build auth-api conteudos-api alunos-api pagamentos-api bff-api`
 
-As imagens geradas serão:
-- `eduonline/auth-api:latest`
-- `eduonline/conteudos-api:latest`
-- `eduonline/alunos-api:latest`
-- `eduonline/pagamentos-api:latest`
-- `eduonline/bff-api:latest`
+As imagens geradas serão (conforme configurado no `docker-compose.yml`):
+- `andrecesco/eduonline-auth-api:latest`
+- `andrecesco/eduonline-conteudos-api:latest`
+- `andrecesco/eduonline-alunos-api:latest`
+- `andrecesco/eduonline-pagamentos-api:latest`
+- `andrecesco/eduonline-bff:latest`
 
 #### **B.2 Subir cluster e aplicar manifests**
 
@@ -132,7 +132,7 @@ Após o port-forward, valide ao menos:
 
 - As configurações principais ficam em `.env`, `docker-compose.yml` e nos `appsettings.json` de cada serviço
 - O seed inicial prepara dados de demonstração para os perfis de administrador e aluno
-- As migrações e seeds são aplicadas automaticamente pelos serviços conforme o ambiente configurado
+- As migrações e seeds são gerenciadas pelo serviço `sqlserver-init` no ambiente Docker Compose (os serviços individuais têm migração automática desabilitada); em desenvolvimento local fora do Docker, o `dotnet ef database update` deve ser executado manualmente
 - As roles usadas pela solução são apenas `Administrador` e `Aluno`
 - O usuário do ASP.NET Identity para alunos é um GUID e corresponde ao `Memo` do aluno
 

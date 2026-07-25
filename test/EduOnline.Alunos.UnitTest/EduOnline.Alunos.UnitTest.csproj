@@ -13,6 +13,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="FluentAssertions" Version="8.10.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
 		<PackageReference Include="MOQ" Version="4.20.72" />
 		<PackageReference Include="MOQ.AutoMock" Version="4.0.2" />
@@ -26,6 +27,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\EduOnline.Alunos.Application\EduOnline.Alunos.Application.csproj" />
+		<ProjectReference Include="..\..\src\EduOnline.Alunos.ApiRest\EduOnline.Alunos.ApiRest.csproj" />
+		<ProjectReference Include="..\..\src\EduOnline.Core.Api\EduOnline.Core.Api.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

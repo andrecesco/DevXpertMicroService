@@ -23,10 +23,7 @@ RUN dotnet publish "src/EduOnline.Api.Status/EduOnline.Api.Status.csproj" -c Rel
 # Stage 3: Runtime - Imagem final leve
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 WORKDIR /app
-RUN apk add --no-cache icu-libs
-
-# Criar usuário não-root para executar a aplicação
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN apk add --no-cache icu-libs && addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copiar arquivos publicados
 COPY --from=build /app/publish .

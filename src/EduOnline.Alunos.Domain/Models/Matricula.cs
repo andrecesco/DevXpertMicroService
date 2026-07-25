@@ -16,8 +16,8 @@ public class Matricula : Entity
     public bool Ativo { get; private set; }
 
     //EF Relations
-    public Certificado? Certificado { get; private set; }
-    public Aluno? Aluno { get; private set; }
+    public Certificado? Certificado { get; set; }
+    public Aluno? Aluno { get; set; }
 
     private Matricula() { }
 

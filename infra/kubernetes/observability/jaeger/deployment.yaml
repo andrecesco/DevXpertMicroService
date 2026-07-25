@@ -27,13 +27,13 @@ spec:
         image: jaegertracing/all-in-one:1.50
         imagePullPolicy: IfNotPresent
         ports:
-        - name: jaeger-agent-zipkin-thrift
+        - name: jgr-zipkin
           containerPort: 6831
           protocol: UDP
-        - name: jaeger-agent-compact
+        - name: jgr-compact
           containerPort: 6832
           protocol: UDP
-        - name: jaeger-agent-binary
+        - name: jgr-binary
           containerPort: 6833
           protocol: UDP
         - name: jaeger-query

@@ -88,7 +88,7 @@ jobs:
         /d:sonar.exclusions="**/Migrations/**,**/obj/**,**/bin/**"
         /d:sonar.test.inclusions="test/**/*Test.cs,test/**/*Tests.cs"
         /d:sonar.coverage.exclusions="**/Migrations/**,**/obj/**,**/bin/**,test/**"
-        /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+        /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
         /d:sonar.issue.ignore.multicriteria="k8sstatus1,k8sstatus2"
         /d:sonar.issue.ignore.multicriteria.k8sstatus1.ruleKey="kubernetes:S6596"
         /d:sonar.issue.ignore.multicriteria.k8sstatus1.resourceKey="infra/kubernetes/deployments/status-api-deployment.yaml"
@@ -102,10 +102,7 @@ jobs:
       run: >
         dotnet test EduOnline.slnx --configuration Release --no-build
         --filter "FullyQualifiedName!~IntegrationTest"
-        /p:CollectCoverage=true
-        /p:CoverletOutputFormat=opencover
-        /p:CoverletOutput="../../coverage/"
-        /p:MergeWith="../../coverage/coverage.opencover.xml"
+        --collect:"XPlat Code Coverage;Format=opencover"
 
     - name: Executar Testes de Integração
       continue-on-error: ${{ github.event_name == 'pull_request' }}
@@ -114,10 +111,7 @@ jobs:
         --configuration Release
         --no-build
         --filter "FullyQualifiedName~IntegrationTest"
-        /p:CollectCoverage=true
-        /p:CoverletOutputFormat=opencover
-        /p:CoverletOutput="../../coverage/"
-        /p:MergeWith="../../coverage/coverage.opencover.xml"
+        --collect:"XPlat Code Coverage;Format=opencover"
         --logger "trx;LogFileName=integration-tests.trx"
 
     - name: Smoke de Observabilidade (HealthChecks)

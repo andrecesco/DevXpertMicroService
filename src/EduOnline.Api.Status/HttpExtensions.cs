@@ -22,8 +22,11 @@ public static class HttpExtensions
                 ClientCertificateOptions = ClientCertificateOption.Manual,
                 ServerCertificateCustomValidationCallback = (_, cert, chain, _) =>
                 {
+                    if (cert is null || chain is null)
+                        return false;
+
                     chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-                    var certificate = X509CertificateLoader.LoadPkcs12(File.ReadAllBytes(path!), certPass);
+                    var certificate = X509CertificateLoader.LoadPkcs12(File.ReadAllBytes(path), certPass);
                     chain.ChainPolicy.CustomTrustStore.Add(certificate);
 
                     return chain.Build(cert);

@@ -1,2 +1,0 @@
-﻿namespace EduOnline.Core.IntegrationTest;
-

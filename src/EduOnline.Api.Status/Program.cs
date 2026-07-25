@@ -59,16 +59,10 @@ app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthC
 // Under certain scenarios, e.g minikube / linux environment / behind load balancer
 // https redirection could lead dev's to over complicated configuration for testing purpouses
 // In production is a good practice to keep it true
-if (app.Configuration["USE_HTTPS_REDIRECTION"] == "true")
-{
-    app.UseHttpsRedirection();
-    app.UseHsts();
-}
-
 app.MapHealthChecksUI(setup =>
 {
     setup.AddCustomStylesheet("eduonline.css");
     setup.UIPath = "/";
     setup.PageTitle = "EduOnline - Status";
 });
-app.Run();
+await app.RunAsync();

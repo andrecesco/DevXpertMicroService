@@ -1,5 +1,6 @@
 ﻿using EduOnline.Auth.ApiRest.Data;
 using EduOnline.Auth.ApiRest.Services;
+using EduOnline.Core.Api.Extensions;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;
 using System.Diagnostics.CodeAnalysis;
@@ -22,7 +23,7 @@ public static class DependencyInjectionConfig
         builder.Services.AddScoped<ApplicationDbContext>();
         builder.Services.AddScoped<AuthenticationService>();
         builder.Services.AddScoped<IAspNetUser, AspNetUser>();
-        builder.Services.AddHttpClient<AlunoProvisioningService>((sp, client) =>
+        builder.Services.AddHttpClientService<AlunoProvisioningService, AlunoProvisioningService>((sp, client) =>
         {
             var configuration = sp.GetRequiredService<IConfiguration>();
             var alunoUrl = configuration["AlunoUrl"] ?? throw new InvalidOperationException("Configuração 'AlunoUrl' não encontrada.");

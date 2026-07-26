@@ -211,5 +211,34 @@ jobs:
     - name: Subir o Docker Compose completo
       run: docker compose up -d
 
+    - name: Verificar saúde dos serviços do Docker Compose
+      shell: pwsh
+      run: |
+        $services = docker compose ps --format json | ConvertFrom-Json
+        $failed = @()
+
+        foreach ($service in $services) {
+          if ($service.Service -eq 'sqlserver-init') {
+            if ($service.State -ne 'exited' -or $service.ExitCode -ne 0) {
+              $failed += $service
+            }
+            continue
+          }
+
+          if ($service.State -ne 'running') {
+            $failed += $service
+            continue
+          }
+
+          if ($service.PSObject.Properties.Name -contains 'Health' -and $service.Health -and $service.Health -ne 'healthy' -and $service.Health -ne 'starting') {
+            $failed += $service
+          }
+        }
+
+        if ($failed.Count -gt 0) {
+          $failed | Format-Table Service,State,Health,ExitCode -AutoSize
+          exit 1
+        }
+
     - name: Verificar status dos containers
       run: docker compose ps

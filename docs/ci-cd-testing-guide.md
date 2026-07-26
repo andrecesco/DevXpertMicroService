@@ -343,7 +343,7 @@ Referência completa: [docs/CI-CD-PIPELINE.md](../docs/CI-CD-PIPELINE.md)
 - **[docs/GITHUB-ACTIONS-SETUP.md](../docs/GITHUB-ACTIONS-SETUP.md)** - Setup secrets
 - **[../DOCKER-README.md](../DOCKER-README.md)** - Docker local
 - **[../README.md](../README.md)** - Visão geral do projeto
-- **[../SECURITY-COMPLIANCE-MATRIX.md](../SECURITY-COMPLIANCE-MATRIX.md)** - Segurança e compliance atualizados
+- **[SECURITY-COMPLIANCE-MATRIX.md](./SECURITY-COMPLIANCE-MATRIX.md)** - Segurança e compliance atualizados
 
 ---
 
@@ -402,3 +402,4 @@ cat docs/CI-CD-PIPELINE.md
 **Versão:** 1.0.0  
 **Data:** 2026  
 **Módulo:** DevXpert MBA - Mod 05 (CI/CD & Kubernetes)
+

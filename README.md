@@ -212,5 +212,6 @@ Após o container estiver rodando é possível acessar através do link http://l
   - `docs/observability-validation-runbook.md` - checklist operacional de validação de resiliência e observabilidade
   - `infra/kubernetes/` - manifests e guias da infraestrutura local em Kubernetes
 - `infra/kubernetes/README.md` - guia complementar com foco nos manifests Kubernetes
-- `SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado de segurança e compliance
+- `docs/SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado de segurança e compliance
 - `FEEDBACK.md` - histórico de feedbacks e correções aplicadas
+

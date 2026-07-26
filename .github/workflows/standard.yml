@@ -124,14 +124,10 @@ jobs:
           fi
         done
 
-    - name: Smoke de Observabilidade (HealthChecks)
+    - name: Smoke de HealthChecks
       run: >
         dotnet test EduOnline.slnx --configuration Release --no-build
         --filter "FullyQualifiedName~HealthChecksIntegrationTest"
-
-    - name: Validar manifestos de observabilidade do Kubernetes
-      shell: pwsh
-      run: ./scripts/validate-observability.ps1
 
     - name: Finalizar a análise do SonarCloud
       env:

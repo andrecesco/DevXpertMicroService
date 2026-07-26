@@ -28,6 +28,6 @@ This folder contains the Kubernetes base manifests for the EduOnline platform.
 ```
 
 ## Notes
-- `kubectl apply -k infra/kubernetes` applies the full manifest set, including the OpenTelemetry Collector, Jaeger, Alertmanager, Elasticsearch, Fluentd, and security workloads under `infra/kubernetes/observability/` and `infra/kubernetes/security/`.
+- `kubectl apply -k infra/kubernetes` applies the full manifest set. For the module baseline, the essential contract is the application workloads plus health checks and metrics; the observability/security stack under `infra/kubernetes/observability/` and `infra/kubernetes/security/` is treated as an extended layer that can be enabled according to the environment.
 - The SQL Server data volume uses a local hostPath so it works on Kind and Minikube.
 - The manifests assume the current services keep their existing HTTP health endpoints under `/health`.

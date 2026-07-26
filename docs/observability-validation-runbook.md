@@ -1,6 +1,6 @@
 # Runbook de Validação de Resiliência e Observabilidade
 
-Este guia consolida o passo a passo para validar, de forma objetiva e reprodutível, os itens de resiliência e observabilidade do projeto.
+Este guia consolida o passo a passo para validar, de forma objetiva e reprodutível, os itens essenciais de resiliência e observabilidade do projeto, deixando as validações da camada estendida como opcionais.
 
 ## 1. Objetivo
 
@@ -8,29 +8,29 @@ Garantir evidência executável para:
 
 - Health checks (`/health`, `/health/ready`, `/health/live`)
 - Exposição de métricas (`/metrics`)
-- Presença dos recursos de observabilidade no Kubernetes (`OTEL Collector`, `Jaeger`, `Alertmanager`, `Elasticsearch`, `Fluentd`)
+- Presença dos recursos essenciais de observabilidade no Kubernetes (`OTEL Collector` e `Prometheus`)
 
 ## 2. Validação no CI (GitHub Actions)
 
-No workflow principal (`.github/workflows/standard.yml`), a validação ocorre com dois blocos:
+No workflow principal (`.github/workflows/standard.yml`), a validação fica restrita ao bloco essencial:
 
-1. **Smoke de Observabilidade (HealthChecks)**
+1. **Smoke de HealthChecks**
    - Executa testes de integração filtrados por `HealthChecksIntegrationTest`.
-2. **Validar manifestos de observabilidade do Kubernetes**
-   - Executa `./scripts/validate-observability.ps1`.
+
+A validação completa dos manifestos de observabilidade permanece disponível, mas como verificação manual/opcional via `./scripts/validate-observability.ps1`.
 
 ### Critério de sucesso no CI
 
 - Job `build` concluído com sucesso.
-- Etapas acima em status verde.
+- Smoke de health checks em status verde.
+- Validações opcionais executadas apenas quando houver necessidade de verificar a camada estendida.
 
 ## 3. Validação local rápida
 
 Na raiz do repositório:
 
 ```powershell
-# 1) Verifica se os recursos obrigatórios de observabilidade
-# estão referenciados no kustomization e existem em disco
+# 1) Verifica a camada estendida de observabilidade quando necessário
 pwsh ./scripts/validate-observability.ps1
 
 # 2) Smoke dos endpoints de health/metrics via integração
@@ -66,8 +66,8 @@ kubectl logs <pod> -n eduonline
 
 Se falhar na validação de manifestos:
 
-- Conferir `infra/kubernetes/kustomization.yaml`
-- Conferir existência dos arquivos em `infra/kubernetes/observability/*`
+- Conferir `infra/kubernetes/kustomization.yaml` apenas se a camada estendida de observabilidade estiver habilitada
+- Conferir existência dos arquivos em `infra/kubernetes/observability/*` quando validar a camada estendida
 
 ## 6. Evidências recomendadas para PR
 

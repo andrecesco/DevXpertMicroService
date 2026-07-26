@@ -1,6 +1,6 @@
+using EduOnline.Bff.ApiRest.Controllers;
 using EduOnline.Bff.ApiRest.Requests;
 using EduOnline.Bff.ApiRest.Services;
-using EduOnline.Bff.ApiRest.Controllers;
 using EduOnline.Core.Api.Controllers;
 using EduOnline.Core.ControleDeAcesso;
 using EduOnline.Core.Mensagens;

@@ -75,8 +75,8 @@ public class PagamentosControllerTest
 
         pagamentoCursoCapturado.Should().NotBeNull();
         pagamentoCursoCapturado!.AlunoId.Should().Be(alunoId);
-        pagamentoCursoCapturado.CursoId.Should().Be(request.CursoId);
-        pagamentoCursoCapturado.MatriculaId.Should().Be(request.MatriculaId);
+        pagamentoCursoCapturado.CursoId.Should().Be(request.CursoId!.Value);
+        pagamentoCursoCapturado.MatriculaId.Should().Be(request.MatriculaId!.Value);
     }
 
     [Fact(DisplayName = "ObterPorId deve retornar NotFound quando pagamento não encontrado")]

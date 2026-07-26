@@ -39,10 +39,10 @@ public class PagamentosController(
 
         var pagamentoCurso = new PagamentoCurso
         {
-            MatriculaId = request.MatriculaId,
-            CursoId = request.CursoId,
+            MatriculaId = request.MatriculaId!.Value,
+            CursoId = request.CursoId!.Value,
             AlunoId = AppUser.GetUserId(),
-            Total = request.Total,
+            Total = request.Total!.Value,
             NomeCartao = request.NomeCartao,
             NumeroCartao = request.NumeroCartao,
             ExpiracaoCartao = request.ExpiracaoCartao,

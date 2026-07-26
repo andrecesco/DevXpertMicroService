@@ -53,4 +53,4 @@ if (app.Environment.IsDevelopment())
     app.UseDbMigrationHelper();
 }
 
-app.Run();
+await app.RunAsync();

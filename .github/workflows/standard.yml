@@ -99,6 +99,9 @@ jobs:
     - name: Restaurar dependências e Build da Solução
       run: dotnet build EduOnline.slnx --configuration Release
 
+    - name: Verificar formatação do código
+      run: dotnet format EduOnline.slnx --verify-no-changes --no-restore
+
     - name: Executar Testes de Unidade
       shell: bash
       run: |

@@ -74,26 +74,26 @@
 
 ### 2. Observabilidade
 
-#### Núcleo obrigatório (métricas e health)
+#### Métricas (Prometheus)
 - **Prometheus** (9090)
   - Scraping de 5 APIs + 1 Database
   - 30 dias de retention
   - 20Gi storage
   - 10+ alertas definidos
-- **OpenTelemetry Collector**
-  - Coleta e exportação de traces/métricas para o ambiente local
-- **Health checks**
-  - `/health`, `/health/ready` e `/health/live` como contrato operacional do baseline
 
-#### Camada estendida (opcional)
+#### Visualização (Grafana)
 - **Grafana** (3000)
   - 4 Dashboards principais
   - Data source: Prometheus
   - Admin: admin/GrafanaAdminPassword2026!
+
+#### Alertas (Alertmanager)
 - **Alertmanager** (9093)
   - Roteamento por severidade (critical, warning, info)
   - Integração com Slack e PagerDuty
   - Inhibit rules para evitar cascata
+
+#### Logs (ELK Stack)
 - **Elasticsearch** (9200)
   - Armazenamento de logs
   - 30Gi storage
@@ -104,12 +104,14 @@
 - **Fluentd/Promtail** (DaemonSet)
   - Coleta de logs de todos os pods
   - Forward para Elasticsearch
+
+#### Tracing (Jaeger)
 - **Jaeger** (16686)
   - Distributed tracing
   - 50% sampling para APIs
   - All-in-one deployment
 
-### 3. Segurança essencial e camada estendida
+### 3. Segurança
 
 #### Gerenciamento de Secrets
 - **Vault** (8200)
@@ -117,16 +119,15 @@
   - Kubernetes auth method
   - 6 Policies (5 APIs + admin)
   - 10Gi storage
-  - Tratado como camada estendida de segurança, não como requisito mínimo do fluxo base
 
 #### Controle de Acesso
 - **RBAC**
   - 5 ServiceAccounts (1 por API)
   - 3 Roles (API, Admin, Developer)
   - Least privilege principle
-- **Pod Security Admission**
-  - `restricted` no namespace
-  - `securityContext` endurecido nos Deployments
+- **Pod Security Policies**
+  - Restricted: máxima segurança
+  - Baseline: compatibilidade
 
 #### Políticas de Rede
 - **Network Policies** (5 policies)

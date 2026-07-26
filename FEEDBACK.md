@@ -18,7 +18,7 @@
   - **Vault aparece em três lugares distintos**: `infra/kubernetes/vault/`, `infra/kubernetes/security/vault/` e `infra/security/vault/`.
   - **Arquitetura superdimensionada frente ao escopo.** O escopo pede "restart policies, logs e métricas" e "health checks". O repositório entrega Vault + External Secrets Operator, Elasticsearch + Kibana, Fluentd + Promtail, Jaeger, Prometheus + Alertmanager, OTEL Collector, cert-manager/ClusterIssuer, PodSecurityPolicies, políticas de auditoria de API server e RBAC por serviço. Isso é muito além do pedido, não é validado por nenhum teste ou pipeline, e — como detalhado nas seções seguintes — convive com um fluxo básico de Kubernetes que **não sobe**. Amplitude foi priorizada sobre funcionamento.
   - `infra/kubernetes/security/rbac/pod-security-policies.yaml` usa PodSecurityPolicy, recurso **removido do Kubernetes desde a 1.25**. É manifesto morto: não aplicará em nenhum cluster atual.
-  - Documentação de infraestrutura dispersa e redundante na raiz: `DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `docs/SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, além de `infra/ARCHITECTURE.md` e `infra/kubernetes/README.md`.
+  - Documentação de infraestrutura dispersa e redundante na raiz: `DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, além de `infra/ARCHITECTURE.md` e `infra/kubernetes/README.md`.
   - O `FEEDBACK.md` anterior existia mas estava **vazio** (0 bytes) — ver seção "Resolução de Feedbacks".
 
 ## Pipeline CI/CD
@@ -113,7 +113,6 @@
 
 - **Pontos negativos:**
   - **TESTES FALHANDO.** `dotnet test --collect:"XPlat Code Coverage"` na raiz da solução resulta em **falha** (exit code 1). Saída real observada:
-
     ```
     Failed!  - Failed: 1, Passed: 26, Skipped: 0, Total: 27 - EduOnline.Auth.ApiRest.IntegrationTest.dll
       Failed GET /health/ready deve retornar 200 na Auth API
@@ -133,9 +132,7 @@
         HttpRequestException : Response status code does not indicate success: 400 (Bad Request).
         AlunoIntegrationTest.cs:line 161
     ```
-
     As 4 falhas de `EduOnline.Alunos.IntegrationTest` são **encadeadas e cobrem exatamente os fluxos de negócio centrais do escopo**: matrícula → progresso → certificado. O escopo determina que "todos os testes devem rodar e passar" e que "os fluxos de negócio funcionam integralmente". **Não atendido.**
-
   - **Cobertura de branches: 19,2% (325 de 1692)** — muito abaixo do critério de **≥ 80%**. Medido com `coverlet` + `reportgenerator` (`TestResults/Summary.txt`):
     ```
     Line coverage:   30.7% (1766 de 5747)
@@ -148,7 +145,7 @@
     2. Mesmo se rodasse, ele cria apenas o banco **`EduOnlineDB`** (`InitDB.sql:12`), enquanto os serviços apontam para `EduOnlineAuthDb`, `EduOnlineConteudosDb`, `EduOnlineAlunosDb` e `EduOnlinePagamentosDb`. **Nenhum serviço usa o banco criado.**
     - Resultado: com migrações desligadas e o script inerte, os schemas não são criados — o ecossistema via compose não tem como funcionar de ponta a ponta. O `init-db.sh` presente em `infra/database/` não é referenciado por nada.
   - `src/EduOnline.WebApps.ApiRest/Dockerfile:~23` compila `EduOnline.Bff.ApiRest.csproj` — o nome do assembly diverge do nome da pasta, o que dificulta a rastreabilidade.
-  - _(Tolerância — mencionado sem peso crítico)_: há resquícios de código comentado no `docker-compose.yml:212-215` (bloco `depends_on` de `alunos-api` comentado) e comentários de seção decorativos redundantes.
+  - *(Tolerância — mencionado sem peso crítico)*: há resquícios de código comentado no `docker-compose.yml:212-215` (bloco `depends_on` de `alunos-api` comentado) e comentários de seção decorativos redundantes.
 
 ## Segurança
 
@@ -161,7 +158,7 @@
   - `.dockerignore` exclui corretamente `**/.env`, `**/*.pfx` e `appsettings.Development.json`, evitando vazamento para dentro das imagens.
 
 - **Pontos negativos:**
-  - `docs/SECURITY-COMPLIANCE-MATRIX.md` e todo o aparato de Vault/PSP/TLS/audit descrevem uma postura de segurança que o repositório **não pratica**: O Vault não é consumido por nenhum Deployment. A documentação de segurança contradiz o código.
+  - `SECURITY-COMPLIANCE-MATRIX.md` e todo o aparato de Vault/PSP/TLS/audit descrevem uma postura de segurança que o repositório **não pratica**: O Vault não é consumido por nenhum Deployment. A documentação de segurança contradiz o código.
 
 ## Documentação
 
@@ -176,7 +173,7 @@
   - **O README documenta um passo que não funciona.** `README.md:64-71` afirma que `docker compose build auth-api conteudos-api alunos-api pagamentos-api bff-api` gera as imagens `eduonline/auth-api:latest`, `eduonline/conteudos-api:latest`, etc. **Isso é falso**: o `docker-compose.yml` tagueia como `andrecesco/eduonline-auth-api:latest` (linha 105) e equivalentes. Seguir o README ao pé da letra produz imagens com nomes que os Deployments não referenciam — e o deploy falha com `ImagePullBackOff`. É exatamente o caso de documentação que **promete** o que o código não entrega.
   - `README.md:30` afirma "Health checks e endpoints de Swagger para todas as APIs" — mas os endpoints `/health/ready` e `/health/live` não existem, conforme teste falhando.
   - Não há documentação do requisito de seed/migração no contexto Docker, nem aviso de que o compose os desativa.
-  - Excesso de documentos sobrepostos (`DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `docs/SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, `infra/ARCHITECTURE.md`, `infra/kubernetes/README.md`, além de 8 guias em `infra/**/*-GUIDE.md`), vários descrevendo componentes não operantes.
+  - Excesso de documentos sobrepostos (`DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, `infra/ARCHITECTURE.md`, `infra/kubernetes/README.md`, além de 8 guias em `infra/**/*-GUIDE.md`), vários descrevendo componentes não operantes.
 
 ## Conclusão
 
@@ -195,12 +192,11 @@ Há ainda um **desequilíbrio de prioridades** que merece reflexão. O repositó
 **Recomendações priorizadas:**
 
 1. **Corrigir o nome das imagens**: unificar compose e Deployments (ex.: `andrecesco/eduonline-auth-api:latest` nos dois) e adicionar `kind load docker-image` ao `setup-kind.ps1`. Corrigir também o `README.md:64-71`.
-2. **Adicionar `dotnet test` ao workflow** e fazer o build falhar com os testes. Em seguida, corrigir os 5 testes quebrados — implementar `/health/ready` e `/health/live` em `ObservabilityExtensions.cs` e investigar os 400/404 de `AlunoIntegrationTest`.
-3. **Completar o pipeline**: `docker/login-action` + `docker/build-push-action` com push para o Docker Hub (tag por SHA além de `latest`), e um passo de análise estática consumindo o `sonar-project.properties` já existente. Encadear os jobs com `needs:` e remover o `docker compose up -d` inócuo.
-4. **Separar liveness de readiness**: liveness deve checar apenas o processo; readiness checa dependências. Hoje ambos apontam para `/health` agregado, o que reinicia pods em falha transitória de banco — o oposto da resiliência exigida.
-5. **Consertar o provisionamento de banco** no compose: reativar `EnableMigrations`/`EnableSeedData` ou executar o `InitDB.sql` por um passo real (job/entrypoint próprio), e alinhar os nomes de banco entre `InitDB.sql`, compose e `secrets.yaml`.
-6. **Remover a duplicação de infraestrutura** e cortar os componentes fora do escopo (Vault, ELK, PSP, cert-manager). Menos superfície, tudo funcionando, vale mais do que amplitude declarativa não validada.
-7. Eliminar o `dotnet build` redundante dos Dockerfiles (fica só `dotnet publish`) e adicionar `USER` não-root nas imagens.
+1. **Adicionar `dotnet test` ao workflow** e fazer o build falhar com os testes. Em seguida, corrigir os 5 testes quebrados — implementar `/health/ready` e `/health/live` em `ObservabilityExtensions.cs` e investigar os 400/404 de `AlunoIntegrationTest`.
+1. **Completar o pipeline**: `docker/login-action` + `docker/build-push-action` com push para o Docker Hub (tag por SHA além de `latest`), e um passo de análise estática consumindo o `sonar-project.properties` já existente. Encadear os jobs com `needs:` e remover o `docker compose up -d` inócuo.
+1. **Separar liveness de readiness**: liveness deve checar apenas o processo; readiness checa dependências. Hoje ambos apontam para `/health` agregado, o que reinicia pods em falha transitória de banco — o oposto da resiliência exigida.
+1. **Consertar o provisionamento de banco** no compose: reativar `EnableMigrations`/`EnableSeedData` ou executar o `InitDB.sql` por um passo real (job/entrypoint próprio), e alinhar os nomes de banco entre `InitDB.sql`, compose e `secrets.yaml`.
+1. **Remover a duplicação de infraestrutura** e cortar os componentes fora do escopo (Vault, ELK, PSP, cert-manager). Menos superfície, tudo funcionando, vale mais do que amplitude declarativa não validada.
+1. Eliminar o `dotnet build` redundante dos Dockerfiles (fica só `dotnet publish`) e adicionar `USER` não-root nas imagens.
 
 O caminho para uma entrega forte é curto: as peças de qualidade já existem e estão bem escritas. O que falta é **fechar o laço entre o declarado e o executado** — nomes de imagem alinhados, testes rodando no CI e segredos fora do repositório.
-

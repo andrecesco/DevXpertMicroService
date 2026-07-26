@@ -18,7 +18,7 @@
   - **Vault aparece em três lugares distintos**: `infra/kubernetes/vault/`, `infra/kubernetes/security/vault/` e `infra/security/vault/`.
   - **Arquitetura superdimensionada frente ao escopo.** O escopo pede "restart policies, logs e métricas" e "health checks". O repositório entrega Vault + External Secrets Operator, Elasticsearch + Kibana, Fluentd + Promtail, Jaeger, Prometheus + Alertmanager, OTEL Collector, cert-manager/ClusterIssuer, PodSecurityPolicies, políticas de auditoria de API server e RBAC por serviço. Isso é muito além do pedido, não é validado por nenhum teste ou pipeline, e — como detalhado nas seções seguintes — convive com um fluxo básico de Kubernetes que **não sobe**. Amplitude foi priorizada sobre funcionamento.
   - `infra/kubernetes/security/rbac/pod-security-policies.yaml` usa PodSecurityPolicy, recurso **removido do Kubernetes desde a 1.25**. É manifesto morto: não aplicará em nenhum cluster atual.
-  - Documentação de infraestrutura dispersa e redundante na raiz: `DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, além de `infra/ARCHITECTURE.md` e `infra/kubernetes/README.md`.
+  - Documentação de infraestrutura dispersa e redundante na raiz: `DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `docs/SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, além de `infra/ARCHITECTURE.md` e `infra/kubernetes/README.md`.
   - O `FEEDBACK.md` anterior existia mas estava **vazio** (0 bytes) — ver seção "Resolução de Feedbacks".
 
 ## Pipeline CI/CD
@@ -161,7 +161,7 @@
   - `.dockerignore` exclui corretamente `**/.env`, `**/*.pfx` e `appsettings.Development.json`, evitando vazamento para dentro das imagens.
 
 - **Pontos negativos:**
-  - `SECURITY-COMPLIANCE-MATRIX.md` e todo o aparato de Vault/PSP/TLS/audit descrevem uma postura de segurança que o repositório **não pratica**: O Vault não é consumido por nenhum Deployment. A documentação de segurança contradiz o código.
+  - `docs/SECURITY-COMPLIANCE-MATRIX.md` e todo o aparato de Vault/PSP/TLS/audit descrevem uma postura de segurança que o repositório **não pratica**: O Vault não é consumido por nenhum Deployment. A documentação de segurança contradiz o código.
 
 ## Documentação
 
@@ -176,7 +176,7 @@
   - **O README documenta um passo que não funciona.** `README.md:64-71` afirma que `docker compose build auth-api conteudos-api alunos-api pagamentos-api bff-api` gera as imagens `eduonline/auth-api:latest`, `eduonline/conteudos-api:latest`, etc. **Isso é falso**: o `docker-compose.yml` tagueia como `andrecesco/eduonline-auth-api:latest` (linha 105) e equivalentes. Seguir o README ao pé da letra produz imagens com nomes que os Deployments não referenciam — e o deploy falha com `ImagePullBackOff`. É exatamente o caso de documentação que **promete** o que o código não entrega.
   - `README.md:30` afirma "Health checks e endpoints de Swagger para todas as APIs" — mas os endpoints `/health/ready` e `/health/live` não existem, conforme teste falhando.
   - Não há documentação do requisito de seed/migração no contexto Docker, nem aviso de que o compose os desativa.
-  - Excesso de documentos sobrepostos (`DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, `infra/ARCHITECTURE.md`, `infra/kubernetes/README.md`, além de 8 guias em `infra/**/*-GUIDE.md`), vários descrevendo componentes não operantes.
+  - Excesso de documentos sobrepostos (`DOCKER-README.md`, `CI-CD-TESTING-GUIDE.md`, `docs/SECURITY-COMPLIANCE-MATRIX.md`, `ProjetoMod05.md`, `infra/ARCHITECTURE.md`, `infra/kubernetes/README.md`, além de 8 guias em `infra/**/*-GUIDE.md`), vários descrevendo componentes não operantes.
 
 ## Conclusão
 

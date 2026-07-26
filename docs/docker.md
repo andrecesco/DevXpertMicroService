@@ -51,7 +51,7 @@
 - `docs/CI-CD-PIPELINE.md` - detalhes do pipeline
 - `docs/GITHUB-ACTIONS-SETUP.md` - configuração de secrets
 - `CI-CD-TESTING-GUIDE.md` - validação dos workflows
-- `SECURITY-COMPLIANCE-MATRIX.md` - estado atual de segurança e compliance
+- [SECURITY-COMPLIANCE-MATRIX.md](./SECURITY-COMPLIANCE-MATRIX.md) - estado atual de segurança e compliance
 - `infra/kubernetes/README.md` - base dos manifests e scripts de Kubernetes
 
 **Stack local atual:** 5 APIs + BFF + SQL Server + EventStoreDB + observabilidade.
@@ -666,7 +666,7 @@ Este projeto é parte do programa MBA DevXpert - Módulo 05.
 - 📖 `docs/observability-validation-runbook.md` - validação operacional de health/metrics e manifestos
 
 ### Segurança e compliance
-- 📖 `SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado atual
+- 📖 [SECURITY-COMPLIANCE-MATRIX.md](./SECURITY-COMPLIANCE-MATRIX.md) - resumo do estado atual
 
 ---
 
@@ -685,3 +685,4 @@ Para dúvidas ou problemas:
 **Última atualização:** 2026  
 **Versão:** `3.0.0` (documentação alinhada ao estado atual)  
 **Status:** ✅ Documentação atualizada para o estado real do projeto
+

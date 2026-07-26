@@ -7,19 +7,12 @@
 ```
 .github/
   └── workflows/
-	  ├── ci.yml                    ✓ Build + Test + Lint (develop branch)
-	  ├── cd.yml                    ✓ Docker Hub Push (main branch)
-	  ├── security.yml              ✓ Vulnerability scanning
-	  └── pr.yml                    ✓ PR automation
+	 └── standard.yml               ✓ Build, testes, SonarCloud e Docker Compose
 
 docs/
-  ├── CI-CD-PIPELINE.md            ✓ Documentação completa (2000+ linhas)
-  └── GITHUB-ACTIONS-SETUP.md      ✓ Setup guide com secrets
+  └── ci-cd-testing-guide.md        ✓ Guia de validação do workflow atual
 
-scripts/
-  └── validate-workflows.ps1        ✓ Script de validação
-
-sonar-project.properties            ✓ SonarQube configuration
+sonar-project.properties             ✓ SonarQube configuration
 ```
 
 ---
@@ -35,17 +28,17 @@ sonar-project.properties            ✓ SonarQube configuration
 | 3 | **Security** | Push/PR main/develop + schedule | 20-30m | CodeQL, Trivy, Snyk, SBOM |
 | 4 | **PR** | PR events | 2-5m | Auto-label, Validate commits, Assign reviewers |
 
-### 5 APIs com Matrix Strategy
+### 5 APIs no pipeline atual
 
 ```
-auth-api      (Porta 5000)
-conteudos-api (Porta 5001)
-alunos-api    (Porta 5002)
-pagamentos-api (Porta 5003)
-bff-api       (Porta 5004)
+auth-api
+conteudos-api
+alunos-api
+pagamentos-api
+bff-api
 ```
 
-Cada workflow roda em paralelo para as 5 APIs (matrix strategy).
+O workflow atual valida a solução, os testes e a saúde do Docker Compose sem depender de workflows separados por API.
 
 ---
 
@@ -101,20 +94,16 @@ git push -u origin develop
 GitHub → Settings → Secrets and variables → Actions → New repository secret
 ```
 
-Guia detalhado: [docs/GITHUB-ACTIONS-SETUP.md](../docs/GITHUB-ACTIONS-SETUP.md)
+Guia detalhado: o workflow atual está centralizado em [`.github/workflows/standard.yml`](../.github/workflows/standard.yml)
 
 ### 4. ✅ Branch Protection Rules
 
 ```
 main:
   ✓ Require pull request before merge
-  ✓ Require status checks (ci.yml, cd.yml)
+  ✓ Require status checks (standard.yml)
   ✓ Require branches to be up to date
   ✓ Include administrators
-
-develop:
-  ✓ Require pull request before merge
-  ✓ Require status checks (ci.yml)
 ```
 
 ---

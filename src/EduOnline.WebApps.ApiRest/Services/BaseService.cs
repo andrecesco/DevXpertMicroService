@@ -21,9 +21,9 @@ public abstract class BaseService
     {
         var json = await response.Content.ReadAsStringAsync();
 
-        if (json == string.Empty) throw new Exception("O response está com o body vazio!");
+        if (json == string.Empty) throw new InvalidOperationException("O response está com o body vazio!");
 
-        return JsonSerializer.Deserialize<T>(json, _options);
+        return JsonSerializer.Deserialize<T>(json, _options)!;
     }
 
     protected static async Task<ResponseResult> ProcessarResposta(HttpResponseMessage response, string mensagemNotFound)
@@ -87,7 +87,7 @@ public abstract class BaseService
 
         var temId = Guid.TryParse(response.Headers.Location.Segments.LastOrDefault(), out var id);
 
-        if (!temId) throw new Exception("O id de cadastro não foi retornado");
+        if (!temId) throw new InvalidOperationException("O id de cadastro não foi retornado");
 
         return id;
     }

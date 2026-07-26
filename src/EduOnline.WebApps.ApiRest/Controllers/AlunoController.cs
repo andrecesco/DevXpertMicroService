@@ -103,6 +103,9 @@ public class AlunoController(IAlunoService alunoService, IConteudoService conteu
         if (id != user.GetUserId() && !user.IsInRole("Administrador"))
             return Forbid();
 
+        if (!request.DataNascimento.HasValue)
+            return BadRequest("DataNascimento é obrigatória");
+
         var response = await alunoService.AtualizarAluno(id, request);
         return response.Success ? NoContent() : RespostaErro(response);
     }
@@ -117,7 +120,10 @@ public class AlunoController(IAlunoService alunoService, IConteudoService conteu
         if (id != user.GetUserId() && !user.IsInRole("Administrador"))
             return Forbid();
 
-        var cursoResponse = await conteudoService.ObterCursoPorId(request.CursoId);
+        if (!request.CursoId.HasValue)
+            return BadRequest("CursoId é obrigatório");
+
+        var cursoResponse = await conteudoService.ObterCursoPorId(request.CursoId.Value);
 
         if (!cursoResponse.Success)
             return RespostaErro(cursoResponse);

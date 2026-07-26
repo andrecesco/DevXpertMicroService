@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace EduOnline.Core.Api.Extensions;
 
@@ -27,14 +28,9 @@ public class HttpClientAuthorizationDelegatingHandler(IHttpContextAccessor httpC
                 request.Headers.TryAddWithoutValidation("Authorization", authorizationValues.ToArray());
             }
 
-            foreach (var header in currentRequestHeaders)
+            foreach (var header in currentRequestHeaders.Where(header => !string.IsNullOrEmpty(header.Key) && !headersToIgnore.Contains(header.Key) && !request.Headers.Contains(header.Key)))
             {
-                if (!string.IsNullOrEmpty(header.Key) &&
-                    !headersToIgnore.Contains(header.Key) &&
-                    !request.Headers.Contains(header.Key))
-                {
-                    request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToString());
-                }
+                request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToString());
             }
         }
 

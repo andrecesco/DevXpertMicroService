@@ -35,7 +35,7 @@ public static class CorsExtensions
                 }
 
                 policy
-                    .SetIsOriginAllowed(_ => false)
+                    .AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             });

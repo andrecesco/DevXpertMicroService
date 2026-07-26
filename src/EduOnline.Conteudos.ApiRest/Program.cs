@@ -49,4 +49,4 @@ app.UseApiHealthChecks();
 
 app.UseDbMigrationHelper();
 
-app.Run();
+await app.RunAsync();

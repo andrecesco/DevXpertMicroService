@@ -127,6 +127,31 @@ jobs:
           fi
         done
 
+    - name: Consolidar cobertura e aplicar gate progressivo
+      shell: bash
+      run: |
+        set -euo pipefail
+        dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.10
+        export PATH="$PATH:$HOME/.dotnet/tools"
+
+        reportgenerator \
+          -reports:"**/TestResults/**/coverage.opencover.xml" \
+          -targetdir:"TestResults/CoverageSummary" \
+          -reporttypes:"TextSummary"
+
+        cat TestResults/CoverageSummary/Summary.txt
+
+        branch_coverage=$(grep -E "Branch coverage:" TestResults/CoverageSummary/Summary.txt | sed -E 's/.*Branch coverage: ([0-9.]+)%.*/\1/')
+        threshold=27.0
+
+        echo "Branch coverage atual: ${branch_coverage}%"
+        echo "Threshold progressivo: ${threshold}%"
+
+        awk -v actual="$branch_coverage" -v min="$threshold" 'BEGIN { if (actual + 0 < min + 0) exit 1 }' || {
+          echo "Cobertura de branches abaixo do threshold progressivo."
+          exit 1
+        }
+
     - name: Smoke de Observabilidade (HealthChecks)
       run: >
         dotnet test EduOnline.slnx --configuration Release --no-build

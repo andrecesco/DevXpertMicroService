@@ -7,6 +7,8 @@ resources:
   - namespace.yaml
   - configmap.yaml
   - secrets.yaml
+  - configmaps/observability-configmap.yaml
+  - secrets/observability-secret.yaml
   - pv-pvc.yaml
   - statefulsets/sqlserver-statefulset.yaml
   - statefulsets/eventstore-statefulset.yaml
@@ -37,3 +39,24 @@ resources:
   - hpa/pagamentos-api-hpa.yaml
   - hpa/bff-api-hpa.yaml
   - rbac/serviceaccount.yaml
+  - observability/otel-collector/configmap.yaml
+  - observability/otel-collector/deployment.yaml
+  - observability/otel-collector/service.yaml
+  - observability/jaeger/configmap.yaml
+  - observability/jaeger/deployment.yaml
+  - observability/jaeger/rbac.yaml
+  - observability/jaeger/service.yaml
+  - observability/alertmanager/configmap.yaml
+  - observability/alertmanager/deployment.yaml
+  - observability/alertmanager/rbac.yaml
+  - observability/alertmanager/service.yaml
+  - observability/elasticsearch/deployment.yaml
+  - observability/elasticsearch/kibana-configmap.yaml
+  - observability/elasticsearch/kibana-deployment.yaml
+  - observability/elasticsearch/kibana-rbac.yaml
+  - observability/elasticsearch/kibana-service.yaml
+  - observability/elasticsearch/rbac.yaml
+  - observability/elasticsearch/service.yaml
+  - observability/fluentd/configmap.yaml
+  - observability/fluentd/daemonset.yaml
+  - observability/fluentd/rbac.yaml

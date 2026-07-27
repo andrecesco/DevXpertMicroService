@@ -29,6 +29,6 @@ This folder contains the Kubernetes base manifests for the EduOnline platform.
 ```
 
 ## Notes
-- `kubectl apply -k infra/kubernetes` applies the simplified base manifest set. The observability and security directories remain available as reference bundles for experiments and local validation, but they are not part of the default composition anymore.
+- `kubectl apply -k infra/kubernetes` applies the base manifest set, including the observability bundle required for the current CI validation. The security directories remain available as reference bundles for experiments and local validation.
 - The SQL Server data volume uses a local hostPath so it works on Kind and Minikube.
 - The manifests assume the current services keep their existing HTTP health endpoints under `/health`.

@@ -6,6 +6,7 @@ using EduOnline.Alunos.Application.Queries;
 using EduOnline.Alunos.Application.Queries.Dtos;
 using EduOnline.Core.Communication.Mediator;
 using EduOnline.Core.ControleDeAcesso;
+using EduOnline.Core.DomainObjects;
 using EduOnline.Core.Mensagens;
 using EduOnline.Core.Mensagens.Notifications;
 using Microsoft.AspNetCore.Http;
@@ -274,6 +275,97 @@ public class AlunoControllerTest
         var result = await controller.FinalizarCurso(userId, Guid.NewGuid());
 
         Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
+    public async Task ObterTodos_QuandoLancaDomainException_DeveRetornarBadRequest()
+    {
+        var query = new Mock<IAlunoQuery>();
+        query.Setup(q => q.ObterTodos()).ThrowsAsync(new DomainException("falha de domínio"));
+        var controller = CriarController(alunoQuery: query.Object);
+
+        var result = await controller.ObterTodos();
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Cadastrar_QuandoMediatorRetornaFalse_DeveRetornarOk()
+    {
+        var mediator = new Mock<IMediatorHandler>();
+        mediator.Setup(m => m.EnviarComando(It.IsAny<Command>())).ReturnsAsync(false);
+        var controller = CriarController(mediatorHandler: mediator.Object);
+
+        var result = await controller.Cadastrar(Guid.NewGuid(),
+            new AdicionarAlunoRequest { Nome = "Aluno Teste", Email = "aluno@teste.com" });
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Cadastrar_QuandoLancaDomainException_DeveRetornarBadRequest()
+    {
+        var mediator = new Mock<IMediatorHandler>();
+        mediator.Setup(m => m.EnviarComando(It.IsAny<Command>())).ThrowsAsync(new DomainException("erro de domínio"));
+        var controller = CriarController(mediatorHandler: mediator.Object);
+
+        var result = await controller.Cadastrar(Guid.NewGuid(),
+            new AdicionarAlunoRequest { Nome = "Aluno Teste", Email = "aluno@teste.com" });
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task AtualizarAluno_QuandoMediatorRetornaFalse_DeveRetornarOk()
+    {
+        var userId = Guid.NewGuid();
+        var mediator = new Mock<IMediatorHandler>();
+        mediator.Setup(m => m.EnviarComando(It.IsAny<Command>())).ReturnsAsync(false);
+        var controller = CriarController(mediatorHandler: mediator.Object, user: new FakeAspNetUser(userId));
+
+        var result = await controller.AtualizarAluno(userId,
+            new AtualizarAlunoRequest { Nome = "Novo Nome", DataNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-20)) });
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task MatricularAluno_QuandoMediatorRetornaFalse_DeveRetornarOk()
+    {
+        var userId = Guid.NewGuid();
+        var mediator = new Mock<IMediatorHandler>();
+        mediator.Setup(m => m.EnviarComando(It.IsAny<Command>())).ReturnsAsync(false);
+        var controller = CriarController(mediatorHandler: mediator.Object, user: new FakeAspNetUser(userId));
+
+        var result = await controller.MatricularAluno(userId, new AdicionarMatriculaRequest());
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task AtualizarProgressoCurso_QuandoMediatorRetornaFalse_DeveRetornarOk()
+    {
+        var userId = Guid.NewGuid();
+        var mediator = new Mock<IMediatorHandler>();
+        mediator.Setup(m => m.EnviarComando(It.IsAny<Command>())).ReturnsAsync(false);
+        var controller = CriarController(mediatorHandler: mediator.Object, user: new FakeAspNetUser(userId));
+
+        var result = await controller.AtualizarProgressoCurso(userId, Guid.NewGuid(), Guid.NewGuid());
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task FinalizarCurso_QuandoMediatorRetornaFalse_DeveRetornarOk()
+    {
+        var userId = Guid.NewGuid();
+        var mediator = new Mock<IMediatorHandler>();
+        mediator.Setup(m => m.EnviarComando(It.IsAny<Command>())).ReturnsAsync(false);
+        var controller = CriarController(mediatorHandler: mediator.Object, user: new FakeAspNetUser(userId));
+
+        var result = await controller.FinalizarCurso(userId, Guid.NewGuid());
+
+        Assert.IsType<OkObjectResult>(result);
     }
 
     private sealed class FakeAspNetUser(Guid userId, bool isAdmin = false) : IAspNetUser

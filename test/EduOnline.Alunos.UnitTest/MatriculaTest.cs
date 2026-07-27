@@ -125,9 +125,10 @@ public class MatriculaTest
         // Arrange
         var matriculaFaker = GerarMatricula();
         var matricula = matriculaFaker.Generate();
+        var validadePassada = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
         // Act
-        var exception = Assert.Throws<DomainException>(() => matricula.AlterarValidade(new Faker().Date.PastDateOnly()));
+        var exception = Assert.Throws<DomainException>(() => matricula.AlterarValidade(validadePassada));
         // Assert
         Assert.Equal("O campo Validade deve ser maior ou igual a data atual", exception.Message);
     }

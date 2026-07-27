@@ -7,8 +7,9 @@ This folder contains the Kubernetes base manifests for the EduOnline platform.
 - SQL Server persistent volume and claim
 - Runtime dependencies for the current services
 - API deployments and services
-- Observability templates and OpenTelemetry Collector resources
-- Ingress, network policies, RBAC, and HPAs
+- Core ingress, network policies, RBAC, and HPAs
+- Complementary observability templates and OpenTelemetry Collector resources
+- Complementary security manifests and bootstrap artifacts
 - Local setup scripts for Kind and Minikube
 
 ## Local setup
@@ -28,6 +29,6 @@ This folder contains the Kubernetes base manifests for the EduOnline platform.
 ```
 
 ## Notes
-- `kubectl apply -k infra/kubernetes` applies the full manifest set, including the OpenTelemetry Collector, Jaeger, Alertmanager, Elasticsearch, Fluentd, and security workloads under `infra/kubernetes/observability/` and `infra/kubernetes/security/`.
+- `kubectl apply -k infra/kubernetes` applies the simplified base manifest set. The observability and security directories remain available as reference bundles for experiments and local validation, but they are not part of the default composition anymore.
 - The SQL Server data volume uses a local hostPath so it works on Kind and Minikube.
 - The manifests assume the current services keep their existing HTTP health endpoints under `/health`.

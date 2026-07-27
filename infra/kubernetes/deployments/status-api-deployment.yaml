@@ -39,8 +39,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: eduonline-config
-            - configMapRef:
-                name: eduonline-observability
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production

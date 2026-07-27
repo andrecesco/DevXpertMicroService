@@ -60,4 +60,3 @@ resources:
   - observability/fluentd/configmap.yaml
   - observability/fluentd/daemonset.yaml
   - observability/fluentd/rbac.yaml
-  - security

@@ -1,4 +1,6 @@
-# Arquitetura EduOnline - Kubernetes Observabilidade e Segurança
+# Arquitetura EduOnline - referência de plataforma para Kubernetes
+
+Este documento descreve a solução como uma arquitetura de referência. O núcleo do escopo fica concentrado nas aplicações, no banco e nos health checks; observabilidade e segurança aparecem aqui como camadas complementares da plataforma, não como exigência mínima para validar o enunciado.
 
 ## 📐 Visão Geral da Arquitetura
 
@@ -44,9 +46,9 @@
 │  │  └────────────────┘  └────────────┘  └──────────────┘  │   │
 │  └──────────────────────────────────────────────────────────┘  │
 │          ↓                                                       │
-│  ┌──────────────────────── Segurança ────────────────────────┐  │
+│  ┌──────────────────── Segurança complementar ──────────────┐  │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │  │
-│  │  │   Vault      │  │  RBAC/PSP    │  │  Network      │  │  │
+│  │  │   Vault      │  │  RBAC/PSA    │  │  Network      │  │  │
 │  │  │   (8200)     │  │   Policies   │  │  Policies     │  │  │
 │  │  └──────────────┘  └──────────────┘  └───────────────┘  │  │
 │  │       ↓                   ↓                  ↓             │  │
@@ -72,7 +74,7 @@
 **Database**:
 - **SQL Server** (1433): Banco de dados relacional
 
-### 2. Observabilidade
+### 2. Observabilidade (camada complementar)
 
 #### Métricas (Prometheus)
 - **Prometheus** (9090)
@@ -111,7 +113,7 @@
   - 50% sampling para APIs
   - All-in-one deployment
 
-### 3. Segurança
+### 3. Segurança (camada complementar)
 
 #### Gerenciamento de Secrets
 - **Vault** (8200)
@@ -120,14 +122,14 @@
   - 6 Policies (5 APIs + admin)
   - 10Gi storage
 
-#### Controle de Acesso
+#### Controle de Acesso e Segurança de Pods
 - **RBAC**
   - 5 ServiceAccounts (1 por API)
   - 3 Roles (API, Admin, Developer)
   - Least privilege principle
-- **Pod Security Policies**
-  - Restricted: máxima segurança
-  - Baseline: compatibilidade
+- **Pod Security Admission**
+  - Restricted: perfil padrão do namespace
+  - Baseline: referência de compatibilidade local
 
 #### Políticas de Rede
 - **Network Policies** (5 policies)
@@ -335,9 +337,6 @@ Storage: 60Gi (PVCs)
 ### Bottlenecks e Soluções
 | Bottleneck | Causa | Solução |
 |-----------|-------|---------|
-| Prometheus storage | 30d retention | Aumentar storage ou usar remote storage |
-| Elasticsearch disk | Log volume | Índice rotation automática |
-| Network I/O | Pod-to-pod chatter | Service mesh (Istio) |
 | API latency | Database queries | Query optimization, caching |
 
 ## 🔄 Fluxo de Deployment
@@ -347,37 +346,34 @@ Storage: 60Gi (PVCs)
 kubectl create namespace eduonline
 ```
 
-### 2. Aplicar RBAC
+### 2. Aplicar a base simplificada
+```bash
+kubectl apply -k infra/kubernetes
+```
+
+### 3. Validar o núcleo funcional
+```bash
+kubectl rollout status deployment/auth-api -n eduonline
+kubectl rollout status deployment/conteudos-api -n eduonline
+kubectl rollout status deployment/alunos-api -n eduonline
+kubectl rollout status deployment/pagamentos-api -n eduonline
+kubectl rollout status deployment/bff-api -n eduonline
+kubectl rollout status deployment/status-api -n eduonline
+```
+
+### 4. Aplicar bundles de referência apenas se necessário
 ```bash
 kubectl apply -f infra/security/rbac/
-```
-
-### 3. Aplicar Network Policies
-```bash
 kubectl apply -f infra/security/network-policies/
-```
-
-### 4. Aplicar Observabilidade
-```bash
 kubectl apply -f infra/observability/prometheus/
 kubectl apply -f infra/observability/grafana/
 kubectl apply -f infra/observability/alertmanager/
 kubectl apply -f infra/observability/elasticsearch/
 kubectl apply -f infra/observability/fluentd/
 kubectl apply -f infra/observability/jaeger/
-```
-
-### 5. Aplicar Segurança
-```bash
 kubectl apply -f infra/security/vault/
 kubectl apply -f infra/security/tls/
 kubectl apply -f infra/security/audit/
-```
-
-### 6. Validar
-```bash
-./infra/observability/validate-stack.sh
-./infra/security/security-test.sh
 ```
 
 ## 📚 Referências

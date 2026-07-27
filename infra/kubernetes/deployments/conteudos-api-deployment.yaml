@@ -39,8 +39,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: eduonline-config
-            - configMapRef:
-                name: eduonline-observability
             - secretRef:
                 name: eduonline-secrets
           env:
@@ -50,8 +48,6 @@ spec:
               value: http://+:5001
             - name: ASPNETCORE_HTTP_PORTS
               value: "5001"
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://jaeger:4317"
             - name: ConnectionStrings__DefaultConnection
               valueFrom:
                 secretKeyRef:

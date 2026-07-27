@@ -9,6 +9,7 @@ Garantir evidência executável para:
 - Health checks (`/health`, `/health/ready`, `/health/live`)
 - Exposição de métricas (`/metrics`)
 - Presença dos recursos de observabilidade no Kubernetes (`OTEL Collector`, `Jaeger`, `Alertmanager`, `Elasticsearch`, `Fluentd`)
+- Configuração mínima de traces (pipeline OTLP -> Jaeger) e alertas (rotas/receivers do Alertmanager)
 
 ## 2. Validação no CI (GitHub Actions)
 
@@ -16,8 +17,11 @@ No workflow principal (`.github/workflows/standard.yml`), a validação ocorre c
 
 1. **Smoke de Observabilidade (HealthChecks)**
    - Executa testes de integração filtrados por `HealthChecksIntegrationTest`.
-2. **Validar manifestos de observabilidade do Kubernetes**
+2. **Validar manifestos e sinais mínimos de observabilidade**
    - Executa `./scripts/validate-observability.ps1`.
+   - Valida presença dos recursos no `kustomization.yaml`.
+   - Valida pipeline de traces no OTEL Collector (OTLP com exportação para Jaeger).
+   - Valida configuração de rotas e receivers no Alertmanager.
 
 ### Critério de sucesso no CI
 

@@ -212,7 +212,11 @@ public class AlunoControllerTest
         var user = new FakeAspNetUser(userId);
 
         var result = await CriarController(alunoService.Object, conteudoService.Object, user)
-            .AtualizarAluno(userId, new AtualizarAlunoRequest());
+            .AtualizarAluno(userId, new AtualizarAlunoRequest
+            {
+                Nome = "Aluno Teste",
+                DataNascimento = DateOnly.FromDateTime(DateTime.Today)
+            });
 
         result.Should().BeOfType<NoContentResult>();
     }
@@ -228,7 +232,11 @@ public class AlunoControllerTest
         var user = new FakeAspNetUser(userId);
 
         var result = await CriarController(alunoService.Object, conteudoService.Object, user)
-            .AtualizarAluno(userId, new AtualizarAlunoRequest());
+            .AtualizarAluno(userId, new AtualizarAlunoRequest
+            {
+                Nome = "Aluno Teste",
+                DataNascimento = DateOnly.FromDateTime(DateTime.Today)
+            });
 
         result.Should().BeOfType<BadRequestObjectResult>();
     }

@@ -48,9 +48,8 @@
 ### 📚 Documentação útil
 
 - `README.md` - visão geral e instruções de execução
-- `docs/CI-CD-PIPELINE.md` - detalhes do pipeline
-- `docs/GITHUB-ACTIONS-SETUP.md` - configuração de secrets
-- `CI-CD-TESTING-GUIDE.md` - validação dos workflows
+- `docs/ci-cd-testing-guide.md` - validação do workflow atual
+- `.github/workflows/standard.yml` - pipeline CI/CD atual
 - [SECURITY-COMPLIANCE-MATRIX.md](./SECURITY-COMPLIANCE-MATRIX.md) - estado atual de segurança e compliance
 - `infra/kubernetes/README.md` - base dos manifests e scripts de Kubernetes
 

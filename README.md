@@ -205,9 +205,7 @@ Após o container estiver rodando é possível acessar através do link http://l
 - `test/` - testes unitários e de integração
 - `docs/` - documentação complementar:
   - `docs/docker.md` - guia detalhado do ambiente Docker e Docker Compose
-  - `docs/ci-cd-testing-guide.md` - validação e testes dos workflows de CI/CD
-  - `docs/CI-CD-PIPELINE.md` - documentação completa do pipeline
-  - `docs/GITHUB-ACTIONS-SETUP.md` - configuração de secrets e workflows
+  - `docs/ci-cd-testing-guide.md` - validação e testes do workflow de CI/CD atual
   - `docs/projeto-mod05.md` - brief de requisitos e critérios de avaliação do módulo
   - `docs/observability-validation-runbook.md` - checklist operacional de validação de resiliência e observabilidade
   - `infra/kubernetes/` - manifests e guias da infraestrutura local em Kubernetes

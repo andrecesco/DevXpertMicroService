@@ -7,6 +7,8 @@ namespace EduOnline.Pagamentos.Data;
 
 public class PagamentoRepository(PagamentosContext context) : IPagamentoRepository
 {
+    private bool disposed;
+
     public IUnitOfWork UnitOfWork => context;
 
     public async Task<Pagamento?> ObterPorIdAsync(Guid id)
@@ -62,7 +64,22 @@ public class PagamentoRepository(PagamentosContext context) : IPagamentoReposito
 
     public void Dispose()
     {
-        context.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            context.Dispose();
+        }
+
+        disposed = true;
     }
 }

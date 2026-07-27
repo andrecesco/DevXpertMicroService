@@ -7,13 +7,13 @@ namespace EduOnline.WebApps.ApiRest.Models;
 public class RealizarPagamentoRequest
 {
     [Required]
-    public Guid MatriculaId { get; set; }
+    public Guid? MatriculaId { get; set; }
 
     [Required]
-    public Guid CursoId { get; set; }
+    public Guid? CursoId { get; set; }
 
     [Required]
-    public decimal Total { get; set; }
+    public decimal? Total { get; set; }
 
     [Required]
     public string NomeCartao { get; set; }

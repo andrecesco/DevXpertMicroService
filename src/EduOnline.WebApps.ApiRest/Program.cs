@@ -45,7 +45,7 @@ app.UseApiHealthChecks();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
 
 [ExcludeFromCodeCoverage]
 public partial class Program

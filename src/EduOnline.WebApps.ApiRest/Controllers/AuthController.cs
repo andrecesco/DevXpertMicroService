@@ -30,7 +30,7 @@ public class AuthController(IAuthService authService, INotificador notificador, 
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> CriarUsuario(CriarUsuarioRequest request)
     {
-        var responseAuth = await authService.CriarUsuarioIdentity(request) ?? throw new Exception("Ocorreu um erro ao se comunicar com a api de autenticação");
+        var responseAuth = await authService.CriarUsuarioIdentity(request) ?? throw new InvalidOperationException("Ocorreu um erro ao se comunicar com a api de autenticação");
 
         if (!responseAuth.Success) return BadRequest(responseAuth);
 

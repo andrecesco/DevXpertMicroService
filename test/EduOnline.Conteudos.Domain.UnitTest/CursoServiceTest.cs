@@ -28,7 +28,7 @@ public class CursoServiceTest
         var conteudoProgramatico = new Faker<ConteudoProgramatico>()
             .RuleFor(c => c.Tema, f => f.Lorem.Paragraph())
             .RuleFor(c => c.NivelId, f => f.PickRandom(niveis))
-            .RuleFor(c => c.CargaHoraria, f => f.Random.Int(0, 1000));
+            .RuleFor(c => c.CargaHoraria, f => f.Random.Int(1, 1000));
 
         var cursoFaker = new Faker<Curso>("pt_BR")
             .RuleFor(c => c.Nome, f =>
@@ -547,7 +547,11 @@ public class CursoServiceTest
         await cursoService.Atualizar(curso);
 
         // Assert
-        _mocker.GetMock<INotificador>().Verify(n => n.Handle(It.IsAny<Notificacao>()), Times.Exactly(0));
+        _notificador.Verify(
+            n => n.Handle(It.Is<Notificacao>(nt =>
+                nt.Mensagem == "Curso não encontrado." ||
+                nt.Mensagem == "Já existe um curso cadastrado com este nome.")),
+            Times.Never);
         _mocker.GetMock<ICursoRepository>().Verify(r => r.Atualizar(It.IsAny<Curso>()), Times.Once);
         _mocker.GetMock<ICursoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
     }

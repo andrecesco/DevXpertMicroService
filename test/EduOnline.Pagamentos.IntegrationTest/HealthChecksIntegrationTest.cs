@@ -32,6 +32,15 @@ public class HealthChecksIntegrationTest
         response.Headers.Contains(CorrelationIdMiddleware.HeaderName).Should().BeTrue();
     }
 
+    [Fact(DisplayName = "GET /health/live deve retornar 200 na Pagamentos API")]
+    public async Task HealthLive_DeveRetornar200()
+    {
+        var response = await _client.GetAsync("/health/live", TestContext.Current.CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.Contains(CorrelationIdMiddleware.HeaderName).Should().BeTrue();
+    }
+
     [Fact(DisplayName = "GET /metrics deve retornar métricas na Pagamentos API")]
     public async Task Metrics_DeveRetornar200()
     {

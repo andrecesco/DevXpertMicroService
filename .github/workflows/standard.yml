@@ -99,8 +99,8 @@ jobs:
     - name: Restaurar dependências e Build da Solução
       run: dotnet build EduOnline.slnx --configuration Release
 
-    - name: Corrigir formatação automaticamente
-      run: dotnet format EduOnline.slnx --no-restore
+    - name: Validar formatação (whitespace)
+      run: dotnet format whitespace EduOnline.slnx --no-restore --verify-no-changes
 
     - name: Executar Testes de Unidade
       shell: bash
@@ -115,7 +115,6 @@ jobs:
         done
 
     - name: Executar Testes de Integração
-      continue-on-error: ${{ github.event_name == 'pull_request' }}
       shell: bash
       run: |
         set -euo pipefail
@@ -162,7 +161,6 @@ jobs:
       run: ./scripts/validate-observability.ps1
 
     - name: Finalizar a análise do SonarCloud
-      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

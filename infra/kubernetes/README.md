@@ -30,7 +30,8 @@ This folder contains the Kubernetes base manifests for the EduOnline platform.
 
 ## Notes
 - `kubectl apply -k infra/kubernetes` applies the base manifest set, including the observability bundle required for the current CI validation.
-- The security directories remain available as **reference bundles** for experiments and local validation.
+- Security complements that are not part of the base flow stay isolated under `infra/kubernetes/security`.
+- Local Docker Compose observability files now live under `infra/compose/observability`.
 - For canonical documentation navigation, use `docs/README.md`.
 - Runtime security status (operante/parcial/não aplicado) is tracked in `docs/SECURITY-COMPLIANCE-MATRIX.md`.
 - The SQL Server data volume uses a local hostPath so it works on Kind and Minikube.

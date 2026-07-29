@@ -42,7 +42,7 @@ metadata:
 nodes:
 - role: control-plane
   extraMounts:
-  - hostPath: $(pwd)/infra/security/audit/audit-policy.yaml
+  - hostPath: $(pwd)/infra/kubernetes/security/audit/audit-policy.yaml
 	containerPath: /etc/kubernetes/audit-policy.yaml
   - hostPath: /tmp/audit-logs
 	containerPath: /var/log/kubernetes
@@ -67,7 +67,7 @@ kind create cluster -f kind-config.yaml
 ```bash
 # Setup
 minikube ssh "mkdir -p /var/log/kubernetes"
-minikube cp infra/security/audit/audit-policy.yaml /etc/kubernetes/audit-policy.yaml
+minikube cp infra/kubernetes/security/audit/audit-policy.yaml /etc/kubernetes/audit-policy.yaml
 
 # Editar API server
 minikube ssh "sudo vi /etc/kubernetes/manifests/kube-apiserver.yaml"

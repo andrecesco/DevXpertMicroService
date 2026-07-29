@@ -28,7 +28,7 @@ echo ""
 echo -e "${YELLOW}Aplicando RBAC para APIs...${NC}"
 for api in auth-api alunos-api conteudos-api pagamentos-api bff-api; do
 	echo "  Aplicando $api..."
-	kubectl apply -f infra/security/rbac/${api}-rbac.yaml -n ${NAMESPACE}
+	kubectl apply -f infra/kubernetes/security/rbac/${api}-rbac.yaml -n ${NAMESPACE}
 done
 
 echo -e "${GREEN}✓ RBAC para APIs aplicado${NC}"
@@ -36,20 +36,17 @@ echo ""
 
 # Apply Admin RBAC
 echo -e "${YELLOW}Aplicando RBAC para Admin...${NC}"
-kubectl apply -f infra/security/rbac/admin-rbac.yaml -n ${NAMESPACE}
+kubectl apply -f infra/kubernetes/security/rbac/admin-rbac.yaml -n ${NAMESPACE}
 echo -e "${GREEN}✓ Admin RBAC aplicado${NC}"
 echo ""
 
 # Apply Developer RBAC
 echo -e "${YELLOW}Aplicando RBAC para Developer...${NC}"
-kubectl apply -f infra/security/rbac/developer-rbac.yaml -n ${NAMESPACE}
+kubectl apply -f infra/kubernetes/security/rbac/developer-rbac.yaml -n ${NAMESPACE}
 echo -e "${GREEN}✓ Developer RBAC aplicado${NC}"
 echo ""
 
-# Apply Pod Security Policies
-echo -e "${YELLOW}Aplicando Pod Security Policies...${NC}"
-kubectl apply -f infra/security/rbac/pod-security-policies.yaml -n ${NAMESPACE}
-echo -e "${GREEN}✓ Pod Security Policies aplicadas${NC}"
+echo -e "${GREEN}✓ RBAC alinhado ao bundle atual (sem PodSecurityPolicy legada)${NC}"
 echo ""
 
 # Verify ServiceAccounts
@@ -65,11 +62,6 @@ echo ""
 # Verify RoleBindings
 echo -e "${YELLOW}Verificando RoleBindings...${NC}"
 kubectl get rolebindings -n ${NAMESPACE}
-echo ""
-
-# Verify PSPs
-echo -e "${YELLOW}Verificando Pod Security Policies...${NC}"
-kubectl get psp -n ${NAMESPACE} 2>/dev/null || echo "  (PSP pode não ser disponível em K8s >= 1.25)"
 echo ""
 
 echo -e "${GREEN}✓ RBAC roles e bindings aplicados com sucesso!${NC}"

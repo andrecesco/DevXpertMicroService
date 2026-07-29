@@ -44,16 +44,7 @@ foreach ($image in $images) {
 }
 
 # ---------------------------------------------------------------------------
-# 4. Instalar CRDs de cert-manager e external-secrets (necessários para TLS e Vault)
-# ---------------------------------------------------------------------------
-Write-Host "Instalando CRDs do cert-manager..." -ForegroundColor Cyan
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.crds.yaml
-
-Write-Host "Instalando CRDs do external-secrets-operator..." -ForegroundColor Cyan
-kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/v0.9.13/deploy/crds/bundle.yaml
-
-# ---------------------------------------------------------------------------
-# 5. Aplicar os manifestos Kubernetes
+# 4. Aplicar os manifestos Kubernetes
 # ---------------------------------------------------------------------------
 Write-Host "Aplicando manifestos Kubernetes com tag '$ImageTag'..." -ForegroundColor Cyan
 & (Join-Path $PSScriptRoot 'apply.ps1') -Namespace 'eduonline' -ImageTag $ImageTag -SkipWait

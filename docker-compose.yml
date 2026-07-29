@@ -92,7 +92,7 @@ services:
     ports:
       - "4317:4317"
     volumes:
-      - ./infra/observability/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+      - ./infra/compose/observability/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
     command: ["--config=/etc/otel-collector-config.yaml"]
     networks:
       - eduonline-network
@@ -116,7 +116,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./infra/observability/prometheus/prometheus-local.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/compose/observability/prometheus-local.yml:/etc/prometheus/prometheus.yml:ro
     networks:
       - eduonline-network
     restart: on-failure   

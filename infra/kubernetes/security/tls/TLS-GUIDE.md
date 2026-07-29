@@ -18,8 +18,8 @@ Implementação de TLS (Transport Layer Security) e mTLS (mutual TLS) para comun
 
 ### Gerar certificados
 ```bash
-chmod +x infra/security/tls/generate-certs.sh
-./infra/security/tls/generate-certs.sh
+chmod +x infra/kubernetes/security/tls/generate-certs.sh
+./infra/kubernetes/security/tls/generate-certs.sh
 ```
 
 Isso irá gerar:
@@ -29,8 +29,8 @@ Isso irá gerar:
 
 ### Criar Kubernetes Secrets
 ```bash
-chmod +x infra/security/tls/create-tls-secrets.sh
-./infra/security/tls/create-tls-secrets.sh
+chmod +x infra/kubernetes/security/tls/create-tls-secrets.sh
+./infra/kubernetes/security/tls/create-tls-secrets.sh
 ```
 
 Isso irá criar:
@@ -46,7 +46,7 @@ Isso irá criar:
 
 ### Aplicar Ingress com TLS
 ```bash
-kubectl apply -f infra/security/tls/ingress-tls.yaml
+kubectl apply -f infra/kubernetes/security/tls/ingress-tls.yaml
 ```
 
 ### Testar HTTPS

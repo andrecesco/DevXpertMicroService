@@ -28,4 +28,4 @@ foreach ($image in $images) {
     minikube image load $image
 }
 
-& (Join-Path $PSScriptRoot 'apply.ps1') -Namespace 'eduonline' -ImageTag $ImageTag
+& (Join-Path $PSScriptRoot 'apply.ps1') -Namespace 'eduonline' -ImageTag $ImageTag -SkipWait

@@ -1,6 +1,7 @@
 param(
 	[string]$Namespace = 'eduonline',
-	[string]$ImageTag = 'latest'
+	[string]$ImageTag = 'latest',
+	[switch]$SkipWait
 )
 
 Set-StrictMode -Version Latest
@@ -22,4 +23,6 @@ foreach ($deployment in $deploymentImages.Keys) {
 	kubectl set image "deployment/$deployment" "$deployment=$image" -n $Namespace
 }
 
-kubectl wait --for=condition=available deployment --all -n $Namespace --timeout=600s
+if (-not $SkipWait) {
+	kubectl wait --for=condition=available deployment --all -n $Namespace --timeout=600s
+}

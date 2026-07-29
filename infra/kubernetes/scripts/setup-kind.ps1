@@ -56,6 +56,6 @@ kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-sec
 # 5. Aplicar os manifestos Kubernetes
 # ---------------------------------------------------------------------------
 Write-Host "Aplicando manifestos Kubernetes com tag '$ImageTag'..." -ForegroundColor Cyan
-& (Join-Path $PSScriptRoot 'apply.ps1') -Namespace 'eduonline' -ImageTag $ImageTag
+& (Join-Path $PSScriptRoot 'apply.ps1') -Namespace 'eduonline' -ImageTag $ImageTag -SkipWait
 
 Write-Host "Setup concluído." -ForegroundColor Green

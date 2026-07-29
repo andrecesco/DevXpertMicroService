@@ -203,13 +203,13 @@ Após o container estiver rodando é possível acessar através do link http://l
 
 - `src/` - APIs, domínios, dados, aplicação, core e BFF
 - `test/` - testes unitários e de integração
-- `docs/` - documentação complementar:
-  - `docs/docker.md` - guia detalhado do ambiente Docker e Docker Compose
-  - `docs/ci-cd-testing-guide.md` - validação e testes do workflow de CI/CD atual
-  - `docs/projeto-mod05.md` - brief de requisitos e critérios de avaliação do módulo
-  - `docs/observability-validation-runbook.md` - checklist operacional de validação de resiliência e observabilidade
-  - `infra/kubernetes/` - manifests e guias da infraestrutura local em Kubernetes
-- `infra/kubernetes/README.md` - guia complementar com foco nos manifests Kubernetes
+- `docs/README.md` - **índice canônico da documentação** (ponto de entrada recomendado)
+- `docs/docker.md` - guia detalhado do ambiente Docker e Docker Compose
+- `docs/ci-cd-testing-guide.md` - validação e testes do workflow de CI/CD atual
+- `docs/projeto-mod05.md` - brief de requisitos e critérios de avaliação do módulo
+- `docs/observability-validation-runbook.md` - checklist operacional de validação de resiliência e observabilidade
 - `docs/SECURITY-COMPLIANCE-MATRIX.md` - resumo do estado de segurança e compliance
+- `infra/ARCHITECTURE.md` - arquitetura de referência da plataforma
+- `infra/kubernetes/README.md` - guia complementar com foco nos manifests Kubernetes
 - `FEEDBACK.md` - histórico de feedbacks e correções aplicadas
 

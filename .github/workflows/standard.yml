@@ -220,6 +220,7 @@ jobs:
     env:
       IMAGE_TAG: ${{ github.sha }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD }}
 
     steps:
     - name: Checkout do código

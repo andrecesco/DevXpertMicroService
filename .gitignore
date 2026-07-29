@@ -93,6 +93,7 @@ StyleCopReport.xml
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
+.tmp-compose-rendered.yml
 *.log
 *.vspscc
 *.vssscc

@@ -236,7 +236,31 @@ jobs:
       run: docker compose pull
 
     - name: Subir o Docker Compose completo
-      run: docker compose up -d
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        docker compose up -d || true
+
+        for i in {1..36}; do
+          status=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' eduonline-sqlserver 2>/dev/null || echo missing)
+          echo "Status health sqlserver: $status (tentativa $i/36)"
+
+          if [[ "$status" == "healthy" ]]; then
+            break
+          fi
+
+          sleep 5
+        done
+
+        final_status=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' eduonline-sqlserver 2>/dev/null || echo missing)
+        if [[ "$final_status" != "healthy" ]]; then
+          docker compose ps
+          docker logs eduonline-sqlserver --tail 200 || true
+          exit 1
+        fi
+
+        docker compose up -d
 
     - name: Verificar saúde dos serviços do Docker Compose
       shell: pwsh

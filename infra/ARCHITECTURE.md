@@ -361,19 +361,9 @@ kubectl rollout status deployment/bff-api -n eduonline
 kubectl rollout status deployment/status-api -n eduonline
 ```
 
-### 4. Aplicar bundles de referência apenas se necessário
+### 4. Aplicar bundles complementares apenas se necessário
 ```bash
-kubectl apply -f infra/security/rbac/
-kubectl apply -f infra/security/network-policies/
-kubectl apply -f infra/observability/prometheus/
-kubectl apply -f infra/observability/grafana/
-kubectl apply -f infra/observability/alertmanager/
-kubectl apply -f infra/observability/elasticsearch/
-kubectl apply -f infra/observability/fluentd/
-kubectl apply -f infra/observability/jaeger/
-kubectl apply -f infra/security/vault/
-kubectl apply -f infra/security/tls/
-kubectl apply -f infra/security/audit/
+kubectl apply -k infra/kubernetes/security
 ```
 
 ## 📚 Referências

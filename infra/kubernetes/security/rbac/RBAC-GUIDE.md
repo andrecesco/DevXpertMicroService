@@ -23,25 +23,22 @@ Este guia documenta a estratégia de RBAC implementada no cluster EduOnline Kube
 
 ### 1. Aplicar todos os RBAC
 ```bash
-chmod +x infra/security/rbac/apply-rbac.sh
-./infra/security/rbac/apply-rbac.sh
+chmod +x infra/kubernetes/security/rbac/apply-rbac.sh
+./infra/kubernetes/security/rbac/apply-rbac.sh
 ```
 
 ### 2. Aplicar manualmente
 ```bash
 # APIs
-kubectl apply -f infra/security/rbac/auth-api-rbac.yaml
-kubectl apply -f infra/security/rbac/alunos-api-rbac.yaml
-kubectl apply -f infra/security/rbac/conteudos-api-rbac.yaml
-kubectl apply -f infra/security/rbac/pagamentos-api-rbac.yaml
-kubectl apply -f infra/security/rbac/bff-api-rbac.yaml
+kubectl apply -f infra/kubernetes/security/rbac/auth-api-rbac.yaml
+kubectl apply -f infra/kubernetes/security/rbac/alunos-api-rbac.yaml
+kubectl apply -f infra/kubernetes/security/rbac/conteudos-api-rbac.yaml
+kubectl apply -f infra/kubernetes/security/rbac/pagamentos-api-rbac.yaml
+kubectl apply -f infra/kubernetes/security/rbac/bff-api-rbac.yaml
 
 # Admin e Developer
-kubectl apply -f infra/security/rbac/admin-rbac.yaml
-kubectl apply -f infra/security/rbac/developer-rbac.yaml
-
-# Pod Security Policies
-kubectl apply -f infra/security/rbac/pod-security-policies.yaml
+kubectl apply -f infra/kubernetes/security/rbac/admin-rbac.yaml
+kubectl apply -f infra/kubernetes/security/rbac/developer-rbac.yaml
 ```
 
 ## Verificação

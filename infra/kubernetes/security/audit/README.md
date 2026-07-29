@@ -10,7 +10,7 @@ kind create cluster --name eduonline --config .\infra\kubernetes\security\audit\
 ```
 
 ## Minikube
-Use the instructions in `infra/security/audit/AUDIT-GUIDE.md` or `infra/security/audit/setup-audit.sh` to add the audit policy file and API server flags.
+Use the instructions in `infra/kubernetes/security/audit/AUDIT-GUIDE.md` or `infra/kubernetes/security/audit/setup-audit.sh` to add the audit policy file and API server flags.
 
 ## Notes
 - The audit policy itself is stored in `audit-policy.yaml` and also wrapped as a ConfigMap in the Kubernetes base.

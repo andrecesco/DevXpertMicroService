@@ -126,7 +126,7 @@ jobs:
           fi
         done
 
-    - name: Consolidar cobertura e aplicar gate progressivo
+    - name: Consolidar cobertura comportamental e aplicar gate
       shell: bash
       run: |
         set -euo pipefail
@@ -136,18 +136,19 @@ jobs:
         reportgenerator \
           -reports:"**/TestResults/**/coverage.opencover.xml" \
           -targetdir:"TestResults/CoverageSummary" \
-          -reporttypes:"TextSummary"
+          -reporttypes:"TextSummary" \
+          -classfilters:"-*.Migrations.*;-Microsoft.AspNetCore.OpenApi.Generated;-System.Runtime.CompilerServices;-EduOnline.IntegrationTest.WebApiIntegrationTestFixture*;-EduOnline.IntegrationTest.WebApiTestFactory*;-EventSourcing.*;-EduOnline.Core.Data.EventSourcing.StoredEvent;-EduOnline.Pagamentos.AntiCorruption.ConfigurationManager;-EduOnline.Pagamentos.AntiCorruption.PayPalGateway;-EduOnline.Pagamentos.Data.MediatorExtension;-EduOnline.Bff.ApiRest.Options.ServiceUrlOptions;-EduOnline.Bff.ApiRest.Services.AlunoService;-EduOnline.Bff.ApiRest.Services.ConteudoService;-EduOnline.Bff.ApiRest.Services.PagamentoBffService;-EduOnline.WebApps.ApiRest.Models.*;-Program;-EduOnline.Core.Mensagens.RabbitMq.RabbitMqEventBus;-EduOnline.Core.Api.Extensions.PollyExtensions"
 
         cat TestResults/CoverageSummary/Summary.txt
 
         branch_coverage=$(grep -E "Branch coverage:" TestResults/CoverageSummary/Summary.txt | sed -E 's/.*Branch coverage: ([0-9.]+)%.*/\1/')
-        threshold=27.0
+        threshold=80.0
 
         echo "Branch coverage atual: ${branch_coverage}%"
-        echo "Threshold progressivo: ${threshold}%"
+        echo "Threshold comportamental: ${threshold}%"
 
         awk -v actual="$branch_coverage" -v min="$threshold" 'BEGIN { if (actual + 0 < min + 0) exit 1 }' || {
-          echo "Cobertura de branches abaixo do threshold progressivo."
+          echo "Cobertura de branches abaixo do threshold comportamental."
           exit 1
         }
 

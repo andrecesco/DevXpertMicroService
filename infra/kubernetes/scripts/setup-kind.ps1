@@ -1,5 +1,6 @@
 param(
-	[string]$ClusterName = 'eduonline'
+	[string]$ClusterName = 'eduonline',
+	[string]$ImageTag = 'latest'
 )
 
 Set-StrictMode -Version Latest
@@ -8,12 +9,12 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..'))
 $composeServices = @('auth-api', 'conteudos-api', 'alunos-api', 'pagamentos-api', 'bff-api', 'status-api')
 $images = @(
-	'andrecesco/eduonline-auth-api:latest',
-	'andrecesco/eduonline-conteudos-api:latest',
-	'andrecesco/eduonline-alunos-api:latest',
-	'andrecesco/eduonline-pagamentos-api:latest',
-	'andrecesco/eduonline-bff:latest',
-	'andrecesco/eduonline-status:latest'
+	"andrecesco/eduonline-auth-api:$ImageTag",
+	"andrecesco/eduonline-conteudos-api:$ImageTag",
+	"andrecesco/eduonline-alunos-api:$ImageTag",
+	"andrecesco/eduonline-pagamentos-api:$ImageTag",
+	"andrecesco/eduonline-bff:$ImageTag",
+	"andrecesco/eduonline-status:$ImageTag"
 )
 
 # ---------------------------------------------------------------------------
@@ -30,7 +31,8 @@ kubectl config use-context "kind-$ClusterName" | Out-Null
 # ---------------------------------------------------------------------------
 # 2. Build das imagens dos microsserviços via docker compose
 # ---------------------------------------------------------------------------
-Write-Host "Executando 'docker compose build' para os microsserviços em '$repoRoot'..." -ForegroundColor Cyan
+$env:IMAGE_TAG = $ImageTag
+Write-Host "Executando 'docker compose build' para os microsserviços em '$repoRoot' com tag '$ImageTag'..." -ForegroundColor Cyan
 docker compose --project-directory $repoRoot build @composeServices
 
 # ---------------------------------------------------------------------------
@@ -53,9 +55,7 @@ kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-sec
 # ---------------------------------------------------------------------------
 # 5. Aplicar os manifestos Kubernetes
 # ---------------------------------------------------------------------------
-Write-Host "Aplicando manifestos Kubernetes..." -ForegroundColor Cyan
-kubectl apply -k (Join-Path $PSScriptRoot '..')
-
-Write-Host "Setup concluído." -ForegroundColor Green
+Write-Host "Aplicando manifestos Kubernetes com tag '$ImageTag'..." -ForegroundColor Cyan
+& (Join-Path $PSScriptRoot 'apply.ps1') -Namespace 'eduonline' -ImageTag $ImageTag -SkipWait
 
 Write-Host "Setup concluído." -ForegroundColor Green

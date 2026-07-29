@@ -11,7 +11,7 @@ services:
     ports:
       - "1433:1433"
     environment:
-      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-P@ssw0rd2024!}"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD}"
       MSSQL_PID: Developer
       ACCEPT_EULA: "Y"
       MSSQL_COLLATION: "Latin1_General_CI_AS"
@@ -20,11 +20,11 @@ services:
       - sqlserver_log:/var/opt/mssql/log
       - sqlserver_backup:/var/opt/mssql/backup
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD:-P@ssw0rd2024!}", "-Q", "SELECT 1"]
-      interval: 15s
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
+      interval: 20s
       timeout: 10s
-      retries: 10
-      start_period: 90s
+      retries: 15
+      start_period: 120s
     networks:
       - eduonline-network
     restart: on-failure
@@ -56,7 +56,7 @@ services:
       - -U
       - sa
       - -P
-      - "${SA_PASSWORD:-P@ssw0rd2024!}"
+      - "${SA_PASSWORD}"
       - -i
       - /InitDB.sql
     networks:
@@ -140,7 +140,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -183,7 +183,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -228,7 +228,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -275,7 +275,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -322,7 +322,7 @@ services:
       ASPNETCORE_URLS: "http://+:5004"
       ASPNETCORE_HTTP_PORTS: "5004"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineBffDb;User Id=sa;Password=${SA_PASSWORD:-P@ssw0rd2024!};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineBffDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       AuthUrl: "http://auth-api:5000"
       ConteudoUrl: "http://conteudos-api:5001"

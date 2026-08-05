@@ -11,12 +11,12 @@ services:
     ports:
       - "1433:1433"
     environment:
-      MSSQL_SA_PASSWORD: "${SA_PASSWORD}"
+      MSSQL_SA_PASSWORD: "eduonline@2026"
       MSSQL_PID: Developer
       ACCEPT_EULA: "Y"
       MSSQL_COLLATION: "Latin1_General_CI_AS"
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "eduonline@2026", "-Q", "SELECT 1"]
       interval: 20s
       timeout: 10s
       retries: 15
@@ -52,7 +52,7 @@ services:
       - -U
       - sa
       - -P
-      - "${SA_PASSWORD}"
+      - "eduonline@2026"
       - -i
       - /InitDB.sql
     networks:
@@ -136,7 +136,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAuthDb;User Id=sa;Password=eduonline@2026;TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -179,7 +179,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineConteudosDb;User Id=sa;Password=eduonline@2026;TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -224,7 +224,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineAlunosDb;User Id=sa;Password=eduonline@2026;TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -271,7 +271,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       SeedSettings__EnableMigrations: "false"
       SeedSettings__EnableSeedData: "false"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlinePagamentosDb;User Id=sa;Password=eduonline@2026;TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       ASPNETCORE_AllowedHosts: "*"
     depends_on:
@@ -318,7 +318,7 @@ services:
       ASPNETCORE_URLS: "http://+:5004"
       ASPNETCORE_HTTP_PORTS: "5004"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineBffDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EduOnlineBffDb;User Id=sa;Password=eduonline@2026;TrustServerCertificate=true;Encrypt=false;"
       ConnectionStrings__EventStoreConnection: "esdb://eventstore:2113?tls=false"
       AuthUrl: "http://auth-api:5000"
       ConteudoUrl: "http://conteudos-api:5001"

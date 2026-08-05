@@ -4,11 +4,14 @@
 -- Cada API possui seu próprio banco de dados (Database per Service), refletindo
 -- o isolamento real usado pelas connection strings do docker-compose.yml.
 -- Não são usados schemas para "separar" domínios dentro de um único banco.
+-- Tabelas e colunas seguem exatamente o modelo gerado pelas migrations do EF Core
+-- de cada serviço (ver src/*/Migrations/*_Initial.cs), para evitar divergência
+-- entre o schema aplicado manualmente e o schema esperado pela aplicação.
 -- Execução: Docker entrypoint para SQL Server
 -- ============================================================================
 
 -- ============================================================================
--- BANCO: EduOnlineAuthDb - Autenticação e Usuários
+-- BANCO: EduOnlineAuthDb - Autenticação e Usuários (ASP.NET Core Identity)
 -- ============================================================================
 USE [master];
 GO
@@ -23,89 +26,156 @@ GO
 USE [EduOnlineAuthDb];
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetRoles]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [dbo].[Users] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
-		[Email] [nvarchar](256) NOT NULL UNIQUE,
-		[NormalizedEmail] [nvarchar](256) NOT NULL UNIQUE,
-		[UserName] [nvarchar](256) NOT NULL UNIQUE,
-		[NormalizedUserName] [nvarchar](256) NOT NULL UNIQUE,
-		[FullName] [nvarchar](256) NOT NULL,
+	CREATE TABLE [dbo].[AspNetRoles] (
+		[Id] [nvarchar](450) NOT NULL PRIMARY KEY,
+		[Name] [nvarchar](256) NULL,
+		[NormalizedName] [nvarchar](256) NULL,
+		[ConcurrencyStamp] [nvarchar](max) NULL
+	);
+	CREATE UNIQUE INDEX [RoleNameIndex] ON [dbo].[AspNetRoles]([NormalizedName]) WHERE [NormalizedName] IS NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUsers]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[AspNetUsers] (
+		[Id] [nvarchar](450) NOT NULL PRIMARY KEY,
+		[StatusId] [int] NOT NULL,
+		[StatusNome] [nvarchar](max) NOT NULL,
+		[UserName] [nvarchar](256) NULL,
+		[NormalizedUserName] [nvarchar](256) NULL,
+		[Email] [nvarchar](256) NULL,
+		[NormalizedEmail] [nvarchar](256) NULL,
+		[EmailConfirmed] [bit] NOT NULL,
 		[PasswordHash] [nvarchar](max) NULL,
 		[SecurityStamp] [nvarchar](max) NULL,
 		[ConcurrencyStamp] [nvarchar](max) NULL,
-		[PhoneNumber] [nvarchar](20) NULL,
-		[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
-		[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
-		[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
-		[LockoutEnabled] [bit] NOT NULL DEFAULT 1,
+		[PhoneNumber] [nvarchar](max) NULL,
+		[PhoneNumberConfirmed] [bit] NOT NULL,
+		[TwoFactorEnabled] [bit] NOT NULL,
 		[LockoutEnd] [datetimeoffset] NULL,
-		[AccessFailedCount] [int] NOT NULL DEFAULT 0,
-		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[IsActive] [bit] NOT NULL DEFAULT 1
+		[LockoutEnabled] [bit] NOT NULL,
+		[AccessFailedCount] [int] NOT NULL
 	);
-	CREATE NONCLUSTERED INDEX [IX_Users_Email] ON [dbo].[Users]([Email]);
-	CREATE NONCLUSTERED INDEX [IX_Users_NormalizedUserName] ON [dbo].[Users]([NormalizedUserName]);
+	CREATE UNIQUE INDEX [UserNameIndex] ON [dbo].[AspNetUsers]([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL;
+	CREATE INDEX [EmailIndex] ON [dbo].[AspNetUsers]([NormalizedEmail]);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Roles]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[RefreshTokens]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [dbo].[Roles] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
-		[Name] [nvarchar](256) NOT NULL UNIQUE,
-		[NormalizedName] [nvarchar](256) NOT NULL UNIQUE,
-		[ConcurrencyStamp] [nvarchar](max) NULL,
-		[Description] [nvarchar](500) NULL,
-		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
+	CREATE TABLE [dbo].[RefreshTokens] (
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+		[Username] [nvarchar](max) NOT NULL,
+		[Token] [uniqueidentifier] NOT NULL,
+		[ExpirationDate] [datetime2] NOT NULL
 	);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetRoleClaims]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [dbo].[UserRoles] (
-		[UserId] [uniqueidentifier] NOT NULL,
-		[RoleId] [uniqueidentifier] NOT NULL,
+	CREATE TABLE [dbo].[AspNetRoleClaims] (
+		[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+		[RoleId] [nvarchar](450) NOT NULL,
+		[ClaimType] [nvarchar](max) NULL,
+		[ClaimValue] [nvarchar](max) NULL,
+		FOREIGN KEY ([RoleId]) REFERENCES [dbo].[AspNetRoles]([Id]) ON DELETE CASCADE
+	);
+	CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [dbo].[AspNetRoleClaims]([RoleId]);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserClaims]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[AspNetUserClaims] (
+		[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+		[UserId] [nvarchar](450) NOT NULL,
+		[ClaimType] [nvarchar](max) NULL,
+		[ClaimValue] [nvarchar](max) NULL,
+		FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers]([Id]) ON DELETE CASCADE
+	);
+	CREATE INDEX [IX_AspNetUserClaims_UserId] ON [dbo].[AspNetUserClaims]([UserId]);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserLogins]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[AspNetUserLogins] (
+		[LoginProvider] [nvarchar](128) NOT NULL,
+		[ProviderKey] [nvarchar](128) NOT NULL,
+		[ProviderDisplayName] [nvarchar](max) NULL,
+		[UserId] [nvarchar](450) NOT NULL,
+		PRIMARY KEY ([LoginProvider], [ProviderKey]),
+		FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers]([Id]) ON DELETE CASCADE
+	);
+	CREATE INDEX [IX_AspNetUserLogins_UserId] ON [dbo].[AspNetUserLogins]([UserId]);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserRoles]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[AspNetUserRoles] (
+		[UserId] [nvarchar](450) NOT NULL,
+		[RoleId] [nvarchar](450) NOT NULL,
 		PRIMARY KEY ([UserId], [RoleId]),
-		FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([Id]) ON DELETE CASCADE,
-		FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE CASCADE
+		FOREIGN KEY ([RoleId]) REFERENCES [dbo].[AspNetRoles]([Id]) ON DELETE CASCADE,
+		FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers]([Id]) ON DELETE CASCADE
+	);
+	CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [dbo].[AspNetUserRoles]([RoleId]);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserTokens]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[AspNetUserTokens] (
+		[UserId] [nvarchar](450) NOT NULL,
+		[LoginProvider] [nvarchar](128) NOT NULL,
+		[Name] [nvarchar](128) NOT NULL,
+		[Value] [nvarchar](max) NULL,
+		PRIMARY KEY ([UserId], [LoginProvider], [Name]),
+		FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers]([Id]) ON DELETE CASCADE
 	);
 END;
 GO
 
-IF NOT EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE [Name] = 'Administrador')
+IF NOT EXISTS (SELECT 1 FROM [dbo].[AspNetRoles] WHERE [NormalizedName] = 'ADMINISTRADOR')
 BEGIN
-	INSERT INTO [dbo].[Roles] ([Id], [Name], [NormalizedName], [Description]) VALUES (NEWID(), 'Administrador', 'ADMINISTRADOR', 'Administrador do sistema');
-	INSERT INTO [dbo].[Roles] ([Id], [Name], [NormalizedName], [Description]) VALUES (NEWID(), 'Aluno', 'ALUNO', 'Estudante da plataforma');
+	INSERT INTO [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (NEWID(), 'Administrador', 'ADMINISTRADOR', NEWID());
+	INSERT INTO [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (NEWID(), 'Aluno', 'ALUNO', NEWID());
 END;
 GO
 
-IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [Email] = 'admin@eduonline.com')
+-- Observação: os Ids abaixo são fixos (em vez de NEWID()) para poderem ser reutilizados
+-- como chave do aluno/admin nos demais bancos (EduOnlineAlunosDb) sem depender de SELECT
+-- entre bancos no momento da criação. O PasswordHash foi gerado offline com
+-- Microsoft.AspNetCore.Identity.PasswordHasher<T> (PBKDF2-HMACSHA256), senha "Teste@123",
+-- exatamente o mesmo algoritmo usado em runtime pelo UserManager<T>.
+IF NOT EXISTS (SELECT 1 FROM [dbo].[AspNetUsers] WHERE [Id] = '3AFD838B-B52B-42F0-90FA-BD94E7EDD19C')
 BEGIN
-	DECLARE @AdminId UNIQUEIDENTIFIER = NEWID();
-	DECLARE @AdminRoleId UNIQUEIDENTIFIER;
+	DECLARE @AdminId NVARCHAR(450) = '3AFD838B-B52B-42F0-90FA-BD94E7EDD19C';
+	DECLARE @AdminPasswordHash NVARCHAR(MAX) = 'AQAAAAIAAYagAAAAEMKNdS+y3bH6sMmwfRDWIY1lnRF9U0Js0mc3AJ9k+rPURoiVTc/BpoqrUV5+oNuWww==';
 
-	INSERT INTO [dbo].[Users] ([Id], [Email], [NormalizedEmail], [UserName], [NormalizedUserName], [FullName])
-	VALUES (@AdminId, 'admin@eduonline.com', 'ADMIN@EDUONLINE.COM', 'admin', 'ADMIN', 'Administrador do Sistema');
+	INSERT INTO [dbo].[AspNetUsers] ([Id], [StatusId], [StatusNome], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnabled], [AccessFailedCount])
+	VALUES (@AdminId, 2, 'Cadastrado', 'admin@eduonline.com', 'ADMIN@EDUONLINE.COM', 'admin@eduonline.com', 'ADMIN@EDUONLINE.COM', 1, @AdminPasswordHash, CONVERT(NVARCHAR(36), NEWID()), CONVERT(NVARCHAR(36), NEWID()), 0, 0, 1, 0);
 
-	SELECT @AdminRoleId = [Id] FROM [dbo].[Roles] WHERE [Name] = 'Administrador';
-	INSERT INTO [dbo].[UserRoles] ([UserId], [RoleId]) VALUES (@AdminId, @AdminRoleId);
+	INSERT INTO [dbo].[AspNetUserRoles] ([UserId], [RoleId])
+	SELECT @AdminId, [Id] FROM [dbo].[AspNetRoles] WHERE [NormalizedName] = 'ADMINISTRADOR';
 END;
 GO
 
-IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [Email] = 'aluno@eduonline.com')
+IF NOT EXISTS (SELECT 1 FROM [dbo].[AspNetUsers] WHERE [Id] = 'D9475E09-793F-4BD8-8F63-93E5038C0D16')
 BEGIN
-	DECLARE @AlunoUserId UNIQUEIDENTIFIER = NEWID();
-	DECLARE @AlunoRoleId UNIQUEIDENTIFIER;
+	DECLARE @AlunoId NVARCHAR(450) = 'D9475E09-793F-4BD8-8F63-93E5038C0D16';
+	DECLARE @AlunoPasswordHash NVARCHAR(MAX) = 'AQAAAAIAAYagAAAAEIfqlKvZovd0L4bUAtA5BANJZjwmHirB4IQDz6HfGkyp59e62FVPb8t/ML6UxQBhjA==';
 
-	INSERT INTO [dbo].[Users] ([Id], [Email], [NormalizedEmail], [UserName], [NormalizedUserName], [FullName])
-	VALUES (@AlunoUserId, 'aluno@eduonline.com', 'ALUNO@EDUONLINE.COM', 'aluno', 'ALUNO', 'João da Silva');
+	INSERT INTO [dbo].[AspNetUsers] ([Id], [StatusId], [StatusNome], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnabled], [AccessFailedCount])
+	VALUES (@AlunoId, 2, 'Cadastrado', 'aluno@eduonline.com', 'ALUNO@EDUONLINE.COM', 'aluno@eduonline.com', 'ALUNO@EDUONLINE.COM', 1, @AlunoPasswordHash, CONVERT(NVARCHAR(36), NEWID()), CONVERT(NVARCHAR(36), NEWID()), 0, 0, 1, 0);
 
-	SELECT @AlunoRoleId = [Id] FROM [dbo].[Roles] WHERE [Name] = 'Aluno';
-	INSERT INTO [dbo].[UserRoles] ([UserId], [RoleId]) VALUES (@AlunoUserId, @AlunoRoleId);
+	INSERT INTO [dbo].[AspNetUserRoles] ([UserId], [RoleId])
+	SELECT @AlunoId, [Id] FROM [dbo].[AspNetRoles] WHERE [NormalizedName] = 'ALUNO';
 END;
 GO
 
@@ -128,55 +198,50 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Cursos]') AND type in (N'U'))
 BEGIN
 	CREATE TABLE [dbo].[Cursos] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
-		[Nome] [nvarchar](256) NOT NULL,
-		[Descricao] [nvarchar](max) NOT NULL,
-		[Instrutor] [nvarchar](256) NOT NULL,
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+		[Nome] [varchar](100) NOT NULL,
+		[Autor] [varchar](100) NOT NULL,
+		[Validade] [date] NOT NULL,
+		[Ativo] [bit] NOT NULL,
+		[Valor] [decimal](18, 2) NOT NULL,
+		[Tema] [varchar](2048) NOT NULL,
+		[NivelId] [int] NOT NULL,
 		[CargaHoraria] [int] NOT NULL,
-		[Preco] [decimal](10, 2) NOT NULL,
-		[Ativo] [bit] NOT NULL DEFAULT 1,
-		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
+		[DataCriacao] [datetime2] NOT NULL
 	);
-	CREATE NONCLUSTERED INDEX [IX_Cursos_Nome] ON [dbo].[Cursos]([Nome]);
-	CREATE NONCLUSTERED INDEX [IX_Cursos_Ativo] ON [dbo].[Cursos]([Ativo]);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Aulas]') AND type in (N'U'))
 BEGIN
 	CREATE TABLE [dbo].[Aulas] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 		[CursoId] [uniqueidentifier] NOT NULL,
-		[Titulo] [nvarchar](256) NOT NULL,
-		[Descricao] [nvarchar](max) NOT NULL,
-		[UrlVideo] [nvarchar](max) NULL,
-		[Ordem] [int] NOT NULL,
-		[DuracaoMinutos] [int] NOT NULL,
-		[Ativo] [bit] NOT NULL DEFAULT 1,
-		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
+		[Titulo] [varchar](100) NOT NULL,
+		[Descricao] [varchar](100) NULL,
+		[LinkMaterial] [varchar](2048) NOT NULL,
+		[DuracaoEmMinutos] [int] NOT NULL,
+		[DataCriacao] [datetime2] NOT NULL,
 		FOREIGN KEY ([CursoId]) REFERENCES [dbo].[Cursos]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_Aulas_CursoId] ON [dbo].[Aulas]([CursoId]);
-	CREATE NONCLUSTERED INDEX [IX_Aulas_Ordem] ON [dbo].[Aulas]([CursoId], [Ordem]);
+	CREATE INDEX [IX_Aulas_CursoId] ON [dbo].[Aulas]([CursoId]);
 END;
 GO
 
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Cursos])
 BEGIN
-	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'Introdução a C#', 'Aprenda os fundamentos da linguagem C# e programação orientada a objetos', 'Prof. João Silva', 40, 149.99);
-	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'ASP.NET Core Avançado', 'Desenvolvimento de aplicações web profissionais com ASP.NET Core', 'Prof. Maria Santos', 60, 199.99);
-	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Descricao], [Instrutor], [CargaHoraria], [Preco]) VALUES (NEWID(), 'Banco de Dados SQL', 'Modelagem e manipulação de dados com SQL Server', 'Prof. Carlos Oliveira', 50, 179.99);
+	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Autor], [Validade], [Ativo], [Valor], [Tema], [NivelId], [CargaHoraria], [DataCriacao]) VALUES (NEWID(), 'Introdução a C#', 'Prof. João Silva', '2030-12-31', 1, 149.99, 'Programação', 1, 40, GETUTCDATE());
+	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Autor], [Validade], [Ativo], [Valor], [Tema], [NivelId], [CargaHoraria], [DataCriacao]) VALUES (NEWID(), 'ASP.NET Core Avançado', 'Prof. Maria Santos', '2030-12-31', 1, 199.99, 'Programação', 3, 60, GETUTCDATE());
+	INSERT INTO [dbo].[Cursos] ([Id], [Nome], [Autor], [Validade], [Ativo], [Valor], [Tema], [NivelId], [CargaHoraria], [DataCriacao]) VALUES (NEWID(), 'Banco de Dados SQL', 'Prof. Carlos Oliveira', '2030-12-31', 1, 179.99, 'Banco de Dados', 2, 50, GETUTCDATE());
 END;
 GO
 
 -- ============================================================================
 -- BANCO: EduOnlineAlunosDb - Alunos e Matrículas
 -- ============================================================================
--- Observação: [UserId] e [CursoId] referenciam registros em EduOnlineAuthDb e
--- EduOnlineConteudosDb, respectivamente. Como bancos separados não suportam
--- FOREIGN KEY entre si, a integridade referencial passa a ser responsabilidade
+-- Observação: [Id] em Alunos referencia o Id do usuário em EduOnlineAuthDb, e
+-- [CursoId] em Matriculas referencia EduOnlineConteudosDb. Como bancos separados
+-- não suportam FOREIGN KEY entre si, a integridade referencial é responsabilidade
 -- da aplicação (nada diferente do que já acontece entre microsserviços).
 USE [master];
 GO
@@ -191,95 +256,69 @@ GO
 USE [EduOnlineAlunosDb];
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AlunosPerfil]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Alunos]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [dbo].[AlunosPerfil] (
+	CREATE TABLE [dbo].[Alunos] (
 		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
-		[UserId] [uniqueidentifier] NOT NULL UNIQUE,
-		[Matricula] [nvarchar](50) NOT NULL UNIQUE,
+		[Nome] [varchar](100) NOT NULL,
+		[Email] [varchar](100) NOT NULL,
 		[DataNascimento] [date] NULL,
-		[Cpf] [nvarchar](14) NULL UNIQUE,
-		[Telefone] [nvarchar](20) NULL,
-		[Endereco] [nvarchar](500) NULL,
-		[Cidade] [nvarchar](100) NULL,
-		[Estado] [nvarchar](2) NULL,
-		[Cep] [nvarchar](10) NULL,
-		[CreatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
+		[Ativo] [bit] NOT NULL,
+		[DataCriacao] [datetime2] NOT NULL
 	);
-	CREATE NONCLUSTERED INDEX [IX_AlunosPerfil_UserId] ON [dbo].[AlunosPerfil]([UserId]);
-	CREATE NONCLUSTERED INDEX [IX_AlunosPerfil_Matricula] ON [dbo].[AlunosPerfil]([Matricula]);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Matriculas]') AND type in (N'U'))
 BEGIN
 	CREATE TABLE [dbo].[Matriculas] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 		[AlunoId] [uniqueidentifier] NOT NULL,
 		[CursoId] [uniqueidentifier] NOT NULL,
-		[DataMatricula] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[DataConclusao] [datetime2] NULL,
-		[Status] [nvarchar](50) NOT NULL DEFAULT 'Ativa',
-		[ProgressoPercentual] [decimal](5, 2) NOT NULL DEFAULT 0,
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([AlunoId]) REFERENCES [dbo].[AlunosPerfil]([Id]) ON DELETE CASCADE
+		[CursoNome] [varchar](100) NOT NULL,
+		[Validade] [date] NOT NULL,
+		[StatusId] [int] NOT NULL,
+		[PagamentoStatusId] [int] NOT NULL,
+		[TotalAulas] [int] NULL,
+		[AulasConcluidas] [nvarchar](max) NULL,
+		[Ativo] [bit] NOT NULL,
+		[DataCriacao] [datetime2] NOT NULL,
+		FOREIGN KEY ([AlunoId]) REFERENCES [dbo].[Alunos]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_Matriculas_AlunoId] ON [dbo].[Matriculas]([AlunoId]);
-	CREATE NONCLUSTERED INDEX [IX_Matriculas_CursoId] ON [dbo].[Matriculas]([CursoId]);
-	CREATE NONCLUSTERED INDEX [IX_Matriculas_Status] ON [dbo].[Matriculas]([Status]);
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ProgressoAulas]') AND type in (N'U'))
-BEGIN
-	CREATE TABLE [dbo].[ProgressoAulas] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
-		[MatriculaId] [uniqueidentifier] NOT NULL,
-		[AulaId] [uniqueidentifier] NOT NULL,
-		[DataConclusao] [datetime2] NULL,
-		[TempoAssistidoSegundos] [int] NOT NULL DEFAULT 0,
-		[Concluida] [bit] NOT NULL DEFAULT 0,
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		FOREIGN KEY ([MatriculaId]) REFERENCES [dbo].[Matriculas]([Id]) ON DELETE CASCADE
-	);
-	CREATE NONCLUSTERED INDEX [IX_ProgressoAulas_MatriculaId] ON [dbo].[ProgressoAulas]([MatriculaId]);
+	CREATE INDEX [IX_Matriculas_AlunoId] ON [dbo].[Matriculas]([AlunoId]);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Certificados]') AND type in (N'U'))
 BEGIN
 	CREATE TABLE [dbo].[Certificados] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
-		[MatriculaId] [uniqueidentifier] NOT NULL UNIQUE,
-		[NumeroCertificado] [nvarchar](100) NOT NULL UNIQUE,
-		[DataEmissao] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[DataValidade] [datetime2] NULL,
-		[Ativo] [bit] NOT NULL DEFAULT 1,
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+		[MatriculaId] [uniqueidentifier] NOT NULL,
+		[Link] [varchar](100) NOT NULL,
+		[DataCriacao] [datetime2] NOT NULL,
 		FOREIGN KEY ([MatriculaId]) REFERENCES [dbo].[Matriculas]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_Certificados_MatriculaId] ON [dbo].[Certificados]([MatriculaId]);
+	CREATE UNIQUE INDEX [IX_Certificados_MatriculaId] ON [dbo].[Certificados]([MatriculaId]);
 END;
 GO
 
--- Seed: perfil e matrícula do aluno de teste, lendo Id's de EduOnlineAuthDb e EduOnlineConteudosDb
--- (consulta entre bancos no mesmo servidor via nome de três partes, sem FK entre eles)
-IF NOT EXISTS (SELECT 1 FROM [dbo].[AlunosPerfil] WHERE [Matricula] = 'ALUNO001')
+-- Seed: perfil e matrícula do aluno de teste (mesmo Id usado em AspNetUsers, em
+-- EduOnlineAuthDb, para o usuário aluno@eduonline.com).
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Alunos] WHERE [Id] = 'D9475E09-793F-4BD8-8F63-93E5038C0D16')
 BEGIN
-	DECLARE @AlunoUserId UNIQUEIDENTIFIER;
-	DECLARE @AlunoPerfilId UNIQUEIDENTIFIER = NEWID();
-	DECLARE @CursoId UNIQUEIDENTIFIER;
+	DECLARE @AlunoId UNIQUEIDENTIFIER = 'D9475E09-793F-4BD8-8F63-93E5038C0D16';
+	DECLARE @MatriculaCursoId UNIQUEIDENTIFIER;
+	DECLARE @MatriculaCursoNome VARCHAR(100);
 
-	SELECT @AlunoUserId = [Id] FROM [EduOnlineAuthDb].[dbo].[Users] WHERE [Email] = 'aluno@eduonline.com';
-	SELECT TOP 1 @CursoId = [Id] FROM [EduOnlineConteudosDb].[dbo].[Cursos];
+	INSERT INTO [dbo].[Alunos] ([Id], [Nome], [Email], [DataNascimento], [Ativo], [DataCriacao])
+	VALUES (@AlunoId, 'João da Silva', 'aluno@eduonline.com', '2000-05-15', 1, GETUTCDATE());
 
-	IF @AlunoUserId IS NOT NULL AND @CursoId IS NOT NULL
+	SELECT TOP 1 @MatriculaCursoId = [Id], @MatriculaCursoNome = [Nome] FROM [EduOnlineConteudosDb].[dbo].[Cursos];
+
+	IF @MatriculaCursoId IS NOT NULL
 	BEGIN
-		INSERT INTO [dbo].[AlunosPerfil] ([Id], [UserId], [Matricula], [DataNascimento], [Cpf], [Telefone])
-		VALUES (@AlunoPerfilId, @AlunoUserId, 'ALUNO001', DATEFROMPARTS(2000, 5, 15), '123.456.789-00', '(11) 98765-4321');
-
-		INSERT INTO [dbo].[Matriculas] ([AlunoId], [CursoId], [Status])
-		VALUES (@AlunoPerfilId, @CursoId, 'Ativa');
+		INSERT INTO [dbo].[Matriculas] ([Id], [AlunoId], [CursoId], [CursoNome], [Validade], [StatusId], [PagamentoStatusId], [TotalAulas], [Ativo], [DataCriacao])
+		VALUES (NEWID(), @AlunoId, @MatriculaCursoId, @MatriculaCursoNome, '2030-12-31', 1, 2, NULL, 1, GETUTCDATE());
 	END;
 END;
 GO
@@ -287,8 +326,8 @@ GO
 -- ============================================================================
 -- BANCO: EduOnlinePagamentosDb - Transações e Histórico
 -- ============================================================================
--- Observação: [MatriculaId] e [AlunoId] referenciam EduOnlineAlunosDb; sem FK
--- entre bancos pelo mesmo motivo descrito acima.
+-- Observação: [AlunoId] e [CursoId] referenciam EduOnlineAlunosDb e
+-- EduOnlineConteudosDb; sem FK entre bancos pelo mesmo motivo descrito acima.
 USE [master];
 GO
 
@@ -305,36 +344,30 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Pagamentos]') AND type in (N'U'))
 BEGIN
 	CREATE TABLE [dbo].[Pagamentos] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
-		[MatriculaId] [uniqueidentifier] NOT NULL,
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 		[AlunoId] [uniqueidentifier] NOT NULL,
-		[Valor] [decimal](10, 2) NOT NULL,
-		[Status] [nvarchar](50) NOT NULL DEFAULT 'Pendente',
-		[MetodoPagamento] [nvarchar](50) NULL,
-		[ReferenciaPagador] [nvarchar](100) NULL,
-		[DataPagamento] [datetime2] NULL,
-		[DataVencimento] [datetime2] NOT NULL,
-		[DataCriacao] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
-		[UpdatedAt] [datetime2] NOT NULL DEFAULT GETUTCDATE()
+		[CursoId] [uniqueidentifier] NOT NULL,
+		[Total] [decimal](18, 2) NOT NULL,
+		[NomeCartao] [varchar](100) NOT NULL,
+		[NumeroCartao] [varchar](100) NOT NULL,
+		[ExpiracaoCartao] [varchar](100) NOT NULL,
+		[CvvCartao] [varchar](100) NOT NULL,
+		[DataCriacao] [datetime2] NOT NULL
 	);
-	CREATE NONCLUSTERED INDEX [IX_Pagamentos_AlunoId] ON [dbo].[Pagamentos]([AlunoId]);
-	CREATE NONCLUSTERED INDEX [IX_Pagamentos_Status] ON [dbo].[Pagamentos]([Status]);
-	CREATE NONCLUSTERED INDEX [IX_Pagamentos_DataVencimento] ON [dbo].[Pagamentos]([DataVencimento]);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[HistoricoTransacoes]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Transacoes]') AND type in (N'U'))
 BEGIN
-	CREATE TABLE [dbo].[HistoricoTransacoes] (
-		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY DEFAULT NEWID(),
+	CREATE TABLE [dbo].[Transacoes] (
+		[Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 		[PagamentoId] [uniqueidentifier] NOT NULL,
-		[StatusAnterior] [nvarchar](50) NOT NULL,
-		[StatusNovo] [nvarchar](50) NOT NULL,
-		[Descricao] [nvarchar](500) NULL,
-		[DataTransacao] [datetime2] NOT NULL DEFAULT GETUTCDATE(),
+		[Total] [decimal](18, 2) NOT NULL,
+		[StatusTransacaoId] [int] NULL,
+		[DataCriacao] [datetime2] NOT NULL,
 		FOREIGN KEY ([PagamentoId]) REFERENCES [dbo].[Pagamentos]([Id]) ON DELETE CASCADE
 	);
-	CREATE NONCLUSTERED INDEX [IX_HistoricoTransacoes_PagamentoId] ON [dbo].[HistoricoTransacoes]([PagamentoId]);
+	CREATE UNIQUE INDEX [IX_Transacoes_PagamentoId] ON [dbo].[Transacoes]([PagamentoId]);
 END;
 GO
 
